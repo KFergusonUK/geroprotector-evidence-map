@@ -1,0 +1,80 @@
+# Weekly refresh and change detection (SPEC §11). A diff, not a monitor:
+# refresh sources, snapshot derived-cell membership, compare with the previous run.
+# Opens an issue and commits a dated changelog ONLY when v_cell_transitions is
+# non-empty for this run; otherwise it leaves no trace beyond the saved state.
+#
+# State: the SQLite database (raw layer, fetch log, snapshot history, reviews) is
+# persisted as an asset on a release tagged `pipeline-state`, because it is too large
+# and too binary for git. Snapshots are append-only inside it.
+name: weekly-refresh
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"     # Mondays 06:17 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write            # commit changelog, upload state asset
+  issues: write              # open an issue on transitions
+
+concurrency:
+  group: weekly-refresh
+  cancel-in-progress: false  # never run two refreshes against the same state
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      GH_TOKEN: ${{ github.token }}
+      STATE_TAG: pipeline-state
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install "PyYAML==6.0.1"
+
+      - name: Restore state
+        run: |
+          mkdir -p data
+          if gh release download "$STATE_TAG" --pattern 'agesdk.sqlite.gz' --dir data; then
+            gunzip -f data/agesdk.sqlite.gz
+          else
+            echo "No saved state: this run is the baseline and will report no transitions."
+          fi
+
+      - name: Tests
+        run: python -m unittest discover -s tests -t .
+
+      - name: Refresh
+        id: refresh
+        run: |
+          python -m agesdk init-db
+          python -m agesdk refresh --changelog-dir changelog
+
+      # Publish before saving state: if saving fails, the next run repeats this
+      # changelog (a duplicate) rather than silently skipping it (a loss).
+      - name: Commit changelog and open issue
+        if: steps.refresh.outputs.transitions != '0'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add changelog/
+          git commit -m "Evidence map changelog: ${{ steps.refresh.outputs.transitions }} transition(s)"
+          git push
+          gh issue create \
+            --title "Evidence map: ${{ steps.refresh.outputs.transitions }} cell transition(s) — $(date -u +%F)" \
+            --body-file "${{ steps.refresh.outputs.changelog }}"
+
+      - name: Save state
+        if: always() && steps.refresh.outcome != 'skipped'
+        run: |
+          gzip -kf data/agesdk.sqlite
+          gh release view "$STATE_TAG" >/dev/null 2>&1 || \
+            gh release create "$STATE_TAG" --title "Pipeline state" --latest=false \
+              --notes "SQLite state for the weekly refresh. Overwritten each run; history lives inside it."
+          gh release upload "$STATE_TAG" data/agesdk.sqlite.gz --clobber

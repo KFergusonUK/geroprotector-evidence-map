@@ -14,7 +14,9 @@ import sqlite3
 import zipfile
 from datetime import datetime
 
-from agesdk.raw import HttpClient, HttpError, RawStore, StoredResponse, utc_now
+import json
+
+from agesdk.raw import HttpClient, HttpError, RawStore, StoredResponse, log_fetch, utc_now
 
 SOURCE = "drugage"
 URL = "https://genomics.senescence.info/drugs/dataset.zip"
@@ -144,3 +146,38 @@ def current_rows(conn: sqlite3.Connection) -> list[dict]:
     """Parsed rows of the current DrugAge CSV in the raw layer."""
     return current_raw(conn)[1]
 
+
+def stored_archive_sha(conn: sqlite3.Connection) -> str | None:
+    row = RawStore(conn).latest(SOURCE, f"{ARCHIVE}!{CSV_MEMBER}", {"url": URL})
+    if row is None or not row["response_meta"]:
+        return None
+    return json.loads(row["response_meta"]).get("archive_sha256")
+
+
+def refresh(conn: sqlite3.Connection, *, run_id: int | None = None,
+            client: HttpClient | None = None) -> dict:
+    """Download DrugAge and compare its archive hash with the stored one. Only a
+    changed archive is ingested; every check is appended to fetch_log either way."""
+    client = client or HttpClient(min_interval_s=1.0)
+    status, body, headers = client.get(URL)
+    if status != 200:
+        log_fetch(conn, source=SOURCE, endpoint=ARCHIVE, params={"url": URL}, outcome="error",
+                  run_id=run_id, note=f"HTTP {status}")
+        raise HttpError(f"DrugAge download: HTTP {status}")
+    zip_sha = hashlib.sha256(body).hexdigest()
+    previous = stored_archive_sha(conn)
+    if previous == zip_sha:
+        latest = RawStore(conn).latest(SOURCE, f"{ARCHIVE}!{CSV_MEMBER}", {"url": URL})
+        log_fetch(conn, source=SOURCE, endpoint=ARCHIVE, params={"url": URL}, outcome="unchanged",
+                  run_id=run_id, raw_response_id=latest["id"], content_sha256=zip_sha,
+                  api_version=latest["api_version"])
+        return {"changed": False, "archive_sha256": zip_sha, "api_version": latest["api_version"]}
+    lower = {k.lower(): v for k, v in headers.items()}
+    http_meta = {k: lower[k] for k in ("last-modified", "etag", "content-type") if k in lower}
+    out = ingest_archive(conn, body, http_meta=http_meta)
+    log_fetch(conn, source=SOURCE, endpoint=ARCHIVE, params={"url": URL}, outcome="changed",
+              run_id=run_id, raw_response_id=out[CSV_MEMBER].id, content_sha256=zip_sha,
+              api_version=out["_summary"]["api_version"],
+              note=f"previous archive {previous or 'none'}")
+    return {"changed": True, "archive_sha256": zip_sha, "previous_archive_sha256": previous,
+            "api_version": out["_summary"]["api_version"], "raw_response_id": out[CSV_MEMBER].id}

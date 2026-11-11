@@ -60,3 +60,22 @@ def load_drugage_evidence(conn: sqlite3.Connection, raw_response_id: int, rows: 
     conn.commit()
     return inserted
 
+
+def drugage_mapping(conn: sqlite3.Connection) -> dict[str, int]:
+    """DrugAge compound strings mapped to compounds (compound_synonym, source 'drugage')."""
+    return {r[0]: r[1] for r in conn.execute(
+        "SELECT synonym, compound_id FROM compound_synonym WHERE source = 'drugage'")}
+
+
+def reprocess_drugage(conn: sqlite3.Connection, raw_response_id: int, rows: list[dict]) -> dict:
+    """Rebuild DrugAge animal_evidence from the given (current) raw response.
+
+    The normalised layer is rebuildable: rows from superseded raw responses are
+    replaced. Reviews survive because they attach to evidence_key, not row ids; a
+    review whose evidence disappeared shows up in v_orphaned_reviews.
+    """
+    removed = conn.execute("DELETE FROM animal_evidence WHERE source = 'drugage' AND raw_response_id <> ?",
+                           (raw_response_id,)).rowcount
+    inserted = load_drugage_evidence(conn, raw_response_id, rows, drugage_mapping(conn))
+    conn.commit()
+    return {"removed": removed, "inserted": inserted}

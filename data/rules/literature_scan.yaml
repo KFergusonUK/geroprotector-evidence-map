@@ -1,0 +1,97 @@
+# Literature scan for pre-database lifespan signals (SPEC §11.4).
+#
+# A CURATION QUEUE ONLY. Nothing found here ever enters the map automatically, under
+# any circumstances: candidates land in literature_candidate as 'queued', and only a
+# named human can move them on. Curated compounds then enter through the normal
+# routes (DrugAge, or a reviewed manual record), never from this table.
+#
+# Expect high noise. Tune the query over time; bump `version` on every change so each
+# candidate records which query found it. First week tested (2026-11-04..11): 6 hits,
+# 1-2 plausibly relevant (obtusifolin in C. elegans). Stoplist widened after that test,
+# before first deployment.
+
+version: litscan-v1
+created: "2026-11-11"
+
+# Europe PMC search syntax. {from} and {to} are filled with the scan window (ISO dates).
+query: >-
+  (TITLE_ABS:"lifespan" OR TITLE_ABS:"life span" OR TITLE_ABS:"longevity")
+  AND (TITLE_ABS:"extends" OR TITLE_ABS:"extended" OR TITLE_ABS:"extension"
+       OR TITLE_ABS:"prolongs" OR TITLE_ABS:"prolonged" OR TITLE_ABS:"increases"
+       OR TITLE_ABS:"increased")
+  AND (TITLE_ABS:"mice" OR TITLE_ABS:"mouse" OR TITLE_ABS:"rats" OR TITLE_ABS:"elegans"
+       OR TITLE_ABS:"Drosophila" OR TITLE_ABS:"killifish")
+  AND SRC:MED
+  AND FIRST_PDATE:[{from} TO {to}]
+
+default_window_days: 7
+max_results: 500
+
+# Text-mined chemical mentions (Europe PMC annotations, type Chemicals) that are never
+# candidate interventions: reagents, solvents, generic classes, nutrients in chow.
+# Lower-case, exact match.
+stoplist:
+  - chemical
+  - chemicals
+  - compound
+  - compounds
+  - drug
+  - drugs
+  - water
+  - oxygen
+  - carbon dioxide
+  - lipid
+  - lipids
+  - protein
+  - proteins
+  - amino acid
+  - amino acids
+  - histone
+  - dna
+  - rna
+  - atp
+  - nad
+  - nad+
+  - glucose
+  - sucrose
+  - ethanol
+  - methanol
+  - dmso
+  - dimethyl sulfoxide
+  - paraformaldehyde
+  - formaldehyde
+  - triton
+  - triton x-100
+  - tween
+  - tween 20
+  - pbs
+  - penicillin
+  - streptomycin
+  - doxycycline
+  - tetracycline
+  - polybrene
+  - puromycin
+  - g418
+  - agar
+  - peptone
+  - sodium chloride
+  - nacl
+  - hydrogen peroxide
+  - fluorodeoxyuridine
+  - fudr
+  - 5-fluoro-2'-deoxyuridine
+  - paraquat
+  - reactive oxygen species
+  - ros
+  - peptide
+  - peptides
+  - neuropeptide
+  - nitrogen
+  - calcium
+  - carbon-dioxide
+  - mineral
+  - minerals
+  - metal
+  - metals
+  - sulfate
+  - platinum

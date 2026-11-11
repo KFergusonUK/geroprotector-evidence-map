@@ -45,6 +45,16 @@ Every compound carries an evidential grade, and every view shows it:
 `measured_lifespan` (DrugAge), `inherited_class` (ATC class-mate), `mechanistic_only`
 (reprogramming cocktail component).
 
+## Weekly refresh
+
+A GitHub Action runs every Monday: it refreshes DrugAge (only if the archive changed),
+ClinicalTrials.gov (only records updated since the last run) and a literature scan,
+snapshots which compounds sit in which output cell, and compares with last week. If a
+compound crossed into a cell (entered the gold cell, became a harm candidate, an ITP tier
+changed, trial results became overdue...), it commits a dated file under `changelog/` and
+opens an issue. Otherwise it does nothing. Refreshes never change a reviewed decision;
+they flag it for a human. See SPEC §11.
+
 ## Quick start
 
 Python ≥ 3.10, one dependency (PyYAML). Standard library otherwise.
@@ -55,6 +65,7 @@ python -m agesdk fetch-drugage        # DrugAge → raw layer (no-op if already 
 python -m agesdk fixture-check --pubchem   # validate the seed fixture
 python -m agesdk fixture-chembl       # ChEMBL IDs + ATC codes for the fixture, for hand entry
 python -m agesdk reprogramming-check  # validate reprogramming evidence, preview the dossier
+python -m agesdk refresh              # refresh, snapshot, changelog on transitions (SPEC §11)
 python -m unittest discover -s tests -t .
 ```
 
@@ -74,6 +85,10 @@ committed; everything in it is rebuilt from the sources and the reviewed data in
 | `data/reference/species_taxon.csv` | Species → tier (mammal / invertebrate / …) |
 | `data/reference/reprogramming_evidence.yaml` | Curated chemical reprogramming cocktails, cited |
 | `agesdk/normalise.py` | Raw → normalised loaders (DrugAge evidence) |
+| `agesdk/refresh.py` | Refresh runs, snapshots, transitions, changelog |
+| `agesdk/litscan.py` | Literature scan → curation queue (never an entry route) |
+| `data/rules/literature_scan.yaml` | Versioned literature query and stoplist |
+| `.github/workflows/weekly-refresh.yml` | Weekly scheduled refresh |
 
 ## Data sources and attribution
 

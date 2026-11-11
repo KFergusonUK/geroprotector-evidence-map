@@ -595,6 +595,7 @@ WITH ext AS (
          sum(v.tier = 'mammal')                              AS n_extension_rows_mammal,
          count(DISTINCT v.pmid)                              AS n_extension_pmids,
          count(DISTINCT p.lab_group)                         AS n_extension_lab_groups,
+         count(DISTINCT CASE WHEN v.tier = 'mammal' THEN p.lab_group END) AS n_mammal_extension_lab_groups,
          sum(p.lab_group IS NULL)                            AS n_extension_rows_lab_unknown
   FROM v_evidence_counted v
   LEFT JOIN publication p ON p.pmid = v.pmid
@@ -603,7 +604,7 @@ WITH ext AS (
 t AS (SELECT value AS min_groups FROM analysis_threshold WHERE name = 'replication_min_lab_groups')
 SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
        ext.n_extension_rows, ext.n_extension_rows_mammal, ext.n_extension_pmids,
-       ext.n_extension_lab_groups, ext.n_extension_rows_lab_unknown,
+       ext.n_extension_lab_groups, ext.n_mammal_extension_lab_groups, ext.n_extension_rows_lab_unknown,
        i.itp_experiments,
        coalesce(i.itp_cohorts_positive, 0) AS itp_cohorts_positive,
        coalesce(i.itp_cohorts_total, 0)    AS itp_cohorts_total,
@@ -614,6 +615,9 @@ SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
        (ext.n_extension_lab_groups >= t.min_groups)             AS replicated_by_lab_groups,
        (ext.n_extension_lab_groups >= t.min_groups
         OR coalesce(i.meets_itp_threshold, 0))                  AS replicated,
+       -- Headline replication (§1.1): mammal lab groups, or the ITP (mammal by design).
+       (ext.n_mammal_extension_lab_groups >= t.min_groups
+        OR coalesce(i.meets_itp_threshold, 0))                  AS replicated_mammal,
        (ext.n_extension_rows_mammal > 0)                        AS has_mammal_extension
 FROM ext
 JOIN compound c USING (compound_id)
@@ -748,4 +752,300 @@ JOIN rp USING (compound_id)
 LEFT JOIN tr USING (compound_id)
 WHERE c.evidence_tier = 'mechanistic_only';
 
-PRAGMA user_version = 4;
+-- ===========================================================================
+-- §11 REFRESH AND CHANGE DETECTION — a diff, not a monitor.
+-- ===========================================================================
+
+-- Raw layer: one row per fetch attempt, changed or not. Unchanged content is not
+-- re-stored in raw_response (identical bodies are deduplicated); this log is where
+-- every refresh's fetch metadata and high-water marks are appended. Append-only.
+CREATE TABLE IF NOT EXISTS fetch_log (
+  id              INTEGER PRIMARY KEY,
+  run_id          INTEGER,                -- snapshot_run, when part of a refresh
+  source          TEXT NOT NULL,
+  endpoint        TEXT NOT NULL,
+  request_params  TEXT NOT NULL,          -- canonical JSON
+  fetched_at      TEXT NOT NULL,
+  outcome         TEXT NOT NULL CHECK (outcome IN ('changed', 'unchanged', 'error')),
+  raw_response_id INTEGER REFERENCES raw_response (id),
+  content_sha256  TEXT,
+  watermark       TEXT,                   -- high-water mark this fetch establishes (e.g. ctgov date)
+  api_version     TEXT,
+  note            TEXT
+);
+CREATE INDEX IF NOT EXISTS ix_fetch_log_src ON fetch_log (source, endpoint, fetched_at);
+
+CREATE TRIGGER IF NOT EXISTS fetch_log_no_update BEFORE UPDATE ON fetch_log
+BEGIN SELECT RAISE(ABORT, 'fetch_log is append-only'); END;
+CREATE TRIGGER IF NOT EXISTS fetch_log_no_delete BEFORE DELETE ON fetch_log
+BEGIN SELECT RAISE(ABORT, 'fetch_log is append-only'); END;
+
+-- One row per refresh run, with the source versions it saw.
+CREATE TABLE IF NOT EXISTS snapshot_run (
+  run_id          INTEGER PRIMARY KEY,
+  started_at      TEXT NOT NULL,
+  finished_at     TEXT,
+  status          TEXT NOT NULL CHECK (status IN ('running', 'complete', 'failed')),
+  schema_version  INTEGER NOT NULL,
+  code_version    TEXT,                   -- git commit, when known
+  source_versions TEXT NOT NULL CHECK (json_valid(source_versions)),
+  note            TEXT
+);
+CREATE TRIGGER IF NOT EXISTS snapshot_run_no_delete BEFORE DELETE ON snapshot_run
+BEGIN SELECT RAISE(ABORT, 'snapshot history is append-only'); END;
+CREATE TRIGGER IF NOT EXISTS snapshot_run_close_once BEFORE UPDATE ON snapshot_run
+WHEN OLD.status <> 'running'
+BEGIN SELECT RAISE(ABORT, 'a finished snapshot run cannot be changed'); END;
+
+-- Derived-view membership per run. Transitions are computed from this stored
+-- state, so the map can show when a compound entered a cell and on what evidence.
+-- No foreign keys: history must outlive rebuilds of the normalised layer.
+CREATE TABLE IF NOT EXISTS snapshot_membership (
+  run_id          INTEGER NOT NULL REFERENCES snapshot_run (run_id),
+  cell            TEXT NOT NULL,
+  cell_class      TEXT NOT NULL CHECK (cell_class IN ('derived_cell', 'churn')),
+  subject         TEXT NOT NULL,          -- compound id, NCT id, 'compound:nct', or a source name
+  compound_id     INTEGER,
+  canonical_name  TEXT,
+  entry_route     TEXT,
+  evidence_tier   TEXT,
+  nct_id          TEXT,
+  state           TEXT,                   -- for state-valued cells (ITP tier, results_state)
+  evidence        TEXT CHECK (evidence IS NULL OR json_valid(evidence)),
+  PRIMARY KEY (run_id, cell, subject)
+);
+CREATE TRIGGER IF NOT EXISTS snapshot_membership_no_update BEFORE UPDATE ON snapshot_membership
+BEGIN SELECT RAISE(ABORT, 'snapshot history is append-only'); END;
+CREATE TRIGGER IF NOT EXISTS snapshot_membership_no_delete BEFORE DELETE ON snapshot_membership
+BEGIN SELECT RAISE(ABORT, 'snapshot history is append-only'); END;
+
+-- Literature scan curation queue (SPEC §11.4). Never an entry route: no foreign key
+-- to compound, no code path from here into compound, and nothing leaves 'queued'
+-- without a named human.
+CREATE TABLE IF NOT EXISTS literature_candidate (
+  id                  INTEGER PRIMARY KEY,
+  pmid                TEXT NOT NULL UNIQUE,
+  title               TEXT NOT NULL,
+  journal             TEXT,
+  first_publication_date TEXT,
+  query_version       TEXT NOT NULL,
+  run_id              INTEGER,
+  unmatched_chemicals TEXT NOT NULL CHECK (json_valid(unmatched_chemicals)
+                        AND json_array_length(unmatched_chemicals) > 0),
+  matched_chemicals   TEXT CHECK (matched_chemicals IS NULL OR json_valid(matched_chemicals)),
+  raw_response_id     INTEGER REFERENCES raw_response (id),
+  status              TEXT NOT NULL DEFAULT 'queued'
+                        CHECK (status IN ('queued', 'not_relevant', 'relevant_needs_curation', 'curated')),
+  reviewed_by         TEXT CHECK (reviewed_by IS NULL OR (length(trim(reviewed_by)) > 0 AND
+                        lower(trim(reviewed_by)) NOT IN ('auto', 'automatic', 'system', 'pipeline', 'script', 'default'))),
+  reviewed_at         TEXT,
+  note                TEXT,
+  CHECK (status = 'queued' OR (reviewed_by IS NOT NULL AND reviewed_at IS NOT NULL))
+);
+
+-- ---------------------------------------------------------------------------
+-- Derived cells (SPEC §1 outputs). Built from the extension, harm and trial views.
+-- ---------------------------------------------------------------------------
+
+-- Systemic trials per compound (only systemic interventions count, §5.6).
+DROP VIEW IF EXISTS v_compound_trials;
+CREATE VIEW v_compound_trials AS
+SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
+       count(DISTINCT ti.nct_id)                                                   AS n_systemic_trials,
+       count(DISTINCT CASE WHEN o.ageing_adjacent = 1 THEN ti.nct_id END)           AS n_ageing_adjacent_trials,
+       count(DISTINCT CASE WHEN t.results_state = 'NOT_POSTED_DUE' THEN ti.nct_id END) AS n_overdue_trials
+FROM compound c
+LEFT JOIN trial_intervention ti ON ti.compound_id = c.compound_id AND ti.systemic_exposure = 'systemic'
+LEFT JOIN trial t               ON t.nct_id = ti.nct_id
+LEFT JOIN trial_outcome o       ON o.nct_id = ti.nct_id
+GROUP BY c.compound_id;
+
+-- Replicated mammalian extension, direct or inherited through class (labelled).
+DROP VIEW IF EXISTS v_extension_replicated;
+CREATE VIEW v_extension_replicated AS
+SELECT e.compound_id, e.canonical_name, e.entry_route, e.evidence_tier,
+       NULL AS basis_compound_id, NULL AS basis_canonical_name, NULL AS basis_evidence_tier,
+       e.itp_experiments, e.itp_cohorts_positive, e.itp_cohorts_total, e.itp_tier,
+       e.n_mammal_extension_lab_groups
+FROM v_extension_evidence e
+WHERE e.has_mammal_extension AND e.replicated_mammal
+UNION ALL
+SELECT b.compound_id, b.canonical_name, b.entry_route, b.evidence_tier,
+       min(b.basis_compound_id), group_concat(DISTINCT b.basis_canonical_name), 'measured_lifespan',
+       max(e.itp_experiments), max(e.itp_cohorts_positive), max(e.itp_cohorts_total), max(e.itp_tier),
+       max(e.n_mammal_extension_lab_groups)
+FROM v_class_entry_basis b
+JOIN v_extension_evidence e ON e.compound_id = b.basis_compound_id
+                           AND e.has_mammal_extension AND e.replicated_mammal
+WHERE b.entry_route = 'class'
+GROUP BY b.compound_id;
+
+DROP VIEW IF EXISTS v_gold_cell;
+CREATE VIEW v_gold_cell AS
+SELECT r.*, t.n_systemic_trials, t.n_ageing_adjacent_trials
+FROM v_extension_replicated r JOIN v_compound_trials t USING (compound_id)
+WHERE t.n_systemic_trials > 0;
+
+DROP VIEW IF EXISTS v_untested_candidates;
+CREATE VIEW v_untested_candidates AS
+SELECT r.* FROM v_extension_replicated r JOIN v_compound_trials t USING (compound_id)
+WHERE t.n_systemic_trials = 0;
+
+DROP VIEW IF EXISTS v_under_tested;
+CREATE VIEW v_under_tested AS
+SELECT r.*, t.n_systemic_trials FROM v_extension_replicated r JOIN v_compound_trials t USING (compound_id)
+WHERE t.n_ageing_adjacent_trials = 0;
+
+DROP VIEW IF EXISTS v_null_cell;
+CREATE VIEW v_null_cell AS
+SELECT n.*, t.n_systemic_trials FROM v_itp_null n JOIN v_compound_trials t USING (compound_id)
+WHERE t.n_systemic_trials > 0;
+
+DROP VIEW IF EXISTS v_unreported;
+CREATE VIEW v_unreported AS
+SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
+       t.nct_id, t.status, t.completion_date, t.primary_completion_date, t.results_state
+FROM trial t
+JOIN trial_intervention ti ON ti.nct_id = t.nct_id AND ti.systemic_exposure = 'systemic'
+JOIN compound c            ON c.compound_id = ti.compound_id
+WHERE t.results_state = 'NOT_POSTED_DUE';
+
+-- Reviews whose evidence no longer exists (e.g. the source corrected the row, so
+-- its evidence_key changed). Never silently dropped: surfaced as a transition.
+DROP VIEW IF EXISTS v_orphaned_reviews;
+CREATE VIEW v_orphaned_reviews AS
+SELECT 'direction_review' AS review_table, dr.evidence_key AS review_key, dr.reviewed_by, dr.reviewed_at
+FROM direction_review dr
+WHERE NOT EXISTS (SELECT 1 FROM animal_evidence ae WHERE ae.evidence_key = dr.evidence_key)
+UNION ALL
+SELECT 'itp_experiment_override', o.evidence_key, o.reviewed_by, o.reviewed_at
+FROM itp_experiment_override o
+WHERE NOT EXISTS (SELECT 1 FROM animal_evidence ae WHERE ae.evidence_key = o.evidence_key);
+
+-- Live membership, the thing a run snapshots. Class 4 = derived_cell; classes 2-3 = churn.
+-- (Class 1, new DrugAge compounds, comes from the raw CSV and is added by agesdk.refresh.)
+DROP VIEW IF EXISTS v_cell_membership_live;
+CREATE VIEW v_cell_membership_live AS
+SELECT 'gold_cell' AS cell, 'derived_cell' AS cell_class, CAST(compound_id AS TEXT) AS subject,
+       compound_id, canonical_name, entry_route, evidence_tier, NULL AS nct_id, NULL AS state,
+       json_object('itp_cohorts', itp_cohorts_positive || '/' || itp_cohorts_total, 'itp_tier', itp_tier,
+                   'itp_experiments', itp_experiments, 'mammal_lab_groups', n_mammal_extension_lab_groups,
+                   'basis', basis_canonical_name, 'systemic_trials', n_systemic_trials) AS evidence
+FROM v_gold_cell
+UNION ALL
+SELECT 'untested_candidate', 'derived_cell', CAST(compound_id AS TEXT), compound_id, canonical_name,
+       entry_route, evidence_tier, NULL, NULL,
+       json_object('itp_cohorts', itp_cohorts_positive || '/' || itp_cohorts_total, 'itp_tier', itp_tier,
+                   'basis', basis_canonical_name)
+FROM v_untested_candidates
+UNION ALL
+SELECT 'under_tested', 'derived_cell', CAST(compound_id AS TEXT), compound_id, canonical_name,
+       entry_route, evidence_tier, NULL, NULL,
+       json_object('systemic_trials', n_systemic_trials, 'itp_tier', itp_tier, 'basis', basis_canonical_name)
+FROM v_under_tested
+UNION ALL
+SELECT 'null_cell', 'derived_cell', CAST(compound_id AS TEXT), compound_id, canonical_name,
+       entry_route, evidence_tier, NULL, NULL,
+       json_object('itp_cohorts', itp_cohorts_positive || '/' || itp_cohorts_total,
+                   'itp_experiments', itp_experiments, 'systemic_trials', n_systemic_trials)
+FROM v_null_cell
+UNION ALL
+SELECT 'harm_candidate', 'derived_cell', CAST(compound_id AS TEXT), compound_id, canonical_name,
+       entry_route, evidence_tier, NULL, review_state,
+       json_object('mammal_shortening_rows', n_mammal_shortening_rows, 'species', species,
+                   'evidence_keys', json(current_evidence_keys))
+FROM v_harm_candidates
+UNION ALL
+SELECT 'harm_signal', 'derived_cell', CAST(compound_id AS TEXT), compound_id, canonical_name,
+       entry_route, evidence_tier, NULL, reviewed_by || ' ' || reviewed_at,
+       json_object('exposure_basis', human_exposure_basis, 'reviewed_by', reviewed_by,
+                   'reviewed_at', reviewed_at)
+FROM v_harm_signal
+UNION ALL
+SELECT 'harm_review_stale', 'derived_cell', CAST(compound_id AS TEXT), compound_id, canonical_name,
+       entry_route, evidence_tier, NULL, NULL,
+       json_object('evidence_changed_since_review', evidence_changed_since_review,
+                   'still_meets_threshold', still_meets_threshold, 'reviewed_by', reviewed_by)
+FROM v_harm_signal
+WHERE evidence_changed_since_review OR NOT still_meets_threshold
+UNION ALL
+SELECT 'unreported', 'derived_cell', CAST(compound_id AS TEXT), compound_id, canonical_name,
+       entry_route, evidence_tier, NULL, NULL,
+       json_object('overdue_trials', json_group_array(nct_id))
+FROM v_unreported GROUP BY compound_id
+UNION ALL
+SELECT 'itp_tier', 'derived_cell', CAST(compound_id AS TEXT), compound_id, canonical_name,
+       entry_route, evidence_tier, NULL, itp_tier,
+       json_object('cohorts', itp_cohorts_positive || '/' || itp_cohorts_total,
+                   'male', coalesce(itp_male_positive, 0) || '/' || itp_male_total,
+                   'female', coalesce(itp_female_positive, 0) || '/' || itp_female_total,
+                   'experiments', itp_experiments)
+FROM v_itp_summary
+UNION ALL
+SELECT 'mechanistic_dossier', 'derived_cell', CAST(compound_id AS TEXT), compound_id, canonical_name,
+       entry_route, evidence_tier, NULL, NULL,
+       json_object('cocktails', cocktails, 'citations', citations, 'systemic_trials', n_systemic_trials)
+FROM v_mechanistic_human_dossier
+UNION ALL
+SELECT 'orphaned_review', 'derived_cell', review_table || ':' || review_key, NULL, NULL, NULL, NULL, NULL, NULL,
+       json_object('review_table', review_table, 'reviewed_by', reviewed_by, 'reviewed_at', reviewed_at)
+FROM v_orphaned_reviews
+UNION ALL
+SELECT 'compound_trial', 'churn', ti.compound_id || ':' || ti.nct_id, ti.compound_id, c.canonical_name,
+       c.entry_route, c.evidence_tier, ti.nct_id, NULL, NULL
+FROM trial_intervention ti JOIN compound c ON c.compound_id = ti.compound_id
+WHERE ti.systemic_exposure = 'systemic'
+GROUP BY ti.compound_id, ti.nct_id
+UNION ALL
+SELECT 'trial_state', 'churn', t.nct_id, NULL, NULL, NULL, NULL, t.nct_id, t.results_state, NULL
+FROM trial t;
+
+-- Every change between consecutive completed runs: entered / left / state_changed.
+-- The full log, churn included. The first run is a baseline and has no changes.
+DROP VIEW IF EXISTS v_membership_changes;
+CREATE VIEW v_membership_changes AS
+WITH runs AS (
+  SELECT run_id, finished_at, lag(run_id) OVER (ORDER BY run_id) AS prev_run_id
+  FROM snapshot_run WHERE status = 'complete')
+SELECT r.run_id, r.prev_run_id, r.finished_at, m.cell, m.cell_class, m.subject, 'entered' AS change,
+       m.compound_id, m.canonical_name, m.entry_route, m.evidence_tier, m.nct_id,
+       NULL AS old_state, m.state AS new_state, NULL AS old_evidence, m.evidence AS new_evidence
+FROM runs r JOIN snapshot_membership m ON m.run_id = r.run_id
+WHERE r.prev_run_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM snapshot_membership p
+                  WHERE p.run_id = r.prev_run_id AND p.cell = m.cell AND p.subject = m.subject)
+UNION ALL
+SELECT r.run_id, r.prev_run_id, r.finished_at, p.cell, p.cell_class, p.subject, 'left',
+       p.compound_id, p.canonical_name, p.entry_route, p.evidence_tier, p.nct_id,
+       p.state, NULL, p.evidence, NULL
+FROM runs r JOIN snapshot_membership p ON p.run_id = r.prev_run_id
+WHERE NOT EXISTS (SELECT 1 FROM snapshot_membership m
+                  WHERE m.run_id = r.run_id AND m.cell = p.cell AND m.subject = p.subject)
+UNION ALL
+SELECT r.run_id, r.prev_run_id, r.finished_at, m.cell, m.cell_class, m.subject, 'state_changed',
+       m.compound_id, m.canonical_name, m.entry_route, m.evidence_tier, m.nct_id,
+       p.state, m.state, p.evidence, m.evidence
+FROM runs r
+JOIN snapshot_membership m ON m.run_id = r.run_id
+JOIN snapshot_membership p ON p.run_id = r.prev_run_id AND p.cell = m.cell AND p.subject = m.subject
+WHERE p.state IS NOT m.state;
+
+-- What warrants attention (change class 4). Everything else stays in the log.
+DROP VIEW IF EXISTS v_cell_transitions;
+CREATE VIEW v_cell_transitions AS
+SELECT * FROM (
+  SELECT CASE
+           WHEN cell = 'gold_cell'         AND change = 'entered' THEN 'entered_gold_cell'
+           WHEN cell = 'under_tested'      AND change = 'left'    THEN 'left_under_tested'
+           WHEN cell = 'harm_candidate'    AND change = 'entered' THEN 'new_harm_candidate'
+           WHEN cell = 'unreported'        AND change = 'entered' THEN 'results_now_overdue'
+           WHEN cell = 'itp_tier'                                 THEN 'itp_tier_changed'
+           WHEN cell = 'harm_review_stale' AND change = 'entered' THEN 'harm_review_needs_revisit'
+           WHEN cell = 'orphaned_review'   AND change = 'entered' THEN 'review_orphaned'
+         END AS transition,
+         run_id, prev_run_id, finished_at, cell, change, subject, compound_id, canonical_name,
+         entry_route, evidence_tier, old_state, new_state, old_evidence, new_evidence
+  FROM v_membership_changes WHERE cell_class = 'derived_cell')
+WHERE transition IS NOT NULL;
+
+PRAGMA user_version = 5;

@@ -8,7 +8,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DB_PATH = PROJECT_ROOT / "data" / "agesdk.sqlite"
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
 
 def db_path() -> Path:
@@ -28,7 +28,8 @@ def connect(path: str | Path | None = None) -> sqlite3.Connection:
 
 # Tables safe to rebuild during a schema upgrade: never the raw layer, and
 # reference tables that are reloaded from data/reference/ anyway.
-PRESERVED_TABLES = {"raw_response"}
+# History is never rebuilt: the raw layer, its fetch log, and snapshot history.
+PRESERVED_TABLES = {"raw_response", "fetch_log", "snapshot_run", "snapshot_membership"}
 RELOADABLE_TABLES = {"species_taxon", "analysis_threshold"}
 
 

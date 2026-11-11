@@ -159,3 +159,28 @@ class CachedFetcher:
         resp = self.get(endpoint, params, **kw)
         return resp.http_status, json.loads(resp.body) if resp.http_status == 200 else None
 
+
+def log_fetch(conn: sqlite3.Connection, *, source: str, endpoint: str, params: dict | None,
+              outcome: str, run_id: int | None = None, raw_response_id: int | None = None,
+              content_sha256: str | None = None, watermark: str | None = None,
+              api_version: str | None = None, note: str | None = None,
+              fetched_at: str | None = None) -> int:
+    """Append one fetch attempt to fetch_log (raw layer, append-only)."""
+    cur = conn.execute(
+        """INSERT INTO fetch_log (run_id, source, endpoint, request_params, fetched_at, outcome,
+                                  raw_response_id, content_sha256, watermark, api_version, note)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (run_id, source, endpoint, canonical_json(params), fetched_at or utc_now(), outcome,
+         raw_response_id, content_sha256, watermark, api_version, note))
+    conn.commit()
+    return cur.lastrowid
+
+
+def last_watermark(conn: sqlite3.Connection, source: str, endpoint: str, params: dict | None) -> str | None:
+    row = conn.execute(
+        """SELECT watermark FROM fetch_log
+           WHERE source = ? AND endpoint = ? AND request_params = ? AND outcome <> 'error'
+             AND watermark IS NOT NULL
+           ORDER BY fetched_at DESC, id DESC LIMIT 1""",
+        (source, endpoint, canonical_json(params))).fetchone()
+    return row[0] if row else None

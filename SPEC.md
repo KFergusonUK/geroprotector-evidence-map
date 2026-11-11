@@ -1,9 +1,15 @@
 # Geroprotector Human Evidence Map — Specification
 
-**Status:** v0.4 draft spec
+**Status:** v0.5 draft spec
 **Owner:** Kevin Ferguson
 
-**Changes since v0.3** (2026-11-11):
+**Changes since v0.4** (2026-11-11):
+- New §11: refresh and change detection as a diff — source refresh with change detection,
+  snapshot history, `v_cell_transitions`, literature curation queue, weekly GitHub Action,
+  and the guard that a refresh never silently changes a reviewed decision.
+- Derived cells built: gold, untested candidates, under-tested, null, unreported.
+
+**Changes in v0.4** (2026-11-11):
 - `compound.evidence_tier` (measured_lifespan | inherited_class | mechanistic_only) is the
   evidential grade; `entry_route` stays the mechanism of entry. Every compound-level view
   carries the tier (§1, §4.4).
@@ -371,13 +377,19 @@ Built:
 - `v_harm_review_context` — each harm candidate's ATC class-mates and their evidence (context only)
 - `v_harm_signal` — harm-path deliverable; reads only reviewed `surface` decisions
 - `v_mechanistic_human_dossier` — mechanistic path: cocktail premise + human trial counts, labelled
+- `v_compound_trials`, `v_extension_replicated`, `v_gold_cell`, `v_untested_candidates`,
+  `v_under_tested`, `v_null_cell`, `v_unreported` — the output cells (§1, §11.2)
+- `v_orphaned_reviews`, `v_cell_membership_live`, `v_membership_changes`,
+  `v_cell_transitions` — change detection (§11)
 - `v_class_entry_basis` — which direct compound and ATC class justify each class entry
 - `v_atc_review_needed` — multi-class compounds awaiting an ATC decision (§5.5)
 - `v_entry_route_check` — stored `entry_route` disagreeing with the data (should be empty)
 
-To build once trials are loaded:
-- `v_gold_cell`, `v_null_cell`, `v_under_tested`, `v_unreported`, `v_compound_summary`
+Still to build:
+- `v_compound_summary`
 - `v_replication_overlap` — replication resting on shared authorship (§5.4)
+
+The output cells exist but stay empty until trials are normalised (§7 step 5).
 
 ---
 
@@ -811,3 +823,122 @@ collaborate. That is the realistic route to the data behind governance walls
   Agonist" did Yang 2023 use (Supplementary Table 1)?
 - Full text of Hou 2013 and Guan 2022 is needed before their cocktails can be recorded.
 
+---
+
+## 11. Refresh and change detection
+
+**A diff, not a monitor.** Each run refreshes the sources, re-processes what changed,
+snapshots derived-view membership, compares it with the previous completed run, and
+emits a reviewable changelog. No notification streams. Implemented in
+`agesdk/refresh.py`; run with `python -m agesdk refresh`.
+
+### 11.1 Source refresh
+
+- **DrugAge.** Download and compare the archive's SHA-256 with the hash stored in the
+  raw layer. Unchanged: nothing is re-processed. Changed: the new members are appended
+  to `raw_response`, and DrugAge `animal_evidence` is rebuilt from the new build for
+  every mapped compound (`compound_synonym`, source `drugage`).
+- **ClinicalTrials.gov.** Per intervention term, only studies whose
+  `LastUpdatePostDate` is on or after the term's high-water mark (minus a 1-day
+  overlap) are requested. The mark is the registry's own data date (`/version`
+  `dataTimestamp`) at the last successful fetch. A term never fetched before gets its
+  full history. A failed fetch is logged and does not advance the mark.
+- **Every refresh appends fetch metadata** to `fetch_log` (raw layer, append-only, same
+  no-update/no-delete triggers as `raw_response`): source, request, time, outcome
+  (`changed` | `unchanged` | `error`), the raw row it resolved to, content hash and
+  high-water mark. Unchanged content is not stored again in `raw_response`; the log is
+  the history of every check.
+
+### 11.2 Change classes
+
+| # | Change | Treatment |
+|---|---|---|
+| 1 | New compound appears in a DrugAge build | churn — logged |
+| 2 | Existing compound gains a trial | churn — logged |
+| 3 | Trial changes state (results posted, crosses into `NOT_POSTED_DUE`) | churn — logged |
+| 4 | A compound crosses into a derived cell it wasn't in before | **surfaced** |
+
+Class 3 is per trial; the corresponding class-4 event is per compound: *the compound*
+enters the unreported cell when one of its systemic trials becomes overdue.
+
+`v_cell_transitions` lists the surfaced transitions between consecutive completed runs:
+
+| Transition | Meaning |
+|---|---|
+| `entered_gold_cell` | replicated mammalian extension and now has systemic human trials |
+| `left_under_tested` | gained a systemic trial with an ageing-adjacent endpoint |
+| `new_harm_candidate` | new credible mammalian shortening (still needs human review) |
+| `results_now_overdue` | a systemic trial of the compound crossed into `NOT_POSTED_DUE` |
+| `itp_tier_changed` | ITP tier changed (or first ITP result) |
+| `harm_review_needs_revisit` | a surfaced harm decision's evidence changed (the guard, §11.6) |
+| `review_orphaned` | a reviewed decision's evidence no longer exists (the guard, §11.6) |
+
+The last two are additions to the five requested: they are how the guard becomes visible.
+`v_membership_changes` holds every change (entered / left / state changed, churn
+included) for audit. The first run is a baseline and reports nothing.
+
+The derived cells behind these (`v_gold_cell`, `v_untested_candidates`,
+`v_under_tested`, `v_null_cell`, `v_unreported`) use *mammal* replication: ≥2 mammal lab
+groups or the ITP threshold. Class-entered compounds inherit their basis compound's
+replication and carry `inherited_class` throughout.
+
+### 11.3 Snapshots
+
+`snapshot_run` records each run (time, status, schema and code version, and the source
+versions it saw: DrugAge build and archive hash, ClinicalTrials.gov API version and data
+date, literature query version and window). `snapshot_membership` stores every derived
+cell's membership per run, with the compound's tier and route and the evidence at that
+moment (ITP cohorts and tier, trial counts, evidence keys). Transitions are computed
+from this stored state, not recomputed, so the map can show **when a compound entered a
+cell and on what evidence**. Both tables are append-only; a finished run cannot be
+altered; failed runs are excluded from comparison. They are never rebuilt by schema
+upgrades.
+
+### 11.4 Literature scan for pre-database signals
+
+Weekly Europe PMC search on lifespan-extension terms, query versioned in
+`data/rules/literature_scan.yaml` (`litscan-v1`). For each hit, Europe PMC's text-mined
+chemical annotations are compared against compound names and synonyms already in the map
+and against DrugAge; papers naming only known compounds, or only reagents on the
+versioned stoplist, are dropped. The rest land in `literature_candidate` as `queued`.
+
+**A curation queue only — never automatic entry, under any circumstances.** There is no
+foreign key or code path from `literature_candidate` into `compound`; the scanner writes
+only to the queue and the fetch log (a test traces its SQL to prove it); a candidate
+leaves `queued` only with a named human reviewer. Anything curated enters by the normal
+routes. The harm path's mandatory-review rule applies in full.
+
+Expect noise. Test week 2026-11-04..11: 6 hits, of which obtusifolin (*C. elegans*) was
+the one plausible signal. Tune the query and stoplist over time; bump the version on
+every change so each candidate records the query that found it.
+
+### 11.5 Scheduling
+
+`.github/workflows/weekly-refresh.yml`: GitHub Action, Mondays 06:17 UTC, plus manual
+dispatch. It lives with the code and leaves a commit trail.
+
+1. Restore the database from the `pipeline-state` release asset (absent on first run:
+   that run is the baseline).
+2. Run the tests, then `refresh`.
+3. **If `v_cell_transitions` is non-empty for the run:** commit
+   `changelog/<date>-run<id>.md` and open an issue with the same text. **Otherwise do
+   nothing** — no commit, no issue.
+4. Save the database back to the release asset. Publishing happens before saving, so a
+   failed save repeats a changelog next week rather than losing one.
+
+State lives in a release asset because the database (raw layer, snapshot history,
+reviews) is too large and binary for git.
+
+### 11.6 Guard: a refresh never silently changes a reviewed decision
+
+- Refresh writes only to the raw layer, `fetch_log`, the rebuildable normalised layer,
+  snapshots and the literature queue — never to `harm_review`, `direction_review`,
+  `itp_experiment_override`, `compound_relation`, ATC reviews or the crosswalk.
+- **Harm path.** If new evidence arrives for a compound with a harm review, the existing
+  `evidence_changed_since_review` flag fires and surfaces as
+  `harm_review_needs_revisit`. The review does not update, and the compound neither
+  enters nor leaves `v_harm_signal` without a human (tested across runs, including when
+  the evidence is withdrawn).
+- **Orphaned reviews.** Reviews attach to `evidence_key`, a hash of the source row. If a
+  new DrugAge build corrects a row, its key changes and the review would silently stop
+  applying; instead it appears in `v_orphaned_reviews` and surfaces as `review_orphaned`.

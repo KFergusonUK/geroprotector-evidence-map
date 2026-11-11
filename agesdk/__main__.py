@@ -75,6 +75,24 @@ def cmd_reprogramming_check(conn, args):
     sys.exit(1 if problems else 0)
 
 
+def cmd_refresh(conn, args):
+    import os
+    from pathlib import Path
+    from agesdk import refresh
+    result = refresh.run(conn, do_ctgov=not args.no_ctgov, do_litscan=not args.no_litscan,
+                         changelog_dir=Path(args.changelog_dir))
+    print(f"run {result.run_id}: {len(result.transitions)} transition(s); churn {result.churn}")
+    for k, v in result.sources.items():
+        print(f"  {k}: {v}")
+    if result.changelog_path:
+        print(f"changelog: {result.changelog_path}")
+    out = os.environ.get("GITHUB_OUTPUT")
+    if out:
+        with open(out, "a", encoding="utf-8") as fh:
+            fh.write(f"transitions={len(result.transitions)}\n")
+            fh.write(f"changelog={result.changelog_path or ''}\n")
+
+
 def cmd_fixture_chembl(conn, args):
     print(json.dumps(fixture.chembl_report(fixture.load(), conn), indent=2))
 
@@ -89,13 +107,17 @@ def main(argv=None):
     p.add_argument("--pubchem", action="store_true", help="also verify CIDs/InChIKeys via PubChem")
     sub.add_parser("fixture-chembl", help="report ChEMBL IDs + ATC codes for fixture entries")
     sub.add_parser("reprogramming-check", help="validate data/reference/reprogramming_evidence.yaml")
+    p = sub.add_parser("refresh", help="refresh sources, snapshot derived cells, write changelog on transitions")
+    p.add_argument("--changelog-dir", default="changelog")
+    p.add_argument("--no-ctgov", action="store_true")
+    p.add_argument("--no-litscan", action="store_true")
     args = ap.parse_args(argv)
 
     conn = db.connect()
     db.init_db(conn)
     {"init-db": cmd_init_db, "fetch-drugage": cmd_fetch_drugage,
      "fixture-check": cmd_fixture_check, "fixture-chembl": cmd_fixture_chembl,
-     "reprogramming-check": cmd_reprogramming_check}[args.cmd](conn, args)
+     "reprogramming-check": cmd_reprogramming_check, "refresh": cmd_refresh}[args.cmd](conn, args)
 
 
 if __name__ == "__main__":
