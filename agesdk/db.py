@@ -8,7 +8,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DB_PATH = PROJECT_ROOT / "data" / "agesdk.sqlite"
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 
 def db_path() -> Path:
@@ -26,8 +26,42 @@ def connect(path: str | Path | None = None) -> sqlite3.Connection:
     return conn
 
 
+# Tables safe to rebuild during a schema upgrade: never the raw layer, and
+# reference tables that are reloaded from data/reference/ anyway.
+PRESERVED_TABLES = {"raw_response"}
+RELOADABLE_TABLES = {"species_taxon", "analysis_threshold"}
+
+
+class MigrationError(RuntimeError):
+    pass
+
+
+def _upgrade(conn: sqlite3.Connection, from_version: int) -> None:
+    """Pre-release upgrade: rebuild every non-raw table, but only if it holds no
+    derived data. Refuses rather than discarding anything that isn't reloadable."""
+    tables = [r[0] for r in conn.execute(
+        "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")]
+    to_drop = [t for t in tables if t not in PRESERVED_TABLES]
+    occupied = [t for t in to_drop if t not in RELOADABLE_TABLES
+                and conn.execute(f'SELECT EXISTS (SELECT 1 FROM "{t}")').fetchone()[0]]
+    if occupied:
+        raise MigrationError(
+            f"schema v{from_version} -> v{SCHEMA_VERSION} needs to rebuild tables that hold data: "
+            f"{occupied}. Write an explicit migration.")
+    conn.execute("PRAGMA foreign_keys = OFF")
+    for v in [r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type = 'view'")]:
+        conn.execute(f'DROP VIEW "{v}"')
+    for t in to_drop:
+        conn.execute(f'DROP TABLE "{t}"')
+    conn.commit()
+    conn.execute("PRAGMA foreign_keys = ON")
+
+
 def init_db(conn: sqlite3.Connection) -> None:
-    """Create or refresh the schema. Idempotent."""
+    """Create or refresh the schema. Idempotent; upgrades empty pre-release schemas."""
+    current = conn.execute("PRAGMA user_version").fetchone()[0]
+    if 0 < current < SCHEMA_VERSION:
+        _upgrade(conn, current)
     sql = resources.files("agesdk").joinpath("schema.sql").read_text(encoding="utf-8")
     conn.executescript(sql)
     conn.commit()

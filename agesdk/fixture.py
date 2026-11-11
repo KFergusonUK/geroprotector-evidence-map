@@ -15,18 +15,20 @@ from pathlib import Path
 import yaml
 
 from agesdk.db import PROJECT_ROOT
+from agesdk.evidence import direction_of_drugage_row, sex_of_drugage_row
 
 FIXTURE_PATH = PROJECT_ROOT / "data" / "fixtures" / "seed_compounds.yaml"
 SPECIES_PATH = PROJECT_ROOT / "data" / "reference" / "species_taxon.csv"
 
 INCHIKEY_RE = re.compile(r"^[A-Z]{14}-[A-Z]{10}-[A-Z]$")
 ATC_RE = re.compile(r"^[A-Z]\d\d[A-Z][A-Z]\d\d$")
-REQUIRED = ("key", "canonical_name", "group", "role", "expected_entry_route", "expected_itp",
-            "headline_v1", "pubchem_cid", "inchikey", "chembl_id", "atc_codes",
-            "drugage_names", "must_match", "must_not_match", "needs_review", "review")
+REQUIRED = ("key", "canonical_name", "group", "role", "expected_entry_route", "expected_paths",
+            "itp_cohorts", "mammal_evidence", "mammal_extension", "pubchem_cid", "inchikey",
+            "chembl_id", "atc_codes", "drugage_names", "must_match", "must_not_match",
+            "needs_review", "route_excluded", "decisions", "review")
 ENTRY_ROUTES = {"direct", "class", "excluded"}
-ITP_STATES = {"positive", "null_result", "untested"}
-ROLES = {"seed", "class_test_case"}
+PATHS = {"extension", "harm_candidate"}
+ROLES = {"seed", "class_test_case", "linked_compound"}
 
 
 def load(path: Path = FIXTURE_PATH) -> dict:
@@ -34,18 +36,31 @@ def load(path: Path = FIXTURE_PATH) -> dict:
         return yaml.safe_load(fh)
 
 
+def _check_itp(k: str, itp, errs: list[str]) -> None:
+    if not isinstance(itp, dict) or set(itp) != {"positive", "total", "male", "female"}:
+        errs.append(f"{k}: itp_cohorts must have positive, total, male, female")
+        return
+    pairs = [(itp["positive"], itp["total"]), tuple(itp["male"]), tuple(itp["female"])]
+    for pos, tot in pairs:
+        if not (isinstance(pos, int) and isinstance(tot, int) and 0 <= pos <= tot):
+            errs.append(f"{k}: bad ITP ratio {pos}/{tot}")
+    if itp["male"][1] + itp["female"][1] > itp["total"]:
+        errs.append(f"{k}: ITP male+female cohorts exceed total")
+
+
 def validate(fx: dict) -> list[str]:
     """Internal consistency. Returns a list of problems (empty = valid)."""
     errs: list[str] = []
     seen: dict[str, dict] = {"key": {}, "pubchem_cid": {}, "inchikey": {}, "canonical_name": {}}
     must_match_owner: dict[str, str] = {}
+    keys = {c.get("key") for c in fx.get("compounds", [])}
+    entries = {c.get("key"): c for c in fx.get("compounds", [])}
 
     for c in fx.get("compounds", []):
         k = c.get("key", "<no key>")
-        for field in REQUIRED:
-            if field not in c:
-                errs.append(f"{k}: missing field {field}")
-        if errs and errs[-1].startswith(f"{k}: missing"):
+        missing = [f for f in REQUIRED if f not in c]
+        if missing:
+            errs.append(f"{k}: missing fields {missing}")
             continue
         if not isinstance(c["inchikey"], str) or not INCHIKEY_RE.match(c["inchikey"]):
             errs.append(f"{k}: inchikey must be a full 27-char InChIKey, got {c['inchikey']!r}")
@@ -53,21 +68,41 @@ def validate(fx: dict) -> list[str]:
             errs.append(f"{k}: canonical_name must be trimmed ASCII")
         if c["expected_entry_route"] not in ENTRY_ROUTES:
             errs.append(f"{k}: bad expected_entry_route {c['expected_entry_route']!r}")
-        if c["expected_itp"] not in ITP_STATES:
-            errs.append(f"{k}: bad expected_itp {c['expected_itp']!r}")
         if c["role"] not in ROLES:
             errs.append(f"{k}: bad role {c['role']!r}")
+        if not set(c["expected_paths"]) <= PATHS:
+            errs.append(f"{k}: bad expected_paths {c['expected_paths']!r}")
+        _check_itp(k, c["itp_cohorts"], errs)
+        if c["mammal_extension"] and not c["mammal_evidence"]:
+            errs.append(f"{k}: mammal_extension without mammal_evidence")
+        if "harm_candidate" in c["expected_paths"] and not c["mammal_evidence"]:
+            errs.append(f"{k}: harm_candidate requires mammal evidence")
         if c["atc_codes"] is not None:
             for code in c["atc_codes"]:
                 if not ATC_RE.match(code):
                     errs.append(f"{k}: bad ATC code {code!r}")
+        for d in c["decisions"]:
+            if not all(d.get(f) for f in ("decision", "decided_by", "decided_at")):
+                errs.append(f"{k}: decision needs decision, decided_by, decided_at: {d!r}")
 
-        # Direct entry ⇔ the compound is in DrugAge.
+        # Direct entry ⇔ the compound is in DrugAge. Paths need DrugAge evidence.
         if (c["expected_entry_route"] == "direct") != bool(c["drugage_names"]):
             errs.append(f"{k}: expected_entry_route={c['expected_entry_route']} "
                         f"but drugage_names={c['drugage_names']!r}")
-        if c["expected_entry_route"] != "direct" and c["role"] == "seed":
+        if c["expected_paths"] and not c["drugage_names"]:
+            errs.append(f"{k}: expected_paths without DrugAge evidence")
+        if c["role"] == "seed" and c["expected_entry_route"] != "direct":
             errs.append(f"{k}: seeds must enter directly")
+
+        # same_substance_as: must name another entry, reciprocally.
+        other = c.get("same_substance_as")
+        if other is not None:
+            if other not in keys or other == k:
+                errs.append(f"{k}: same_substance_as {other!r} is not another fixture entry")
+            elif entries[other].get("same_substance_as") != k:
+                errs.append(f"{k}: same_substance_as {other!r} is not reciprocated")
+            elif entries[other]["inchikey"] == c["inchikey"]:
+                errs.append(f"{k}: same_substance_as link with identical InChIKey; that is a duplicate")
 
         for field in seen:
             v = c[field]
@@ -75,10 +110,13 @@ def validate(fx: dict) -> list[str]:
                 errs.append(f"{k}: duplicate {field} {v!r} (also {seen[field][v]})")
             seen[field][v] = k
 
-        mm, mn, nr = (set(map(str, c[f])) for f in ("must_match", "must_not_match", "needs_review"))
+        mm, mn, nr, rx = (set(map(str, c[f])) for f in
+                          ("must_match", "must_not_match", "needs_review", "route_excluded"))
         for a, b, label in ((mm, mn, "must_match/must_not_match"),
                             (mm, nr, "must_match/needs_review"),
-                            (mn, nr, "must_not_match/needs_review")):
+                            (mn, nr, "must_not_match/needs_review"),
+                            (rx, mn, "route_excluded/must_not_match"),
+                            (rx, nr, "route_excluded/needs_review")):
             if a & b:
                 errs.append(f"{k}: {label} overlap: {sorted(a & b)}")
         for s in mm:
@@ -88,9 +126,6 @@ def validate(fx: dict) -> list[str]:
         for s in c.get("drugage_names", []):
             if s not in mm:
                 errs.append(f"{k}: DrugAge name {s!r} is not in must_match")
-
-    # A string one compound must match must not be something another compound must reject
-    # unless that is deliberate — it always is a precision test, so only flag self-conflicts above.
     return errs
 
 
@@ -101,26 +136,27 @@ def load_species_tiers(path: Path = SPECIES_PATH) -> dict[str, str]:
 
 def drugage_facts(rows: list[dict], names: list[str], tiers: dict[str, str]) -> dict:
     """What DrugAge actually says about the given exact names."""
-    sel = [r for r in rows if r["compound_name"] in names]
-    itp = [r for r in sel if r["ITP"] == "Yes"]
+    sel = [(r, direction_of_drugage_row(r)[0]) for r in rows if r["compound_name"] in names]
+    itp = [(sex_of_drugage_row(r), d == "extension") for r, d in sel if r["ITP"] == "Yes"]
 
-    def sig_extension(r):
-        try:
-            return r["avg_lifespan_significance"] == "S" and float(r["avg_lifespan_change_percent"]) > 0
-        except ValueError:
-            return False
+    def ratio(sex=None):
+        x = [pos for s, pos in itp if sex is None or s == sex]
+        return [sum(x), len(x)]
 
-    if not itp:
-        itp_state = "untested"
-    elif any(sig_extension(r) for r in itp):
-        itp_state = "positive"
-    else:
-        itp_state = "null_result"
+    mammal = [(r, d) for r, d in sel if tiers.get(r["species"]) == "mammal"]
+    paths = []
+    if any(d == "extension" for _, d in sel):
+        paths.append("extension")
+    if any(d == "shortening" for _, d in mammal):
+        paths.append("harm_candidate")
+    overall = ratio()
     return {
         "n_rows": len(sel),
-        "names_found": sorted({r["compound_name"] for r in sel}),
-        "itp": itp_state,
-        "mammal": any(tiers.get(r["species"]) == "mammal" for r in sel),
+        "paths": paths,
+        "itp_cohorts": {"positive": overall[0], "total": overall[1],
+                        "male": ratio("M"), "female": ratio("F")},
+        "mammal_evidence": bool(mammal),
+        "mammal_extension": any(d == "extension" for _, d in mammal),
     }
 
 
@@ -132,13 +168,12 @@ def check_against_drugage(fx: dict, rows: list[dict], tiers: dict[str, str]) -> 
         for n in c["drugage_names"] + c.get("drugage_names_needs_review", []):
             if n not in all_names:
                 errs.append(f"{k}: DrugAge name {n!r} not found in the loaded CSV")
-        if not c["drugage_names"]:
-            continue
         facts = drugage_facts(rows, c["drugage_names"], tiers)
-        if facts["itp"] != c["expected_itp"]:
-            errs.append(f"{k}: fixture says ITP {c['expected_itp']}, DrugAge says {facts['itp']}")
-        if facts["mammal"] != c["headline_v1"]:
-            errs.append(f"{k}: fixture headline_v1={c['headline_v1']}, DrugAge mammal={facts['mammal']}")
+        for field, expected in (("paths", c["expected_paths"]), ("itp_cohorts", c["itp_cohorts"]),
+                                ("mammal_evidence", c["mammal_evidence"]),
+                                ("mammal_extension", c["mammal_extension"])):
+            if facts[field] != expected:
+                errs.append(f"{k}: fixture {field}={expected!r}, DrugAge says {facts[field]!r}")
     return errs
 
 

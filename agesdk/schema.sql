@@ -83,19 +83,55 @@ CREATE TABLE IF NOT EXISTS compound_atc (
   source_chembl_id TEXT,
   raw_response_id INTEGER REFERENCES raw_response (id),
   -- Only 'auto' and 'accepted' rows can carry class entry.
-  --   auto           — compound has exactly one level-4 class, and it is not an 'other' (…X) bucket
-  --   pending_review — multi-class compound, or an 'other' bucket; blocks class entry until reviewed
+  --   auto           — compound has exactly one specific level-4 class
+  --   pending_review — compound has >1 specific level-4 class; blocks class entry until reviewed
   --   accepted / rejected — a human decision on whether this class may carry class entry
+  --   residual       — an 'other/various' bucket (level 4 ending in X). Residual groupings are
+  --                    not mechanisms: they NEVER carry class entry, reviewed or not.
   review_status   TEXT NOT NULL DEFAULT 'pending_review'
-                    CHECK (review_status IN ('auto', 'pending_review', 'accepted', 'rejected')),
+                    CHECK (review_status IN ('auto', 'pending_review', 'accepted', 'rejected', 'residual')),
   reviewed_by     TEXT,
   reviewed_at     TEXT,
   note            TEXT,
   PRIMARY KEY (compound_id, atc_code),
-  CHECK (review_status NOT IN ('accepted', 'rejected') OR reviewed_by IS NOT NULL)
+  CHECK (review_status NOT IN ('accepted', 'rejected') OR reviewed_by IS NOT NULL),
+  CHECK ((substr(atc_code, 5, 1) = 'X') = (review_status = 'residual'))
 );
 
 CREATE INDEX IF NOT EXISTS ix_compound_atc_l4 ON compound_atc (atc_level4);
+
+-- Reviewed links between compound rows that stay separate (SPEC §5.1).
+-- same_substance_as: e.g. NDGA (stereo undefined) and masoprocol (meso-NDGA).
+-- Never used to override a canonical InChIKey or to merge counts. Symmetric,
+-- so stored once with the lower id first.
+CREATE TABLE IF NOT EXISTS compound_relation (
+  compound_id         INTEGER NOT NULL REFERENCES compound (compound_id),
+  related_compound_id INTEGER NOT NULL REFERENCES compound (compound_id),
+  relation            TEXT NOT NULL CHECK (relation IN ('same_substance_as')),
+  reviewed_by         TEXT NOT NULL CHECK (length(trim(reviewed_by)) > 0),
+  reviewed_at         TEXT NOT NULL,
+  note                TEXT,
+  PRIMARY KEY (compound_id, related_compound_id, relation),
+  CHECK (compound_id < related_compound_id)
+);
+
+-- Documented thresholds the derived views apply (SPEC §5.4, §5.7). Views read
+-- these; nobody adjudicates individual compounds.
+CREATE TABLE IF NOT EXISTS analysis_threshold (
+  name      TEXT PRIMARY KEY,
+  value     REAL NOT NULL,
+  rationale TEXT NOT NULL
+);
+
+INSERT OR IGNORE INTO analysis_threshold (name, value, rationale) VALUES
+  ('itp_min_positive_cohorts', 1,
+   'SPEC §5.4: ≥1 ITP cohort with significant extension. The ratio is always shown alongside.'),
+  ('itp_min_positive_fraction', 0.0,
+   'Minimum positive/total ITP cohorts. 0 = no additional requirement beyond the cohort count.'),
+  ('replication_min_lab_groups', 2,
+   'SPEC §5.4: ≥2 independent lab groups (senior author + affiliation) with significant extension.'),
+  ('harm_min_mammal_shortening_rows', 1,
+   'SPEC §5.7: a single credible mammalian signal surfaces a harm candidate (sensitive by design).');
 
 -- Tiering is a view over this table, never a deletion (SPEC §1.1).
 CREATE TABLE IF NOT EXISTS species_taxon (
@@ -121,6 +157,13 @@ CREATE TABLE IF NOT EXISTS animal_evidence (
   max_lifespan_significance TEXT CHECK (max_lifespan_significance IN ('S', 'NS')),
   weight_change_pct         REAL,
   weight_change_significance TEXT CHECK (weight_change_significance IN ('S', 'NS')),
+  -- Direction of effect (SPEC §5.4), derived by agesdk.evidence.derive_direction.
+  -- 'null' = measured, not significant. 'unassessed' = no significance reported:
+  -- NOT negative evidence. Every row is kept whatever its direction.
+  direction                 TEXT NOT NULL
+                              CHECK (direction IN ('extension', 'shortening', 'null', 'unassessed')),
+  direction_basis           TEXT NOT NULL CHECK (direction_basis IN ('avg', 'max', 'none')),
+  direction_rule_version    TEXT NOT NULL,
   is_itp                    INTEGER NOT NULL DEFAULT 0 CHECK (is_itp IN (0, 1)),
   pmid                      TEXT,           -- joins publication.pmid; no FK, publications load later
   source                    TEXT NOT NULL DEFAULT 'drugage',
@@ -156,6 +199,22 @@ CREATE TABLE IF NOT EXISTS publication_author (
   PRIMARY KEY (pmid, position)
 );
 
+-- Harm path (SPEC §5.7): mandatory human review. Nothing reaches v_harm_signal
+-- except through a row here, and a row here cannot exist without a named
+-- human reviewer, a rationale and, to surface, a stated human-exposure basis.
+CREATE TABLE IF NOT EXISTS harm_review (
+  compound_id           INTEGER PRIMARY KEY REFERENCES compound (compound_id),
+  decision              TEXT NOT NULL CHECK (decision IN ('surface', 'reject')),
+  human_exposure_basis  TEXT,             -- why exposure is substantial (approved drug, common supplement, ...)
+  rationale             TEXT NOT NULL CHECK (length(trim(rationale)) > 0),
+  reviewed_by           TEXT NOT NULL CHECK (
+                          length(trim(reviewed_by)) > 0 AND
+                          lower(trim(reviewed_by)) NOT IN ('auto', 'automatic', 'system', 'pipeline', 'script', 'default')),
+  reviewed_at           TEXT NOT NULL CHECK (length(trim(reviewed_at)) > 0),
+  evidence_row_ids      TEXT NOT NULL CHECK (json_valid(evidence_row_ids) AND json_type(evidence_row_ids) = 'array'),
+  CHECK (decision <> 'surface' OR length(trim(coalesce(human_exposure_basis, ''))) > 0)
+);
+
 CREATE TABLE IF NOT EXISTS trial (
   nct_id              TEXT PRIMARY KEY,
   title               TEXT,
@@ -180,7 +239,13 @@ CREATE TABLE IF NOT EXISTS trial_intervention (
   raw_name          TEXT NOT NULL,        -- as the sponsor wrote it, unmodified
   intervention_type TEXT,
   compound_id       INTEGER REFERENCES compound (compound_id),  -- nullable until matched
-  PRIMARY KEY (nct_id, raw_name)
+  -- Systemic exposure criterion (SPEC §5.6). Identity and route are separate
+  -- questions: a sirolimus-eluting stent IS sirolimus, but does not qualify.
+  route             TEXT,                 -- as derived from the registry record
+  systemic_exposure TEXT CHECK (systemic_exposure IN ('systemic', 'local', 'unclear')),
+  route_rule_version TEXT,
+  PRIMARY KEY (nct_id, raw_name),
+  CHECK (systemic_exposure IS NULL OR route_rule_version IS NOT NULL)
 );
 
 CREATE TABLE IF NOT EXISTS trial_condition (
@@ -237,27 +302,29 @@ WHERE r.id = (
   ORDER BY r2.fetched_at DESC, r2.id DESC
   LIMIT 1);
 
--- Compounds whose ATC rows need a human decision before they can carry class entry.
+-- ---------------------------------------------------------------------------
+-- Class entry (SPEC §5.5)
+-- ---------------------------------------------------------------------------
+
+-- Multi-class compounds awaiting a human decision. Residual (…X) rows are
+-- excluded by rule and do not count toward 'multi-class'.
 DROP VIEW IF EXISTS v_atc_review_needed;
 CREATE VIEW v_atc_review_needed AS
 WITH per_compound AS (
   SELECT compound_id, count(DISTINCT atc_level4) AS n_level4
-  FROM compound_atc GROUP BY compound_id)
+  FROM compound_atc WHERE review_status <> 'residual' GROUP BY compound_id)
 SELECT c.compound_id, c.canonical_name, c.entry_route,
        ca.atc_code, ca.atc_level4, ca.review_status, pc.n_level4,
-       CASE
-         WHEN pc.n_level4 > 1 AND substr(ca.atc_level4, 5, 1) = 'X' THEN 'multi_class+other_bucket'
-         WHEN pc.n_level4 > 1 THEN 'multi_class'
-         WHEN substr(ca.atc_level4, 5, 1) = 'X' THEN 'other_bucket'
-       END AS reason
+       'multi_class' AS reason
 FROM compound_atc ca
 JOIN compound c ON c.compound_id = ca.compound_id
 JOIN per_compound pc ON pc.compound_id = ca.compound_id
-WHERE (pc.n_level4 > 1 OR substr(ca.atc_level4, 5, 1) = 'X')
-  AND ca.review_status NOT IN ('accepted', 'rejected');
+WHERE pc.n_level4 > 1
+  AND ca.review_status NOT IN ('accepted', 'rejected', 'residual');
 
 -- Why each compound is eligible via class: one hop only, from a 'direct'
--- compound with animal evidence, through a class both sides may use.
+-- compound with significant lifespan EXTENSION (shortening never propagates),
+-- through a specific class both sides may use (residual buckets never do).
 DROP VIEW IF EXISTS v_class_entry_basis;
 CREATE VIEW v_class_entry_basis AS
 SELECT DISTINCT
@@ -273,24 +340,140 @@ JOIN compound_atc ba ON ba.atc_level4 = ca.atc_level4
                     AND ba.review_status IN ('auto', 'accepted')
 JOIN compound b      ON b.compound_id = ba.compound_id
                     AND b.entry_route = 'direct'
-WHERE EXISTS (SELECT 1 FROM animal_evidence ae WHERE ae.compound_id = b.compound_id);
+WHERE EXISTS (SELECT 1 FROM animal_evidence ae
+              WHERE ae.compound_id = b.compound_id AND ae.direction = 'extension');
 
 -- Integrity check: stored entry_route vs what the data supports. Should be empty.
 DROP VIEW IF EXISTS v_entry_route_check;
 CREATE VIEW v_entry_route_check AS
-SELECT c.compound_id, c.canonical_name, c.entry_route,
-       CASE
-         WHEN c.entry_route = 'direct'
-              AND NOT EXISTS (SELECT 1 FROM animal_evidence ae WHERE ae.compound_id = c.compound_id)
-           THEN 'direct_without_animal_evidence'
-         WHEN c.entry_route = 'class'
-              AND EXISTS (SELECT 1 FROM animal_evidence ae WHERE ae.compound_id = c.compound_id)
-           THEN 'class_but_has_animal_evidence'
-         WHEN c.entry_route = 'class'
-              AND NOT EXISTS (SELECT 1 FROM v_class_entry_basis v WHERE v.compound_id = c.compound_id)
-           THEN 'class_without_basis'
-       END AS problem
-FROM compound c
+SELECT * FROM (
+  SELECT c.compound_id, c.canonical_name, c.entry_route,
+         CASE
+           WHEN c.entry_route = 'direct'
+                AND NOT EXISTS (SELECT 1 FROM animal_evidence ae WHERE ae.compound_id = c.compound_id)
+             THEN 'direct_without_animal_evidence'
+           WHEN c.entry_route = 'class'
+                AND EXISTS (SELECT 1 FROM animal_evidence ae WHERE ae.compound_id = c.compound_id)
+             THEN 'class_but_has_animal_evidence'
+           WHEN c.entry_route = 'class'
+                AND NOT EXISTS (SELECT 1 FROM v_class_entry_basis v WHERE v.compound_id = c.compound_id)
+             THEN 'class_without_basis'
+         END AS problem
+  FROM compound c)
 WHERE problem IS NOT NULL;
 
-PRAGMA user_version = 1;
+-- ---------------------------------------------------------------------------
+-- ITP evidence as a ratio, by sex (SPEC §5.4). A cohort = one ITP row in the source.
+-- ---------------------------------------------------------------------------
+
+DROP VIEW IF EXISTS v_itp_summary;
+CREATE VIEW v_itp_summary AS
+WITH t AS (
+  SELECT (SELECT value FROM analysis_threshold WHERE name = 'itp_min_positive_cohorts')  AS min_pos,
+         (SELECT value FROM analysis_threshold WHERE name = 'itp_min_positive_fraction') AS min_frac),
+agg AS (
+  SELECT compound_id,
+         sum(direction = 'extension')                    AS itp_cohorts_positive,
+         count(*)                                        AS itp_cohorts_total,
+         sum(direction = 'shortening')                   AS itp_cohorts_shortening,
+         sum(sex = 'M' AND direction = 'extension')      AS itp_male_positive,
+         sum(sex = 'M')                                  AS itp_male_total,
+         sum(sex = 'F' AND direction = 'extension')      AS itp_female_positive,
+         sum(sex = 'F')                                  AS itp_female_total
+  FROM animal_evidence WHERE is_itp = 1 GROUP BY compound_id)
+SELECT c.compound_id, c.canonical_name, c.entry_route, agg.*,
+       (agg.itp_cohorts_positive >= t.min_pos
+        AND 1.0 * agg.itp_cohorts_positive / agg.itp_cohorts_total >= t.min_frac) AS meets_itp_threshold
+FROM agg JOIN compound c USING (compound_id) CROSS JOIN t;
+
+-- ===========================================================================
+-- EXTENSION PATH (SPEC §5.4). Conservative. Counts here never include
+-- shortening rows, and no view combines this path with the harm path.
+-- ===========================================================================
+
+DROP VIEW IF EXISTS v_extension_evidence;
+CREATE VIEW v_extension_evidence AS
+WITH ext AS (
+  SELECT ae.compound_id,
+         count(*)                                            AS n_extension_rows,
+         sum(st.tier = 'mammal')                             AS n_extension_rows_mammal,
+         count(DISTINCT ae.pmid)                             AS n_extension_pmids,
+         count(DISTINCT p.lab_group)                         AS n_extension_lab_groups,
+         sum(p.lab_group IS NULL)                            AS n_extension_rows_lab_unknown
+  FROM animal_evidence ae
+  LEFT JOIN species_taxon st ON st.species = ae.species
+  LEFT JOIN publication p    ON p.pmid = ae.pmid
+  WHERE ae.direction = 'extension'
+  GROUP BY ae.compound_id),
+t AS (SELECT value AS min_groups FROM analysis_threshold WHERE name = 'replication_min_lab_groups')
+SELECT c.compound_id, c.canonical_name, c.entry_route,
+       ext.n_extension_rows, ext.n_extension_rows_mammal, ext.n_extension_pmids,
+       ext.n_extension_lab_groups, ext.n_extension_rows_lab_unknown,
+       coalesce(i.itp_cohorts_positive, 0) AS itp_cohorts_positive,
+       coalesce(i.itp_cohorts_total, 0)    AS itp_cohorts_total,
+       i.itp_male_positive, i.itp_male_total, i.itp_female_positive, i.itp_female_total,
+       coalesce(i.meets_itp_threshold, 0)  AS meets_itp_threshold,
+       (ext.n_extension_lab_groups >= t.min_groups)             AS replicated_by_lab_groups,
+       (ext.n_extension_lab_groups >= t.min_groups
+        OR coalesce(i.meets_itp_threshold, 0))                  AS replicated,
+       (ext.n_extension_rows_mammal > 0)                        AS has_mammal_extension
+FROM ext
+JOIN compound c USING (compound_id)
+LEFT JOIN v_itp_summary i USING (compound_id)
+CROSS JOIN t;
+
+-- Null cell evidence: ITP-tested and not meeting the ITP threshold. Built from
+-- ITP data alone, so it is the exact complement of meets_itp_threshold.
+DROP VIEW IF EXISTS v_itp_null;
+CREATE VIEW v_itp_null AS
+SELECT * FROM v_itp_summary WHERE NOT meets_itp_threshold;
+
+-- ===========================================================================
+-- HARM PATH (SPEC §5.7). Sensitive detection, mandatory human review.
+-- ===========================================================================
+
+-- Review queue. Detection only: appearing here surfaces nothing.
+DROP VIEW IF EXISTS v_harm_candidates;
+CREATE VIEW v_harm_candidates AS
+WITH sh AS (
+  SELECT ae.compound_id,
+         count(*)                         AS n_mammal_shortening_rows,
+         count(DISTINCT ae.pmid)          AS n_mammal_shortening_pmids,
+         group_concat(DISTINCT ae.species) AS species,
+         sum(ae.is_itp)                   AS n_itp_shortening_rows,
+         json_group_array(ae.id)          AS current_row_ids
+  FROM animal_evidence ae
+  JOIN species_taxon st ON st.species = ae.species AND st.tier = 'mammal'
+  WHERE ae.direction = 'shortening'
+  GROUP BY ae.compound_id),
+t AS (SELECT value AS min_rows FROM analysis_threshold WHERE name = 'harm_min_mammal_shortening_rows')
+SELECT c.compound_id, c.canonical_name, c.entry_route,
+       sh.n_mammal_shortening_rows, sh.n_mammal_shortening_pmids, sh.species, sh.n_itp_shortening_rows,
+       sh.current_row_ids,
+       coalesce(hr.decision, 'unreviewed') AS review_state
+FROM sh
+JOIN compound c USING (compound_id)
+CROSS JOIN t
+LEFT JOIN harm_review hr USING (compound_id)
+WHERE sh.n_mammal_shortening_rows >= t.min_rows;
+
+-- The harm-path deliverable. Reads ONLY from harm_review rows with
+-- decision = 'surface'; there is no path into this view without a named reviewer.
+DROP VIEW IF EXISTS v_harm_signal;
+CREATE VIEW v_harm_signal AS
+SELECT c.compound_id, c.canonical_name, c.entry_route,
+       hr.human_exposure_basis, hr.rationale, hr.reviewed_by, hr.reviewed_at,
+       hc.n_mammal_shortening_rows, hc.n_mammal_shortening_pmids, hc.species,
+       (hc.compound_id IS NOT NULL) AS still_meets_threshold,
+       -- Evidence added or removed since review: the decision needs revisiting.
+       (EXISTS (SELECT 1 FROM json_each(coalesce(hc.current_row_ids, '[]')) cur
+                WHERE cur.value NOT IN (SELECT value FROM json_each(hr.evidence_row_ids)))
+        OR EXISTS (SELECT 1 FROM json_each(hr.evidence_row_ids) rev
+                   WHERE rev.value NOT IN (SELECT value FROM json_each(coalesce(hc.current_row_ids, '[]')))))
+         AS evidence_changed_since_review
+FROM harm_review hr
+JOIN compound c USING (compound_id)
+LEFT JOIN v_harm_candidates hc USING (compound_id)
+WHERE hr.decision = 'surface';
+
+PRAGMA user_version = 2;

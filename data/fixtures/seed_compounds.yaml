@@ -19,11 +19,22 @@
 #   must_not_match   Strings the resolver MUST NOT map to this compound (precision tests).
 #   needs_review     Strings the resolver must route to manual review, never auto-map
 #                    (combination products, mixtures, extracts, stereo ambiguity).
+#   route_excluded   Strings that DO resolve to this compound but fail the systemic
+#                    exposure criterion (SPEC §5.6): stents, topicals, implants, ...
 #   expected_entry_route  direct | class | excluded
-#   expected_itp     positive (>=1 ITP cohort with significant extension) | null_result | untested
-#   headline_v1      true if the compound has mammal evidence (v1 headline scope)
+#   expected_paths   Entry paths from the compound's OWN DrugAge evidence (SPEC §1);
+#                    class entry is recorded separately in expected_entry_route:
+#                    extension (>=1 significant extension, any species) and/or
+#                    harm_candidate (>=1 significant mammalian shortening; surfacing
+#                    still needs human review). [] = in the data, on no path.
+#   itp_cohorts      ITP cohorts with significant extension / ITP cohorts tested,
+#                    overall and by sex. Ratios, not a verdict (SPEC §5.4).
+#   mammal_evidence  any mammal row, any direction (the 159-compound universe)
+#   mammal_extension >=1 significant mammal extension row
+#   decisions        Decisions made by a named person, with date. Distinct from the
+#                    entry-level review sign-off.
 
-fixture_version: 0.1.0
+fixture_version: 0.2.0
 pubchem_checked_at: "2026-11-11"
 drugage_version: "Build 5 (2024-11-29); archive sha256 d12f59717de60a207748f53bdbcdb484ed07e30d8608eb8e4a101e2a08d7fa80"
 
@@ -35,8 +46,10 @@ compounds:
     group: naming_nightmare
     role: seed
     expected_entry_route: direct
-    expected_itp: positive
-    headline_v1: true
+    expected_paths: [extension]
+    itp_cohorts: {positive: 14, total: 16, male: [7, 8], female: [7, 8]}
+    mammal_evidence: true
+    mammal_extension: true
     pubchem_cid: 5284616
     inchikey: QFJCIRLUMZQUOT-HPLJOQBZSA-N
     chembl_id: null
@@ -46,12 +59,14 @@ compounds:
                  "Sirolimus 0.5 mg", "Rapamune 2mg tablet", "nab-sirolimus", "encapsulated rapamycin"]
     must_not_match: [everolimus, Everolimus, temsirolimus, zotarolimus, ridaforolimus, umirolimus,
                      tacrolimus, FK506, pimecrolimus, RAD001, Afinitor, Zortress, Torisel]
-    needs_review: ["sirolimus-eluting stent", "rapamycin topical"]
+    needs_review: []
     notes: >
       Rapalogs are different molecules; never merge. A future 'analogue_of' link may relate
-      them. Drug-eluting stents deliver sirolimus locally to the coronary artery; whether a
-      stent trial counts as a sirolimus trial is a scope decision, so it goes to review.
-      nab-sirolimus (Fyarro) is a formulation of the same molecule.
+      them. Stents and topicals resolve to sirolimus (identity) but fail the systemic
+      exposure criterion (route). nab-sirolimus (Fyarro) is IV: same molecule, systemic.
+    route_excluded: ["sirolimus-eluting stent", "sirolimus-eluting coronary stent", "rapamycin topical", "topical sirolimus", "sirolimus gel"]
+    decisions:
+    - {decision: "Drug-eluting stents excluded by the systemic exposure rule (SPEC §5.6), not case by case.", decided_by: "Kevin Ferguson", decided_at: "2026-11-11"}
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: 17a-estradiol
@@ -59,8 +74,10 @@ compounds:
     group: naming_nightmare
     role: seed
     expected_entry_route: direct
-    expected_itp: positive
-    headline_v1: true
+    expected_paths: [extension]
+    itp_cohorts: {positive: 4, total: 6, male: [4, 4], female: [0, 2]}
+    mammal_evidence: true
+    mammal_extension: true
     pubchem_cid: 68570
     inchikey: VOXZDWNPVJITMN-SFFUCWETSA-N
     chembl_id: null
@@ -76,8 +93,11 @@ compounds:
       THE stereo trap. 17-beta-estradiol (CID 5757, VOXZDWNPVJITMN-ZBRFXRBCSA-N) shares the
       InChIKey first block and has a massive HRT trial dossier; a false join would put this
       compound straight into the gold cell. Bare 'estradiol' always means 17-beta.
-      ITP effect is male-only (females NS). Human use: topical alfatradiol for alopecia (EU).
+      ITP effect is male-only (4/4 male, 0/2 female). Human use is topical alfatradiol for
+      alopecia (EU), which the systemic exposure rule excludes: expect almost no qualifying trials.
       DrugAge's string uses U+2010 hyphens; ASCII matching alone will miss it.
+    route_excluded: ["alfatradiol topical solution", "Ell-Cranell alpha", "topical 17-alpha-estradiol"]
+    decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: ndga
@@ -85,8 +105,10 @@ compounds:
     group: naming_nightmare
     role: seed
     expected_entry_route: direct
-    expected_itp: positive
-    headline_v1: true
+    expected_paths: [extension]
+    itp_cohorts: {positive: 4, total: 6, male: [4, 4], female: [0, 2]}
+    mammal_evidence: true
+    mammal_extension: true
     pubchem_cid: 4534
     inchikey: HCZKYJDFEPMADG-UHFFFAOYSA-N
     chembl_id: null
@@ -94,15 +116,46 @@ compounds:
     drugage_names: [Nordihydroguaiaretic acid]
     must_match: [nordihydroguaiaretic acid, NDGA, Nordihydroguaiaretic acid]
     must_not_match: [guaiaretic acid, dihydroguaiaretic acid, tetra-O-methyl nordihydroguaiaretic acid,
-                     terameprocol, M4N, EM-1421]
-    needs_review: [masoprocol, Actinex, meso-NDGA, chaparral, Larrea tridentata extract]
+                     terameprocol, M4N, EM-1421, masoprocol, Masoprocol, Actinex, meso-NDGA]
+    needs_review: [chaparral, Larrea tridentata extract]
+    same_substance_as: masoprocol
     notes: >
-      DECISION NEEDED. CID 4534 has undefined stereo. Masoprocol (CID 71398,
-      HCZKYJDFEPMADG-TXEJJXNPSA-N) is the meso stereoisomer and was an approved topical drug
-      (Actinex). Same first block, different full key. Commercial NDGA is predominantly meso,
-      so they are probably the same substance in practice, but that is a manual call, not an
-      InChIKey match. Terameprocol (M4N) is a methylated derivative: a different molecule.
+      CID 4534 has undefined stereo. Masoprocol (CID 71398, HCZKYJDFEPMADG-TXEJJXNPSA-N) is
+      the meso stereoisomer, an approved topical drug (Actinex). Same first block, different
+      full key. Decided: two compound rows, linked same_substance_as (see masoprocol entry);
+      the resolver maps masoprocol strings to masoprocol, never to NDGA.
+      Terameprocol (M4N) is a methylated derivative: a different molecule.
       Chaparral is the plant source: an extract, never a match.
+    route_excluded: []
+    decisions:
+    - {decision: "NDGA and masoprocol are separate compound rows linked same_substance_as; canonical InChIKeys are not overridden to force a merge.", decided_by: "Kevin Ferguson", decided_at: "2026-11-11"}
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: masoprocol
+    canonical_name: masoprocol
+    group: naming_nightmare
+    role: linked_compound
+    expected_entry_route: excluded
+    expected_paths: []
+    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    mammal_evidence: false
+    mammal_extension: false
+    pubchem_cid: 71398
+    inchikey: HCZKYJDFEPMADG-TXEJJXNPSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: []
+    must_match: [masoprocol, Masoprocol, Actinex, meso-NDGA, meso-nordihydroguaiaretic acid]
+    must_not_match: [nordihydroguaiaretic acid, NDGA, terameprocol, M4N]
+    needs_review: []
+    same_substance_as: ndga
+    route_excluded: [Actinex, "masoprocol cream", "masoprocol 10% cream"]
+    decisions:
+    - {decision: "Separate row from NDGA, linked same_substance_as. Not in DrugAge; enters no path on its own.", decided_by: "Kevin Ferguson", decided_at: "2026-11-11"}
+    notes: >
+      The meso stereoisomer of NDGA. Exists to keep NDGA's identity clean: masoprocol strings
+      resolve here, not to NDGA. Its human use (Actinex, topical for actinic keratosis) also
+      fails the systemic exposure rule.
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: akg
@@ -110,8 +163,10 @@ compounds:
     group: naming_nightmare
     role: seed
     expected_entry_route: direct
-    expected_itp: null_result
-    headline_v1: true
+    expected_paths: [extension]
+    itp_cohorts: {positive: 0, total: 2, male: [0, 1], female: [0, 1]}
+    mammal_evidence: true
+    mammal_extension: true
     pubchem_cid: 51
     inchikey: KPGXRSRHYNQIFN-UHFFFAOYSA-N
     chembl_id: null
@@ -129,6 +184,8 @@ compounds:
       Ornithine / arginine AKG are salts with a second active amino acid: mixtures, review.
       Dimethyl-AKG is a cell-permeable ester (different molecule). ITP: NS both sexes, but
       non-ITP mouse data exist: a real test of the ITP-null cell.
+    route_excluded: []
+    decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   # ------------------------------------------------- heavy human data, other indications
@@ -137,8 +194,10 @@ compounds:
     group: heavy_human_data
     role: seed
     expected_entry_route: direct
-    expected_itp: null_result
-    headline_v1: true
+    expected_paths: [extension, harm_candidate]
+    itp_cohorts: {positive: 0, total: 2, male: [0, 1], female: [0, 1]}
+    mammal_evidence: true
+    mammal_extension: true
     pubchem_cid: 4091
     inchikey: XZWYZXLIPXDOLR-UHFFFAOYSA-N
     chembl_id: null
@@ -155,6 +214,9 @@ compounds:
       metformin but test another drug: review. ITP: NS both sexes (metformin alone).
       Phenformin and buformin are in DrugAge as separate biguanides: separate compounds,
       and probable class-mates via ATC A10BA.
+      Harm candidate: non-ITP mouse study, male -14% (significant). On both paths; counts never merge.
+    route_excluded: []
+    decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: canagliflozin
@@ -162,8 +224,10 @@ compounds:
     group: heavy_human_data
     role: seed
     expected_entry_route: direct
-    expected_itp: positive
-    headline_v1: true
+    expected_paths: [extension, harm_candidate]
+    itp_cohorts: {positive: 3, total: 6, male: [3, 3], female: [0, 3]}
+    mammal_evidence: true
+    mammal_extension: true
     pubchem_cid: 24812758
     inchikey: XTNGUQKDFGDXSJ-ZXGKGEBGSA-N
     chembl_id: null
@@ -173,9 +237,11 @@ compounds:
     must_not_match: [dapagliflozin, empagliflozin, ertugliflozin, sotagliflozin, ipragliflozin, Jardiance, Farxiga]
     needs_review: [Invokamet, "canagliflozin/metformin", "SGLT2 inhibitor", "SGLT2i"]
     notes: >
-      ITP: male-only extension; females NS (one cohort female -6%, significant).
+      ITP: male 3/3, female 0/3, and one female cohort -6% significant: also a harm candidate.
       The basis compound for class entry of other SGLT2 inhibitors (empagliflozin test case).
       Class-level strings ('SGLT2 inhibitor') are not compound matches.
+    route_excluded: []
+    decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: aspirin
@@ -183,8 +249,10 @@ compounds:
     group: heavy_human_data
     role: seed
     expected_entry_route: direct
-    expected_itp: positive
-    headline_v1: true
+    expected_paths: [extension, harm_candidate]
+    itp_cohorts: {positive: 1, total: 6, male: [1, 3], female: [0, 3]}
+    mammal_evidence: true
+    mammal_extension: true
     pubchem_cid: 2244
     inchikey: BSYNRYMUTXBXSQ-UHFFFAOYSA-N
     chembl_id: null
@@ -202,11 +270,12 @@ compounds:
       '5-ASA' (mesalamine) vs 'ASA' (aspirin) is a substring trap. Salicylic acid is
       aspirin's metabolite but a different compound. Lysine acetylsalicylate and carbasalate
       calcium are aspirin salts/complexes and collapse to aspirin (note the salt).
-      Aluminum acetylsalicylate (DrugAge, flies) does not resolve in PubChem by name:
-      manual salt-collapse decision. ITP: one male cohort significant (+8%), other cohorts
-      NS. Under the corrected §5.4 rule this still counts as ITP-positive; it is the weakest
-      such case and a good test of whether the rule is too permissive.
+      Aluminum acetylsalicylate (DrugAge, flies) does not resolve in PubChem: unresolvable. ITP: 1/6 cohorts (male 1/3, female 0/3). Also a harm
+      candidate: one non-ITP female mouse study, -10% (significant).
       Multi-class (B01AC + N02BA + others): will be flagged for ATC review.
+    route_excluded: []
+    decisions:
+    - {decision: "Aluminium acetylsalicylate is unresolvable; left in drugage_names_needs_review.", decided_by: "Kevin Ferguson", decided_at: "2026-11-11"}
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: lithium
@@ -214,8 +283,10 @@ compounds:
     group: heavy_human_data
     role: seed
     expected_entry_route: direct
-    expected_itp: untested
-    headline_v1: false
+    expected_paths: [extension]
+    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    mammal_evidence: false
+    mammal_extension: false
     pubchem_cid: 28486
     inchikey: HBBGRARXTFLTSG-UHFFFAOYSA-N
     chembl_id: null
@@ -233,6 +304,9 @@ compounds:
       real false-positive source. Orotate/aspartate are supplement salts with weak
       evidence of equivalence: review. DrugAge evidence is worms/flies only, so lithium is
       outside the v1 headline despite a large human psychiatric dossier.
+    route_excluded: []
+    decisions:
+    - {decision: "Accepted: all lithium salts collapse to Li+ (CID 28486). Manual salt-collapse override, SPEC §5.1.", decided_by: "Kevin Ferguson", decided_at: "2026-11-11"}
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: acarbose
@@ -240,8 +314,10 @@ compounds:
     group: heavy_human_data
     role: seed
     expected_entry_route: direct
-    expected_itp: positive
-    headline_v1: true
+    expected_paths: [extension]
+    itp_cohorts: {positive: 9, total: 10, male: [5, 5], female: [4, 5]}
+    mammal_evidence: true
+    mammal_extension: true
     pubchem_cid: 9811704
     inchikey: CEMXHAPUFJOOSV-XGWNLRGSSA-N
     chembl_id: null
@@ -255,6 +331,9 @@ compounds:
       (XUFXOAAUWZOOIT-UGEKTDRHSA-N, same formula C25H43NO18) also exists; confirm against
       ChEMBL's standard InChIKey before accepting. ITP: strongest male effect in DrugAge
       (up to +22%), females smaller. Large human RCTs (STOP-NIDDM, ACE): gold-cell candidate.
+    route_excluded: []
+    decisions:
+    - {decision: "DEFERRED until ChEMBL recovers: take the PubChem record carrying ATC A10BF01.", decided_by: "Kevin Ferguson", decided_at: "2026-11-11"}
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: captopril
@@ -262,8 +341,10 @@ compounds:
     group: heavy_human_data
     role: seed
     expected_entry_route: direct
-    expected_itp: positive
-    headline_v1: true
+    expected_paths: [extension]
+    itp_cohorts: {positive: 2, total: 2, male: [1, 1], female: [1, 1]}
+    mammal_evidence: true
+    mammal_extension: true
     pubchem_cid: 44093
     inchikey: FAKRSMQSSFJEIM-RQJHMYQMSA-N
     chembl_id: null
@@ -276,6 +357,8 @@ compounds:
       ITP-positive. Enalapril is also in DrugAge and is ITP-null: an ACE-inhibitor class
       with one positive and one null direct member, which tests whether class entry and
       the null cell stay distinct.
+    route_excluded: []
+    decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: meclizine
@@ -283,8 +366,10 @@ compounds:
     group: heavy_human_data
     role: seed
     expected_entry_route: direct
-    expected_itp: positive
-    headline_v1: true
+    expected_paths: [extension]
+    itp_cohorts: {positive: 2, total: 2, male: [1, 1], female: [1, 1]}
+    mammal_evidence: true
+    mammal_extension: true
     pubchem_cid: 4034
     inchikey: OCJYIGYOJCODJL-UHFFFAOYSA-N
     chembl_id: null
@@ -297,6 +382,8 @@ compounds:
       'Meclozine' is the INN; 'meclizine' the USAN. Plain 'Dramamine' is dimenhydrinate;
       'Dramamine Less Drowsy' is meclizine (brand-extension trap). Cyclizine is in DrugAge
       separately ('Cyclizine HCl', parent CID 6726) and probably shares ATC class R06AE.
+    route_excluded: []
+    decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   # ---------------------------------------------------------------------------- senolytics
@@ -305,8 +392,10 @@ compounds:
     group: senolytic
     role: seed
     expected_entry_route: direct
-    expected_itp: untested
-    headline_v1: true
+    expected_paths: [extension, harm_candidate]
+    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    mammal_evidence: true
+    mammal_extension: false
     pubchem_cid: 5280343
     inchikey: REFJWTPEDVJJIY-UHFFFAOYSA-N
     chembl_id: null
@@ -320,6 +409,10 @@ compounds:
       glycosides: different molecules, and rutin is itself in DrugAge. D+Q is excluded as
       a mixture (SPEC §6) but trial strings containing it must go to review, not silently
       map to quercetin. Phytosome = formulation: review.
+      Its only significant mammal result is a SHORTENING (male mouse -14%): harm candidate,
+      and its extension evidence is invertebrate-only.
+    route_excluded: []
+    decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: fisetin
@@ -327,8 +420,10 @@ compounds:
     group: senolytic
     role: seed
     expected_entry_route: direct
-    expected_itp: null_result
-    headline_v1: true
+    expected_paths: [extension]
+    itp_cohorts: {positive: 0, total: 4, male: [0, 2], female: [0, 2]}
+    mammal_evidence: true
+    mammal_extension: true
     pubchem_cid: 5281614
     inchikey: XHEFDIBZLJXQHF-UHFFFAOYSA-N
     chembl_id: null
@@ -338,6 +433,8 @@ compounds:
     must_not_match: [quercetin, kaempferol, fisetinidol, luteolin]
     needs_review: []
     notes: ITP-null both sexes despite non-ITP mouse data. Null-cell candidate.
+    route_excluded: []
+    decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   # --------------------------------------------------------------- supplement-adjacent
@@ -346,8 +443,10 @@ compounds:
     group: supplement_adjacent
     role: seed
     expected_entry_route: direct
-    expected_itp: untested
-    headline_v1: false
+    expected_paths: []
+    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    mammal_evidence: false
+    mammal_extension: false
     pubchem_cid: 14180
     inchikey: DAYLJWODMCOQEW-TURQNECASA-N
     chembl_id: null
@@ -361,7 +460,11 @@ compounds:
     notes: >
       PubChem name lookup -> CID 14180 (neutral/zwitterion); PubChem's 'parent' points to
       CID 14181, a protonated cation (-O suffix). Keep 14180. NMNH is the reduced form:
-      different molecule. DrugAge has one fly entry only, so outside v1 headline.
+      different molecule. DrugAge has one fly row with no significant extension: NMN is in the
+      data but on NO entry path. A hyped supplement correctly absent from the map.
+    route_excluded: []
+    decisions:
+    - {decision: "DEFERRED until ChEMBL recovers: take the beta-anomer record.", decided_by: "Kevin Ferguson", decided_at: "2026-11-11"}
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: nr
@@ -369,8 +472,10 @@ compounds:
     group: supplement_adjacent
     role: seed
     expected_entry_route: direct
-    expected_itp: null_result
-    headline_v1: true
+    expected_paths: [extension]
+    itp_cohorts: {positive: 0, total: 2, male: [0, 1], female: [0, 1]}
+    mammal_evidence: true
+    mammal_extension: true
     pubchem_cid: 439924
     inchikey: JLEBZPBDRKPWTD-TURQNECASA-O
     chembl_id: null
@@ -386,6 +491,8 @@ compounds:
       chloride salt (CID 90480033) collapses to it. 'NR' is a dangerous abbreviation
       (also 'not reported', 'normal range'): exact-token, context-checked only.
       NRPT/Basis is NR + pterostilbene: mixture, review. ITP: NS.
+    route_excluded: []
+    decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: resveratrol
@@ -393,8 +500,10 @@ compounds:
     group: supplement_adjacent
     role: seed
     expected_entry_route: direct
-    expected_itp: null_result
-    headline_v1: true
+    expected_paths: [extension]
+    itp_cohorts: {positive: 0, total: 6, male: [0, 3], female: [0, 3]}
+    mammal_evidence: true
+    mammal_extension: false
     pubchem_cid: 445154
     inchikey: LUKBXSAWLPMMSZ-OWOJBTEDSA-N
     chembl_id: null
@@ -407,7 +516,10 @@ compounds:
     notes: >
       CID 445154 is trans. cis-resveratrol (CID 1548910) shares the first block: review,
       not auto-match. SRT501 is a resveratrol formulation; SRT2104/SRT1720 are different
-      synthetic SIRT1 activators. Polydatin/piceid is the glucoside. ITP: NS. Null-cell candidate.
+      synthetic SIRT1 activators. Polydatin/piceid is the glucoside. ITP 0/6. Null-cell candidate.
+      No significant mammal extension anywhere in DrugAge: extension evidence is invertebrate-only.
+    route_excluded: []
+    decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: spermidine
@@ -415,8 +527,10 @@ compounds:
     group: supplement_adjacent
     role: seed
     expected_entry_route: direct
-    expected_itp: untested
-    headline_v1: true
+    expected_paths: [extension]
+    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    mammal_evidence: true
+    mammal_extension: true
     pubchem_cid: 1102
     inchikey: ATHGHQPFGPMSJY-UHFFFAOYSA-N
     chembl_id: null
@@ -428,6 +542,8 @@ compounds:
     notes: >
       Most human trials use wheat-germ extracts, not pure spermidine: extracts go to review
       and probably do not map. Spermine and putrescine are separate DrugAge compounds.
+    route_excluded: []
+    decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: taurine
@@ -435,8 +551,10 @@ compounds:
     group: supplement_adjacent
     role: seed
     expected_entry_route: direct
-    expected_itp: untested
-    headline_v1: true
+    expected_paths: [extension]
+    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    mammal_evidence: true
+    mammal_extension: true
     pubchem_cid: 1123
     inchikey: XOAAWQZATWQOTB-UHFFFAOYSA-N
     chembl_id: null
@@ -450,6 +568,8 @@ compounds:
       TUDCA and taurolidine contain 'taur' and appear in many trials: substring traps.
       Acamprosate is N-acetylhomotaurine. Note: 'L-taurine' is a common but chemically
       meaningless label (taurine is achiral); still must match.
+    route_excluded: []
+    decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   # ---------------------------------------------- class-layer test cases (not seeds)
@@ -458,8 +578,10 @@ compounds:
     group: class_test_case
     role: class_test_case
     expected_entry_route: class
-    expected_itp: untested
-    headline_v1: false
+    expected_paths: []
+    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    mammal_evidence: false
+    mammal_extension: false
     expected_class_basis: {atc_level4: A10BK, basis: canagliflozin}
     pubchem_cid: 11949646
     inchikey: OBWASQILIWPZMG-QZMOQZSNSA-N
@@ -474,6 +596,8 @@ compounds:
       because canagliflozin is a direct member. Must appear with entry_route='class' and
       never be merged with direct-entry output. headline_v1 refers to direct mammal
       evidence, which it has none of.
+    route_excluded: []
+    decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: semaglutide
@@ -481,8 +605,10 @@ compounds:
     group: class_test_case
     role: class_test_case
     expected_entry_route: excluded
-    expected_itp: untested
-    headline_v1: false
+    expected_paths: []
+    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    mammal_evidence: false
+    mammal_extension: false
     expected_class_basis: {atc_level4: A10BJ, basis: null}
     pubchem_cid: 56843331
     inchikey: DLSWIYLPEUIQAV-CCUURXOWSA-N
@@ -496,4 +622,6 @@ compounds:
       NEGATIVE class test. Not in DrugAge, and no GLP-1 receptor agonist is in DrugAge
       Build 5, so class A10BJ has no direct basis: must NOT enter, despite an enormous
       human dossier. If it appears in any output, class entry is leaking.
+    route_excluded: []
+    decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}

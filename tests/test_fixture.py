@@ -22,6 +22,7 @@ class FixtureInternal(unittest.TestCase):
             roles.setdefault(c["role"], set()).add(c["key"])
         self.assertEqual(len(roles["seed"]), 18)
         self.assertEqual(roles["class_test_case"], {"empagliflozin", "semaglutide"})
+        self.assertEqual(roles["linked_compound"], {"masoprocol"})
         for dropped in ("dasatinib", "glycine-nac", "dasatinib-quercetin"):
             self.assertNotIn(dropped, self.by_key())
 
@@ -38,6 +39,43 @@ class FixtureInternal(unittest.TestCase):
 
     def test_rapalogs_never_match_rapamycin(self):
         self.assertIn("everolimus", self.by_key()["rapamycin"]["must_not_match"])
+
+    def test_ndga_masoprocol_linked_not_merged(self):
+        k = self.by_key()
+        self.assertEqual(k["ndga"]["same_substance_as"], "masoprocol")
+        self.assertEqual(k["masoprocol"]["same_substance_as"], "ndga")
+        self.assertNotEqual(k["ndga"]["inchikey"], k["masoprocol"]["inchikey"])
+        self.assertIn("masoprocol", k["ndga"]["must_not_match"])
+
+    def test_stents_are_route_excluded_not_identity_excluded(self):
+        r = self.by_key()["rapamycin"]
+        self.assertIn("sirolimus-eluting stent", r["route_excluded"])
+        self.assertNotIn("sirolimus-eluting stent", r["must_not_match"] + r["needs_review"])
+
+    def test_both_path_compounds(self):
+        both = {c["key"] for c in self.fx["compounds"]
+                if set(c["expected_paths"]) == {"extension", "harm_candidate"}}
+        self.assertEqual(both, {"metformin", "canagliflozin", "aspirin", "quercetin"})
+
+    def test_nmn_is_on_no_path(self):
+        self.assertEqual(self.by_key()["nmn"]["expected_paths"], [])
+
+    def test_user_decisions_are_attributed(self):
+        decided = {c["key"] for c in self.fx["compounds"] if c["decisions"]}
+        self.assertTrue({"ndga", "masoprocol", "lithium", "acarbose", "nmn", "aspirin", "rapamycin"} <= decided)
+
+    def test_validator_catches_unreciprocated_link(self):
+        fx = copy.deepcopy(self.fx)
+        for c in fx["compounds"]:
+            if c["key"] == "masoprocol":
+                c["same_substance_as"] = None
+        self.assertTrue(any("not reciprocated" in e for e in fixture.validate(fx)))
+
+    def test_validator_catches_route_excluded_conflict(self):
+        fx = copy.deepcopy(self.fx)
+        r = next(c for c in fx["compounds"] if c["key"] == "rapamycin")
+        r["must_not_match"].append(r["route_excluded"][0])
+        self.assertTrue(any("route_excluded/must_not_match" in e for e in fixture.validate(fx)))
 
     def test_validator_catches_truncated_inchikey(self):
         fx = copy.deepcopy(self.fx)
