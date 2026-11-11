@@ -158,3 +158,4 @@ class CachedFetcher:
     def get_json(self, endpoint: str, params: dict | None = None, **kw):
         resp = self.get(endpoint, params, **kw)
         return resp.http_status, json.loads(resp.body) if resp.http_status == 200 else None
+

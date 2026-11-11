@@ -50,11 +50,20 @@ CREATE TABLE IF NOT EXISTS compound (
                       inchikey GLOB '[A-Z][A-Z][A-Z][A-Z][A-Z][A-Z][A-Z][A-Z][A-Z][A-Z][A-Z][A-Z][A-Z][A-Z]-[A-Z][A-Z][A-Z][A-Z][A-Z][A-Z][A-Z][A-Z][A-Z][A-Z]-[A-Z]')),
   chembl_id       TEXT UNIQUE,
   is_mixture      INTEGER NOT NULL DEFAULT 0 CHECK (is_mixture IN (0, 1)),
-  -- 'direct': has animal lifespan evidence itself.
-  -- 'class' : enters only because it shares an ATC level-4 class with a
-  --           'direct' compound. Weaker, one-hop inference. Never merge the two in output.
-  entry_route     TEXT NOT NULL CHECK (entry_route IN ('direct', 'class')),
-  notes           TEXT
+  -- Mechanism of entry (SPEC §1):
+  --   'direct'                 has measured animal lifespan evidence itself (DrugAge)
+  --   'class'                  shares an ATC level-4 class with a 'direct' compound (one hop)
+  --   'reprogramming_cocktail' named component of a published chemical reprogramming
+  --                            cocktail (reprogramming_evidence), no lifespan evidence
+  entry_route     TEXT NOT NULL CHECK (entry_route IN ('direct', 'class', 'reprogramming_cocktail')),
+  -- Evidential grade (SPEC §1). Every compound-level view carries it; no view shows a
+  -- compound in a count without it. Where a compound qualifies several ways, the
+  -- strongest grade wins: measured_lifespan > inherited_class > mechanistic_only.
+  evidence_tier   TEXT NOT NULL CHECK (evidence_tier IN ('measured_lifespan', 'inherited_class', 'mechanistic_only')),
+  notes           TEXT,
+  CHECK ((entry_route = 'direct'                 AND evidence_tier = 'measured_lifespan') OR
+         (entry_route = 'class'                  AND evidence_tier = 'inherited_class') OR
+         (entry_route = 'reprogramming_cocktail' AND evidence_tier = 'mechanistic_only'))
 );
 
 -- Mixtures link to their parents (SPEC §5.1).
@@ -100,6 +109,38 @@ CREATE TABLE IF NOT EXISTS compound_atc (
 
 CREATE INDEX IF NOT EXISTS ix_compound_atc_l4 ON compound_atc (atc_level4);
 
+-- Chemical reprogramming evidence (SPEC §5.8): the premise for the third entry path.
+-- To the standard DrugAge meets: no bare names. Every row must say where (PMID or
+-- DOI), which cocktail, its components, which cells, and what was demonstrated.
+-- Curated in data/reference/reprogramming_evidence.yaml and loaded from there.
+CREATE TABLE IF NOT EXISTS reprogramming_evidence (
+  id                     INTEGER PRIMARY KEY,
+  compound_id            INTEGER NOT NULL REFERENCES compound (compound_id),
+  source_component_name  TEXT NOT NULL CHECK (length(trim(source_component_name)) > 0),  -- as the paper wrote it
+  citation_pmid          TEXT CHECK (citation_pmid IS NULL OR (citation_pmid GLOB '[1-9]*' AND citation_pmid NOT GLOB '*[^0-9]*')),
+  citation_doi           TEXT CHECK (citation_doi IS NULL OR citation_doi LIKE '10.%/%'),
+  cocktail_name          TEXT NOT NULL CHECK (length(trim(cocktail_name)) > 0),
+  cocktail_components    TEXT NOT NULL CHECK (json_valid(cocktail_components)
+                           AND json_type(cocktail_components) = 'array'
+                           AND json_array_length(cocktail_components) >= 2),  -- a cocktail, not a single agent
+  composition_complete   INTEGER NOT NULL CHECK (composition_complete IN (0, 1)),
+  cell_type              TEXT NOT NULL CHECK (length(trim(cell_type)) > 0),
+  cell_species           TEXT NOT NULL CHECK (length(trim(cell_species)) > 0),
+  in_vivo                INTEGER NOT NULL CHECK (in_vivo IN (0, 1)),
+  demonstration_kind     TEXT NOT NULL CHECK (demonstration_kind IN (
+                           'full_pluripotency', 'partial_reprogramming_rejuvenation', 'transdifferentiation')),
+  demonstrated           TEXT NOT NULL CHECK (length(trim(demonstrated)) >= 40),  -- what was actually shown
+  verified_from          TEXT NOT NULL CHECK (verified_from IN ('full_text', 'abstract')),
+  recorded_by            TEXT NOT NULL CHECK (length(trim(recorded_by)) > 0),
+  recorded_at            TEXT NOT NULL,
+  reviewed_by            TEXT,
+  reviewed_at            TEXT,
+  note                   TEXT,
+  CHECK (citation_pmid IS NOT NULL OR citation_doi IS NOT NULL),
+  CHECK (reviewed_by IS NULL OR reviewed_at IS NOT NULL),
+  UNIQUE (compound_id, cocktail_name, citation_pmid, citation_doi)
+);
+
 -- Reviewed links between compound rows that stay separate (SPEC §5.1).
 -- same_substance_as: e.g. NDGA (stereo undefined) and masoprocol (meso-NDGA).
 -- Never used to override a canonical InChIKey or to merge counts. Symmetric,
@@ -125,9 +166,17 @@ CREATE TABLE IF NOT EXISTS analysis_threshold (
 
 INSERT OR IGNORE INTO analysis_threshold (name, value, rationale) VALUES
   ('itp_min_positive_cohorts', 1,
-   'SPEC §5.4: ≥1 ITP cohort with significant extension. The ratio is always shown alongside.'),
+   'SPEC §5.4: ≥1 ITP cohort (one sex in one independent experiment) with significant extension. Ratio and tier always shown alongside.'),
   ('itp_min_positive_fraction', 0.0,
-   'Minimum positive/total ITP cohorts. 0 = no additional requirement beyond the cohort count.'),
+   'Minimum positive/total ITP cohorts. 0 = no requirement beyond the cohort count; the tier carries the strength.'),
+  ('itp_tier_strong_min_positive', 2,
+   'Tier strong: at least this many positive cohorts, and ...'),
+  ('itp_tier_strong_min_fraction', 0.5,
+   '... at least this fraction of cohorts positive.'),
+  ('itp_tier_weak_max_positive', 1,
+   'Tier weak: at most this many positive cohorts, and ...'),
+  ('itp_tier_weak_below_fraction', 0.5,
+   '... positive fraction below this (the majority of cohorts not positive). Anything else with ≥1 positive is mixed.'),
   ('replication_min_lab_groups', 2,
    'SPEC §5.4: ≥2 independent lab groups (senior author + affiliation) with significant extension.'),
   ('harm_min_mammal_shortening_rows', 1,
@@ -158,22 +207,63 @@ CREATE TABLE IF NOT EXISTS animal_evidence (
   weight_change_pct         REAL,
   weight_change_significance TEXT CHECK (weight_change_significance IN ('S', 'NS')),
   -- Direction of effect (SPEC §5.4), derived by agesdk.evidence.derive_direction.
-  -- 'null' = measured, not significant. 'unassessed' = no significance reported:
-  -- NOT negative evidence. Every row is kept whatever its direction.
+  -- Per measure: 'extension' | 'shortening' (significant), 'null' (measured, not
+  -- significant), 'unassessed' (no significance reported: NOT negative evidence).
+  avg_direction             TEXT NOT NULL
+                              CHECK (avg_direction IN ('extension', 'shortening', 'null', 'unassessed')),
+  max_direction             TEXT NOT NULL
+                              CHECK (max_direction IN ('extension', 'shortening', 'null', 'unassessed')),
+  -- Combined. Average and maximum are treated symmetrically; no precedence. Where
+  -- they point in opposite directions the row is 'conflict' and goes to human review
+  -- (direction_review); until resolved it counts toward no path.
   direction                 TEXT NOT NULL
-                              CHECK (direction IN ('extension', 'shortening', 'null', 'unassessed')),
-  direction_basis           TEXT NOT NULL CHECK (direction_basis IN ('avg', 'max', 'none')),
+                              CHECK (direction IN ('extension', 'shortening', 'null', 'unassessed', 'conflict')),
+  direction_conflict        INTEGER NOT NULL CHECK (direction_conflict IN (0, 1)),
   direction_rule_version    TEXT NOT NULL,
+  -- Stable content hash of the source row: survives reloads, so reviews keyed on it persist.
+  evidence_key              TEXT NOT NULL,
   is_itp                    INTEGER NOT NULL DEFAULT 0 CHECK (is_itp IN (0, 1)),
   pmid                      TEXT,           -- joins publication.pmid; no FK, publications load later
   source                    TEXT NOT NULL DEFAULT 'drugage',
   source_compound_name      TEXT NOT NULL,  -- verbatim source string, unmodified
   raw_response_id           INTEGER REFERENCES raw_response (id),
   source_row_number         INTEGER,        -- 1-based data row within that raw response
-  UNIQUE (raw_response_id, source_row_number)
+  UNIQUE (raw_response_id, source_row_number),
+  CHECK ((direction = 'conflict') = (direction_conflict = 1))
 );
 
 CREATE INDEX IF NOT EXISTS ix_animal_evidence_compound ON animal_evidence (compound_id);
+CREATE INDEX IF NOT EXISTS ix_animal_evidence_key ON animal_evidence (evidence_key);
+
+-- Human override of a row's direction (SPEC §5.4). Keyed on evidence_key so a
+-- decision survives a reload of the normalised layer. Two uses:
+--   conflict_resolution — the row's measures point in opposite directions
+--   source_error        — the source misreports the publication (citation required)
+-- The raw and normalised layers are never edited; the override is applied in v_animal_evidence.
+CREATE TABLE IF NOT EXISTS direction_review (
+  evidence_key        TEXT PRIMARY KEY,
+  reason              TEXT NOT NULL CHECK (reason IN ('conflict_resolution', 'source_error')),
+  resolved_direction  TEXT NOT NULL
+                        CHECK (resolved_direction IN ('extension', 'shortening', 'null', 'unassessed')),
+  rationale           TEXT NOT NULL CHECK (length(trim(rationale)) > 0),
+  citation            TEXT,               -- e.g. 'PMID:38041783 abstract'
+  reviewed_by         TEXT NOT NULL CHECK (
+                        length(trim(reviewed_by)) > 0 AND
+                        lower(trim(reviewed_by)) NOT IN ('auto', 'automatic', 'system', 'pipeline', 'script', 'default')),
+  reviewed_at         TEXT NOT NULL CHECK (length(trim(reviewed_at)) > 0),
+  CHECK (reason <> 'source_error' OR length(trim(coalesce(citation, ''))) > 0)
+);
+
+-- ITP experiment identity (SPEC §5.4). By default an experiment is one PMID; this
+-- table overrides that where one paper reports several independent experiments or
+-- one experiment is reported across papers.
+CREATE TABLE IF NOT EXISTS itp_experiment_override (
+  evidence_key    TEXT PRIMARY KEY,
+  experiment_id   TEXT NOT NULL CHECK (length(trim(experiment_id)) > 0),
+  reviewed_by     TEXT NOT NULL CHECK (length(trim(reviewed_by)) > 0),
+  reviewed_at     TEXT NOT NULL,
+  note            TEXT
+);
 
 -- Publications behind animal evidence; lab_group derivation (SPEC §5.4).
 CREATE TABLE IF NOT EXISTS publication (
@@ -211,7 +301,8 @@ CREATE TABLE IF NOT EXISTS harm_review (
                           length(trim(reviewed_by)) > 0 AND
                           lower(trim(reviewed_by)) NOT IN ('auto', 'automatic', 'system', 'pipeline', 'script', 'default')),
   reviewed_at           TEXT NOT NULL CHECK (length(trim(reviewed_at)) > 0),
-  evidence_row_ids      TEXT NOT NULL CHECK (json_valid(evidence_row_ids) AND json_type(evidence_row_ids) = 'array'),
+  -- evidence_key values of the rows reviewed (stable across reloads)
+  evidence_keys         TEXT NOT NULL CHECK (json_valid(evidence_keys) AND json_type(evidence_keys) = 'array'),
   CHECK (decision <> 'surface' OR length(trim(coalesce(human_exposure_basis, ''))) > 0)
 );
 
@@ -303,6 +394,46 @@ WHERE r.id = (
   LIMIT 1);
 
 -- ---------------------------------------------------------------------------
+-- Effective direction: the source-derived direction, replaced by a human
+-- direction_review where one exists (conflict resolution or source-error correction). Every path view reads THIS, never
+-- animal_evidence.direction directly. Unresolved conflicts stay 'conflict' and
+-- count toward no path.
+-- ---------------------------------------------------------------------------
+
+DROP VIEW IF EXISTS v_animal_evidence;
+CREATE VIEW v_animal_evidence AS
+SELECT ae.*,
+       coalesce(dr.resolved_direction, ae.direction)   AS effective_direction,
+       dr.reason                                       AS direction_review_reason,
+       dr.reviewed_by                                  AS direction_reviewed_by,
+       st.tier                                         AS tier,
+       -- Exact duplicate source rows (every field identical; 7 in DrugAge Build 5,
+       -- all C. elegans). Kept, but counted once.
+       (row_number() OVER (PARTITION BY ae.evidence_key ORDER BY ae.id) > 1) AS is_exact_duplicate,
+       cmp.evidence_tier                               AS evidence_tier
+FROM animal_evidence ae
+JOIN compound cmp             ON cmp.compound_id = ae.compound_id
+LEFT JOIN direction_review dr ON dr.evidence_key = ae.evidence_key
+LEFT JOIN species_taxon st    ON st.species = ae.species;
+
+-- What every count is computed from: effective direction, exact duplicates removed.
+DROP VIEW IF EXISTS v_evidence_counted;
+CREATE VIEW v_evidence_counted AS
+SELECT * FROM v_animal_evidence WHERE NOT is_exact_duplicate;
+
+-- Conflicts awaiting a human. Mammal rows first: those can affect the harm path.
+DROP VIEW IF EXISTS v_direction_review_needed;
+CREATE VIEW v_direction_review_needed AS
+SELECT v.id, v.evidence_key, v.compound_id, c.canonical_name, v.evidence_tier, v.species, v.tier, v.sex,
+       v.avg_lifespan_change_pct, v.avg_lifespan_significance, v.avg_direction,
+       v.max_lifespan_change_pct, v.max_lifespan_significance, v.max_direction,
+       v.is_itp, v.pmid
+FROM v_animal_evidence v
+JOIN compound c USING (compound_id)
+WHERE v.effective_direction = 'conflict'
+ORDER BY (v.tier = 'mammal') DESC, c.canonical_name;
+
+-- ---------------------------------------------------------------------------
 -- Class entry (SPEC §5.5)
 -- ---------------------------------------------------------------------------
 
@@ -313,7 +444,7 @@ CREATE VIEW v_atc_review_needed AS
 WITH per_compound AS (
   SELECT compound_id, count(DISTINCT atc_level4) AS n_level4
   FROM compound_atc WHERE review_status <> 'residual' GROUP BY compound_id)
-SELECT c.compound_id, c.canonical_name, c.entry_route,
+SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
        ca.atc_code, ca.atc_level4, ca.review_status, pc.n_level4,
        'multi_class' AS reason
 FROM compound_atc ca
@@ -328,10 +459,11 @@ WHERE pc.n_level4 > 1
 DROP VIEW IF EXISTS v_class_entry_basis;
 CREATE VIEW v_class_entry_basis AS
 SELECT DISTINCT
-  c.compound_id, c.canonical_name, c.entry_route,
+  c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
   ca.atc_level4,
   b.compound_id    AS basis_compound_id,
-  b.canonical_name AS basis_canonical_name
+  b.canonical_name AS basis_canonical_name,
+  b.evidence_tier  AS basis_evidence_tier
 FROM compound c
 JOIN compound_atc ca ON ca.compound_id = c.compound_id
                     AND ca.review_status IN ('auto', 'accepted')
@@ -340,14 +472,14 @@ JOIN compound_atc ba ON ba.atc_level4 = ca.atc_level4
                     AND ba.review_status IN ('auto', 'accepted')
 JOIN compound b      ON b.compound_id = ba.compound_id
                     AND b.entry_route = 'direct'
-WHERE EXISTS (SELECT 1 FROM animal_evidence ae
-              WHERE ae.compound_id = b.compound_id AND ae.direction = 'extension');
+WHERE EXISTS (SELECT 1 FROM v_evidence_counted ae
+              WHERE ae.compound_id = b.compound_id AND ae.effective_direction = 'extension');
 
 -- Integrity check: stored entry_route vs what the data supports. Should be empty.
 DROP VIEW IF EXISTS v_entry_route_check;
 CREATE VIEW v_entry_route_check AS
 SELECT * FROM (
-  SELECT c.compound_id, c.canonical_name, c.entry_route,
+  SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
          CASE
            WHEN c.entry_route = 'direct'
                 AND NOT EXISTS (SELECT 1 FROM animal_evidence ae WHERE ae.compound_id = c.compound_id)
@@ -358,33 +490,97 @@ SELECT * FROM (
            WHEN c.entry_route = 'class'
                 AND NOT EXISTS (SELECT 1 FROM v_class_entry_basis v WHERE v.compound_id = c.compound_id)
              THEN 'class_without_basis'
+           WHEN c.entry_route = 'reprogramming_cocktail'
+                AND EXISTS (SELECT 1 FROM animal_evidence ae WHERE ae.compound_id = c.compound_id)
+             THEN 'mechanistic_but_has_animal_evidence'
+           WHEN c.entry_route = 'reprogramming_cocktail'
+                AND EXISTS (SELECT 1 FROM v_class_entry_basis v WHERE v.compound_id = c.compound_id)
+             THEN 'mechanistic_but_has_class_basis'
+           WHEN c.entry_route = 'reprogramming_cocktail'
+                AND NOT EXISTS (SELECT 1 FROM reprogramming_evidence r WHERE r.compound_id = c.compound_id)
+             THEN 'mechanistic_without_reprogramming_evidence'
          END AS problem
   FROM compound c)
 WHERE problem IS NOT NULL;
 
 -- ---------------------------------------------------------------------------
--- ITP evidence as a ratio, by sex (SPEC §5.4). A cohort = one ITP row in the source.
+-- ITP evidence (SPEC §5.4)
+--   arm        = one ITP row in the source (one sex x one dose/start age/regimen)
+--   experiment = one independent ITP study: PMID by default, or itp_experiment_override
+--   cohort     = one sex within one experiment. Arms in the same experiment share a
+--                control group, so cohorts, not arms, are the unit of the ratio.
+--   A cohort is positive if any of its arms shows significant extension.
 -- ---------------------------------------------------------------------------
+
+DROP VIEW IF EXISTS v_itp_cohort;
+CREATE VIEW v_itp_cohort AS
+SELECT v.compound_id, v.evidence_tier,
+       coalesce(o.experiment_id, 'pmid:' || v.pmid)       AS experiment_id,
+       v.sex,
+       count(*)                                           AS n_arms,
+       sum(v.effective_direction = 'extension')           AS n_arms_positive,
+       sum(v.effective_direction = 'shortening')          AS n_arms_shortening,
+       sum(v.effective_direction = 'conflict')            AS n_arms_conflict,
+       max(v.effective_direction = 'extension')           AS is_positive
+FROM v_evidence_counted v
+LEFT JOIN itp_experiment_override o ON o.evidence_key = v.evidence_key
+WHERE v.is_itp = 1
+-- Group on the expression, not the alias: 'experiment_id' would bind to o.experiment_id.
+GROUP BY v.compound_id, v.evidence_tier, coalesce(o.experiment_id, 'pmid:' || v.pmid), v.sex;
 
 DROP VIEW IF EXISTS v_itp_summary;
 CREATE VIEW v_itp_summary AS
 WITH t AS (
-  SELECT (SELECT value FROM analysis_threshold WHERE name = 'itp_min_positive_cohorts')  AS min_pos,
-         (SELECT value FROM analysis_threshold WHERE name = 'itp_min_positive_fraction') AS min_frac),
+  SELECT (SELECT value FROM analysis_threshold WHERE name = 'itp_min_positive_cohorts')     AS min_pos,
+         (SELECT value FROM analysis_threshold WHERE name = 'itp_min_positive_fraction')    AS min_frac,
+         (SELECT value FROM analysis_threshold WHERE name = 'itp_tier_strong_min_positive') AS s_pos,
+         (SELECT value FROM analysis_threshold WHERE name = 'itp_tier_strong_min_fraction') AS s_frac,
+         (SELECT value FROM analysis_threshold WHERE name = 'itp_tier_weak_max_positive')   AS w_pos,
+         (SELECT value FROM analysis_threshold WHERE name = 'itp_tier_weak_below_fraction') AS w_frac),
 agg AS (
   SELECT compound_id,
-         sum(direction = 'extension')                    AS itp_cohorts_positive,
-         count(*)                                        AS itp_cohorts_total,
-         sum(direction = 'shortening')                   AS itp_cohorts_shortening,
-         sum(sex = 'M' AND direction = 'extension')      AS itp_male_positive,
-         sum(sex = 'M')                                  AS itp_male_total,
-         sum(sex = 'F' AND direction = 'extension')      AS itp_female_positive,
-         sum(sex = 'F')                                  AS itp_female_total
-  FROM animal_evidence WHERE is_itp = 1 GROUP BY compound_id)
-SELECT c.compound_id, c.canonical_name, c.entry_route, agg.*,
-       (agg.itp_cohorts_positive >= t.min_pos
-        AND 1.0 * agg.itp_cohorts_positive / agg.itp_cohorts_total >= t.min_frac) AS meets_itp_threshold
-FROM agg JOIN compound c USING (compound_id) CROSS JOIN t;
+         count(DISTINCT experiment_id)                AS itp_experiments,
+         sum(n_arms_positive)                         AS itp_arms_positive,
+         sum(n_arms)                                  AS itp_arms_total,
+         sum(is_positive)                             AS itp_cohorts_positive,
+         count(*)                                     AS itp_cohorts_total,
+         sum(n_arms_shortening > 0)                   AS itp_cohorts_with_shortening,
+         sum(n_arms_conflict > 0)                     AS itp_cohorts_with_conflict,
+         sum(CASE WHEN sex = 'M' THEN is_positive END) AS itp_male_positive,
+         sum(sex = 'M')                               AS itp_male_total,
+         sum(CASE WHEN sex = 'F' THEN is_positive END) AS itp_female_positive,
+         sum(sex = 'F')                               AS itp_female_total
+  FROM v_itp_cohort GROUP BY compound_id),
+tiered AS (
+  SELECT agg.*, t.*,
+         -- tier(p, n): none | weak | mixed | strong; NULL when nothing tested
+         CASE WHEN itp_cohorts_total = 0 THEN NULL
+              WHEN itp_cohorts_positive = 0 THEN 'none'
+              WHEN itp_cohorts_positive >= s_pos AND 1.0 * itp_cohorts_positive / itp_cohorts_total >= s_frac THEN 'strong'
+              WHEN itp_cohorts_positive <= w_pos AND 1.0 * itp_cohorts_positive / itp_cohorts_total < w_frac THEN 'weak'
+              ELSE 'mixed' END AS itp_tier,
+         CASE WHEN itp_male_total = 0 THEN NULL
+              WHEN itp_male_positive = 0 THEN 'none'
+              WHEN itp_male_positive >= s_pos AND 1.0 * itp_male_positive / itp_male_total >= s_frac THEN 'strong'
+              WHEN itp_male_positive <= w_pos AND 1.0 * itp_male_positive / itp_male_total < w_frac THEN 'weak'
+              ELSE 'mixed' END AS itp_male_tier,
+         CASE WHEN itp_female_total = 0 THEN NULL
+              WHEN itp_female_positive = 0 THEN 'none'
+              WHEN itp_female_positive >= s_pos AND 1.0 * itp_female_positive / itp_female_total >= s_frac THEN 'strong'
+              WHEN itp_female_positive <= w_pos AND 1.0 * itp_female_positive / itp_female_total < w_frac THEN 'weak'
+              ELSE 'mixed' END AS itp_female_tier,
+         (itp_cohorts_positive >= min_pos
+          AND 1.0 * itp_cohorts_positive / itp_cohorts_total >= min_frac) AS meets_itp_threshold
+  FROM agg CROSS JOIN t)
+SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
+       tiered.itp_experiments, tiered.itp_arms_positive, tiered.itp_arms_total,
+       tiered.itp_cohorts_positive, tiered.itp_cohorts_total,
+       tiered.itp_male_positive, tiered.itp_male_total,
+       tiered.itp_female_positive, tiered.itp_female_total,
+       tiered.itp_cohorts_with_shortening, tiered.itp_cohorts_with_conflict,
+       tiered.itp_tier, tiered.itp_male_tier, tiered.itp_female_tier,
+       tiered.meets_itp_threshold
+FROM tiered JOIN compound c USING (compound_id);
 
 -- ===========================================================================
 -- EXTENSION PATH (SPEC §5.4). Conservative. Counts here never include
@@ -394,24 +590,26 @@ FROM agg JOIN compound c USING (compound_id) CROSS JOIN t;
 DROP VIEW IF EXISTS v_extension_evidence;
 CREATE VIEW v_extension_evidence AS
 WITH ext AS (
-  SELECT ae.compound_id,
+  SELECT v.compound_id,
          count(*)                                            AS n_extension_rows,
-         sum(st.tier = 'mammal')                             AS n_extension_rows_mammal,
-         count(DISTINCT ae.pmid)                             AS n_extension_pmids,
+         sum(v.tier = 'mammal')                              AS n_extension_rows_mammal,
+         count(DISTINCT v.pmid)                              AS n_extension_pmids,
          count(DISTINCT p.lab_group)                         AS n_extension_lab_groups,
          sum(p.lab_group IS NULL)                            AS n_extension_rows_lab_unknown
-  FROM animal_evidence ae
-  LEFT JOIN species_taxon st ON st.species = ae.species
-  LEFT JOIN publication p    ON p.pmid = ae.pmid
-  WHERE ae.direction = 'extension'
-  GROUP BY ae.compound_id),
+  FROM v_evidence_counted v
+  LEFT JOIN publication p ON p.pmid = v.pmid
+  WHERE v.effective_direction = 'extension'
+  GROUP BY v.compound_id),
 t AS (SELECT value AS min_groups FROM analysis_threshold WHERE name = 'replication_min_lab_groups')
-SELECT c.compound_id, c.canonical_name, c.entry_route,
+SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
        ext.n_extension_rows, ext.n_extension_rows_mammal, ext.n_extension_pmids,
        ext.n_extension_lab_groups, ext.n_extension_rows_lab_unknown,
+       i.itp_experiments,
        coalesce(i.itp_cohorts_positive, 0) AS itp_cohorts_positive,
        coalesce(i.itp_cohorts_total, 0)    AS itp_cohorts_total,
+       i.itp_arms_positive, i.itp_arms_total,
        i.itp_male_positive, i.itp_male_total, i.itp_female_positive, i.itp_female_total,
+       i.itp_tier, i.itp_male_tier, i.itp_female_tier,
        coalesce(i.meets_itp_threshold, 0)  AS meets_itp_threshold,
        (ext.n_extension_lab_groups >= t.min_groups)             AS replicated_by_lab_groups,
        (ext.n_extension_lab_groups >= t.min_groups
@@ -432,24 +630,27 @@ SELECT * FROM v_itp_summary WHERE NOT meets_itp_threshold;
 -- HARM PATH (SPEC §5.7). Sensitive detection, mandatory human review.
 -- ===========================================================================
 
--- Review queue. Detection only: appearing here surfaces nothing.
+-- Review queue. Detection only: appearing here surfaces nothing. Unresolved
+-- mammalian direction conflicts are shown but never qualify a compound.
 DROP VIEW IF EXISTS v_harm_candidates;
 CREATE VIEW v_harm_candidates AS
 WITH sh AS (
-  SELECT ae.compound_id,
-         count(*)                         AS n_mammal_shortening_rows,
-         count(DISTINCT ae.pmid)          AS n_mammal_shortening_pmids,
-         group_concat(DISTINCT ae.species) AS species,
-         sum(ae.is_itp)                   AS n_itp_shortening_rows,
-         json_group_array(ae.id)          AS current_row_ids
-  FROM animal_evidence ae
-  JOIN species_taxon st ON st.species = ae.species AND st.tier = 'mammal'
-  WHERE ae.direction = 'shortening'
-  GROUP BY ae.compound_id),
+  SELECT v.compound_id,
+         count(*)                           AS n_mammal_shortening_rows,
+         count(DISTINCT v.pmid)             AS n_mammal_shortening_pmids,
+         group_concat(DISTINCT v.species)   AS species,
+         sum(v.is_itp)                      AS n_itp_shortening_rows,
+         json_group_array(v.evidence_key)   AS current_evidence_keys
+  FROM v_evidence_counted v
+  WHERE v.effective_direction = 'shortening' AND v.tier = 'mammal'
+  GROUP BY v.compound_id),
 t AS (SELECT value AS min_rows FROM analysis_threshold WHERE name = 'harm_min_mammal_shortening_rows')
-SELECT c.compound_id, c.canonical_name, c.entry_route,
+SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
        sh.n_mammal_shortening_rows, sh.n_mammal_shortening_pmids, sh.species, sh.n_itp_shortening_rows,
-       sh.current_row_ids,
+       (SELECT count(*) FROM v_evidence_counted v2
+        WHERE v2.compound_id = c.compound_id AND v2.tier = 'mammal'
+          AND v2.effective_direction = 'conflict')       AS n_mammal_unresolved_conflicts,
+       sh.current_evidence_keys,
        coalesce(hr.decision, 'unreviewed') AS review_state
 FROM sh
 JOIN compound c USING (compound_id)
@@ -457,23 +658,94 @@ CROSS JOIN t
 LEFT JOIN harm_review hr USING (compound_id)
 WHERE sh.n_mammal_shortening_rows >= t.min_rows;
 
+-- Class context for the harm reviewer. For each harm candidate, its ATC class-mates
+-- (specific classes only; residual buckets are not mechanisms) and their evidence.
+-- Context only: class-mates do NOT enter the harm path through this view.
+DROP VIEW IF EXISTS v_harm_review_context;
+CREATE VIEW v_harm_review_context AS
+SELECT hc.compound_id                AS candidate_compound_id,
+       hc.canonical_name             AS candidate_name,
+       hc.evidence_tier              AS candidate_evidence_tier,
+       ca.atc_level4,
+       m.compound_id                 AS classmate_compound_id,
+       m.canonical_name              AS classmate_name,
+       m.entry_route                 AS classmate_entry_route,
+       m.evidence_tier               AS classmate_evidence_tier,
+       (SELECT count(*) FROM v_evidence_counted v WHERE v.compound_id = m.compound_id
+          AND v.tier = 'mammal' AND v.effective_direction = 'shortening') AS classmate_mammal_shortening_rows,
+       (SELECT count(*) FROM v_evidence_counted v WHERE v.compound_id = m.compound_id
+          AND v.tier = 'mammal' AND v.effective_direction = 'extension')  AS classmate_mammal_extension_rows,
+       (SELECT count(*) FROM v_evidence_counted v WHERE v.compound_id = m.compound_id
+          AND v.tier = 'mammal' AND v.effective_direction = 'conflict')   AS classmate_mammal_conflicts,
+       coalesce((SELECT hr.decision FROM harm_review hr WHERE hr.compound_id = m.compound_id),
+                CASE WHEN EXISTS (SELECT 1 FROM v_harm_candidates h2 WHERE h2.compound_id = m.compound_id)
+                     THEN 'unreviewed' ELSE 'not_a_candidate' END)        AS classmate_harm_state
+FROM v_harm_candidates hc
+JOIN compound_atc ca ON ca.compound_id = hc.compound_id AND ca.review_status <> 'residual'
+JOIN compound_atc ma ON ma.atc_level4 = ca.atc_level4 AND ma.compound_id <> hc.compound_id
+                    AND ma.review_status <> 'residual'
+JOIN compound m      ON m.compound_id = ma.compound_id
+GROUP BY hc.compound_id, ca.atc_level4, m.compound_id;
+
 -- The harm-path deliverable. Reads ONLY from harm_review rows with
 -- decision = 'surface'; there is no path into this view without a named reviewer.
 DROP VIEW IF EXISTS v_harm_signal;
 CREATE VIEW v_harm_signal AS
-SELECT c.compound_id, c.canonical_name, c.entry_route,
+SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
        hr.human_exposure_basis, hr.rationale, hr.reviewed_by, hr.reviewed_at,
        hc.n_mammal_shortening_rows, hc.n_mammal_shortening_pmids, hc.species,
        (hc.compound_id IS NOT NULL) AS still_meets_threshold,
        -- Evidence added or removed since review: the decision needs revisiting.
-       (EXISTS (SELECT 1 FROM json_each(coalesce(hc.current_row_ids, '[]')) cur
-                WHERE cur.value NOT IN (SELECT value FROM json_each(hr.evidence_row_ids)))
-        OR EXISTS (SELECT 1 FROM json_each(hr.evidence_row_ids) rev
-                   WHERE rev.value NOT IN (SELECT value FROM json_each(coalesce(hc.current_row_ids, '[]')))))
+       (EXISTS (SELECT 1 FROM json_each(coalesce(hc.current_evidence_keys, '[]')) cur
+                WHERE cur.value NOT IN (SELECT value FROM json_each(hr.evidence_keys)))
+        OR EXISTS (SELECT 1 FROM json_each(hr.evidence_keys) rev
+                   WHERE rev.value NOT IN (SELECT value FROM json_each(coalesce(hc.current_evidence_keys, '[]')))))
          AS evidence_changed_since_review
 FROM harm_review hr
 JOIN compound c USING (compound_id)
 LEFT JOIN v_harm_candidates hc USING (compound_id)
 WHERE hr.decision = 'surface';
 
-PRAGMA user_version = 2;
+-- ===========================================================================
+-- MECHANISTIC PATH (SPEC §5.8). Chemical reprogramming components with no measured
+-- lifespan evidence. Never in the gold cell. This view is their deliverable: what
+-- human trial data exists, labelled as resting on a weaker premise.
+-- ===========================================================================
+
+DROP VIEW IF EXISTS v_mechanistic_human_dossier;
+CREATE VIEW v_mechanistic_human_dossier AS
+WITH rp AS (
+  SELECT compound_id,
+         count(DISTINCT cocktail_name)                                AS n_cocktails,
+         group_concat(DISTINCT cocktail_name)                         AS cocktails,
+         group_concat(DISTINCT coalesce('PMID:' || citation_pmid, 'DOI:' || citation_doi)) AS citations,
+         group_concat(DISTINCT cell_type)                             AS cell_types,
+         group_concat(DISTINCT demonstration_kind)                    AS demonstration_kinds,
+         max(in_vivo)                                                 AS any_in_vivo,
+         min(reviewed_by IS NOT NULL)                                 AS all_rows_reviewed
+  FROM reprogramming_evidence GROUP BY compound_id),
+tr AS (
+  SELECT ti.compound_id,
+         count(DISTINCT ti.nct_id)                                    AS n_systemic_trials,
+         count(DISTINCT CASE WHEN t.results_state IN ('POSTED', 'PARTIAL', 'PUBLISHED_ONLY')
+                             THEN ti.nct_id END)                      AS n_trials_with_results,
+         count(DISTINCT CASE WHEN o.ageing_adjacent = 1 THEN ti.nct_id END) AS n_trials_ageing_adjacent
+  FROM trial_intervention ti
+  JOIN trial t ON t.nct_id = ti.nct_id
+  LEFT JOIN trial_outcome o ON o.nct_id = ti.nct_id
+  WHERE ti.systemic_exposure = 'systemic' AND ti.compound_id IS NOT NULL
+  GROUP BY ti.compound_id)
+SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
+       'Mechanistic premise only: named component of a published chemical reprogramming '
+       || 'cocktail. No measured lifespan evidence for this compound.'  AS premise,
+       rp.n_cocktails, rp.cocktails, rp.citations, rp.cell_types, rp.demonstration_kinds,
+       rp.any_in_vivo, rp.all_rows_reviewed,
+       coalesce(tr.n_systemic_trials, 0)        AS n_systemic_trials,
+       coalesce(tr.n_trials_with_results, 0)    AS n_trials_with_results,
+       coalesce(tr.n_trials_ageing_adjacent, 0) AS n_trials_ageing_adjacent
+FROM compound c
+JOIN rp USING (compound_id)
+LEFT JOIN tr USING (compound_id)
+WHERE c.evidence_tier = 'mechanistic_only';
+
+PRAGMA user_version = 4;

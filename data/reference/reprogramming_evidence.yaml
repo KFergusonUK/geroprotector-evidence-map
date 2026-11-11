@@ -1,0 +1,257 @@
+# Chemical reprogramming evidence: the premise for the mechanistic entry path (SPEC §5.8).
+#
+# Inclusion rule (deliberately tight): the compound appeared as a NAMED COMPONENT of a
+# PUBLISHED chemical reprogramming cocktail. Not "regenerative medicine" broadly.
+#
+# Standard: the same as DrugAge's. No bare names. Every cocktail records the citation
+# (PMID or DOI), the components as the paper wrote them, the cell type and species, and
+# what was actually demonstrated. The schema enforces this on load.
+#
+# Curation status: DRAFT. Extracted on 2026-11-11 by Claude from the full text of the
+# cited paper (Europe PMC, stored in raw_response). Every cocktail needs human review:
+# set reviewed_by / reviewed_at when checked. Only text actually read is recorded:
+# supplementary tables were NOT available, so cocktails whose full composition lives
+# there are marked composition_complete: false.
+
+schema_version: 1
+
+citations:
+  yang2023:
+    pmid: "37437248"
+    doi: "10.18632/aging.204896"
+    pmcid: PMC10373966
+    title: "Chemically induced reprogramming to reverse cellular aging"
+    journal: "Aging (Albany NY) 2023"
+    verified_from: full_text
+    verified_at: "2026-11-11"
+
+# Shared description of the Yang 2023 system, quoted or closely paraphrased from the text.
+_yang_cells: &yang_cells
+  cell_type: "Replicatively senescent human fibroblasts carrying a nucleocytoplasmic compartmentalization (NCC) reporter, held non-dividing in low serum"
+  cell_species: human
+  in_vivo: false
+  demonstration_kind: partial_reprogramming_rejuvenation
+
+cocktails:
+  - name: "Yang 2023 C1 (VC6TF)"
+    citation: yang2023
+    <<: *yang_cells
+    components_as_written: ["valproic acid (V)", "CHIR-99021 (C)", "E-616452 (6)", "tranylcypromine (T)", "forskolin (F)"]
+    component_keys: [valproic_acid, chir99021, repsox, tranylcypromine, forskolin]
+    composition_complete: true
+    demonstrated: >-
+      Restored NCC reporter integrity and significantly reduced transcriptomic age (rodent,
+      hybrid and human chronological transcriptomic clocks) after 4 days; with C2 and C3, the
+      largest effect, >3 years by the human chronological clock. Most effective basal cocktail
+      in the 80-combination NCC screen. No pluripotency markers (NANOG, EPCAM) or iPSC gene
+      modules detected; fibroblast identity retained. In vitro only; no lifespan measured.
+    note: "Basal cocktail drawn from mouse chemical-iPSC work (Hou 2013, PMID 23868920; Li 2011, PMID 20956998), per the paper."
+
+  - name: "Yang 2023 C2 (C1 + sodium butyrate)"
+    citation: yang2023
+    <<: *yang_cells
+    components_as_written: ["valproic acid (V)", "CHIR-99021 (C)", "E-616452 (6)", "tranylcypromine (T)", "forskolin (F)", "sodium butyrate"]
+    component_keys: [valproic_acid, chir99021, repsox, tranylcypromine, forskolin, butyrate]
+    composition_complete: false
+    demonstrated: >-
+      Restored NCC reporter integrity and significantly reduced transcriptomic age of senescent
+      fibroblasts after 4 days; among the three (C1-C3) reducing chronological transcriptomic
+      age by >3 years. No pluripotency markers. In vitro only; no lifespan measured.
+    note: "Text: 'based on Cocktail 1' plus additives; sodium butyrate named for C2. Full additive list in Supplementary Table 2 (not read)."
+
+  - name: "Yang 2023 C3 (C1 + bFGF)"
+    citation: yang2023
+    <<: *yang_cells
+    components_as_written: ["valproic acid (V)", "CHIR-99021 (C)", "E-616452 (6)", "tranylcypromine (T)", "forskolin (F)", "basic fibroblast growth factor (bFGF)"]
+    component_keys: [valproic_acid, chir99021, repsox, tranylcypromine, forskolin, bfgf]
+    composition_complete: false
+    demonstrated: >-
+      Restored NCC reporter integrity and significantly reduced transcriptomic age of senescent
+      fibroblasts after 4 days; among the three (C1-C3) reducing chronological transcriptomic
+      age by >3 years. No pluripotency markers. In vitro only; no lifespan measured.
+    note: "Text: bFGF 'was used for Cocktail 3'. Full additive list in Supplementary Table 2 (not read)."
+
+  - name: "Yang 2023 C4 (C6NYSA)"
+    citation: yang2023
+    <<: *yang_cells
+    components_as_written: ["CHIR-99021 (C)", "E-616452 (6)", "TTNPB (N)", "Y-27632 (Y)", "Smoothened Agonist (S)", "ABT-869 (A)"]
+    component_keys: [chir99021, repsox, ttnpb, y27632, smoothened_agonist, abt869]
+    composition_complete: true
+    demonstrated: >-
+      Restored NCC reporter integrity and significantly reduced transcriptomic age of senescent
+      fibroblasts after 4 days, generally less than the mouse-derived cocktails C1-C3. No
+      pluripotency markers; fibroblast identity retained. In vitro only; no lifespan measured.
+    note: "Basal cocktail from the initiation stage of human chemical-iPSC generation (Guan 2022, PMID 35418683), per the paper."
+
+  - name: "Yang 2023 C5 (C4 + sodium butyrate)"
+    citation: yang2023
+    <<: *yang_cells
+    components_as_written: ["CHIR-99021 (C)", "E-616452 (6)", "TTNPB (N)", "Y-27632 (Y)", "Smoothened Agonist (S)", "ABT-869 (A)", "sodium butyrate"]
+    component_keys: [chir99021, repsox, ttnpb, y27632, smoothened_agonist, abt869, butyrate]
+    composition_complete: false
+    demonstrated: >-
+      Restored NCC reporter integrity and significantly reduced transcriptomic age of senescent
+      fibroblasts after 4 days. No pluripotency markers. In vitro only; no lifespan measured.
+    note: "Text: sodium butyrate named for C5. Full additive list in Supplementary Table 2 (not read)."
+
+  - name: "Yang 2023 C6 (C4 + alpha-ketoglutarate)"
+    citation: yang2023
+    <<: *yang_cells
+    components_as_written: ["CHIR-99021 (C)", "E-616452 (6)", "TTNPB (N)", "Y-27632 (Y)", "Smoothened Agonist (S)", "ABT-869 (A)", "alpha ketoglutarate (α-KG)"]
+    component_keys: [chir99021, repsox, ttnpb, y27632, smoothened_agonist, abt869, akg]
+    composition_complete: false
+    demonstrated: >-
+      Restored NCC reporter integrity and significantly reduced transcriptomic age of senescent
+      fibroblasts after 4 days. No pluripotency markers. In vitro only; no lifespan measured.
+    note: "Text: α-KG 'was included in Cocktail 6'. Full additive list in Supplementary Table 2 (not read)."
+
+# Component identities. identity_status: verified (loaded) | needs_review (NOT loaded).
+# expected_evidence_tier is checked against DrugAge: anything in DrugAge is measured_lifespan.
+compounds:
+  - key: valproic_acid
+    canonical_name: valproic acid
+    names_in_sources: ["valproic acid (V)", "valproic acid", VPA, "Valproic acid"]
+    pubchem_cid: 3121
+    inchikey: NIJJYAXOARWZEE-UHFFFAOYSA-N
+    identity_status: verified
+    expected_evidence_tier: measured_lifespan
+    drugage_names: [Valproic acid]
+    must_not_match: [valpromide, divalproex sodium]
+    note: "In DrugAge, so measured_lifespan; the cocktail rows are recorded as additional context. Divalproex and valpromide are prodrug/complex forms: review, not auto-match."
+
+  - key: chir99021
+    canonical_name: CHIR-99021
+    names_in_sources: ["CHIR-99021 (C)", CHIR-99021, CHIR99021, CT99021, laduviglusib]
+    pubchem_cid: 9956119
+    inchikey: AQGNHMOJWBZFQQ-UHFFFAOYSA-N
+    identity_status: verified
+    expected_evidence_tier: mechanistic_only
+    drugage_names: []
+    must_not_match: [CHIR-98014, tideglusib, lithium]
+    note: "GSK3 inhibitor. PubChem title is the INN 'laduviglusib'."
+
+  - key: repsox
+    canonical_name: RepSox
+    names_in_sources: ["E-616452 (6)", E-616452, "616452", RepSox, "ALK5 inhibitor II"]
+    pubchem_cid: 449054
+    inchikey: LBPKYPYHDKKRFS-UHFFFAOYSA-N
+    identity_status: verified
+    expected_evidence_tier: mechanistic_only
+    drugage_names: []
+    must_not_match: [SB431542, galunisertib]
+    note: "TGF-β receptor (ALK5) inhibitor; the paper uses the catalogue name E-616452. SB431542 appears in the paper only as an inhibitor control, not a cocktail component."
+
+  - key: tranylcypromine
+    canonical_name: tranylcypromine
+    names_in_sources: ["tranylcypromine (T)", tranylcypromine, Parnate]
+    pubchem_cid: 5530
+    inchikey: AELCINSCMGFISI-UHFFFAOYSA-N
+    identity_status: verified
+    expected_evidence_tier: mechanistic_only
+    drugage_names: []
+    must_not_match: [selegiline, L-deprenyl, phenelzine, rasagiline]
+    note: "Approved MAO inhibitor antidepressant (also LSD1 inhibitor): a substantial human dossier on a mechanistic premise."
+
+  - key: forskolin
+    canonical_name: forskolin
+    names_in_sources: ["forskolin (F)", forskolin, colforsin]
+    pubchem_cid: 47936
+    inchikey: OHCQJHSOBUTRHG-KGGHGJDLSA-N
+    identity_status: verified
+    expected_evidence_tier: mechanistic_only
+    drugage_names: []
+    must_not_match: [colforsin daropate, NKH477, "Coleus forskohlii extract"]
+    note: "Adenylyl cyclase activator. Coleus forskohlii supplements are extracts: never auto-match."
+
+  - key: ttnpb
+    canonical_name: TTNPB
+    names_in_sources: ["TTNPB (N)", TTNPB, arotinoid acid]
+    pubchem_cid: 5289501
+    inchikey: FOIVPCKZDPCJJY-JQIJEIRASA-N
+    identity_status: verified
+    expected_evidence_tier: mechanistic_only
+    drugage_names: []
+    must_not_match: [tretinoin, all-trans retinoic acid, bexarotene, tamibarotene]
+    note: "Synthetic retinoid (RAR agonist); PubChem title 'arotinoid acid'."
+
+  - key: y27632
+    canonical_name: Y-27632
+    names_in_sources: ["Y-27632 (Y)", Y-27632, Y27632, "Y 27632"]
+    pubchem_cid: 448042
+    inchikey: IYOZTVGMEWJPKR-VOMCLLRMSA-N
+    identity_status: verified
+    expected_evidence_tier: mechanistic_only
+    drugage_names: []
+    must_not_match: [ximelagatran, Exanta, fasudil, ripasudil, netarsudil]
+    note: >-
+      ROCK inhibitor. TRAP: PubChem titles CID 448042 'Ximelegatran', one letter from
+      ximelagatran, an unrelated withdrawn thrombin inhibitor. Formula C14H21N3O, IUPAC name and
+      CAS 146986-50-7 confirm this is Y-27632. Fasudil is the clinical ROCK inhibitor: a
+      different molecule.
+
+  - key: smoothened_agonist
+    canonical_name: smoothened agonist (unspecified)
+    names_in_sources: ["Smoothened Agonist (S)"]
+    pubchem_cid: null
+    inchikey: null
+    identity_status: needs_review
+    candidate: {name: SAG, pubchem_cid: 5284330, inchikey: VFSUUTYAEQOIMW-UHFFFAOYSA-N}
+    expected_evidence_tier: mechanistic_only
+    drugage_names: []
+    must_not_match: [purmorphamine]
+    note: "The paper says only 'Smoothened Agonist (S)'. SAG is the likely compound but is not named in the text read; Supplementary Table 1 may say. NOT loaded until resolved."
+
+  - key: abt869
+    canonical_name: linifanib
+    names_in_sources: ["ABT-869 (A)", ABT-869, linifanib, RG3635]
+    pubchem_cid: 11485656
+    inchikey: MPVGZUGXCQEXTM-UHFFFAOYSA-N
+    identity_status: verified
+    expected_evidence_tier: mechanistic_only
+    drugage_names: []
+    must_not_match: [sunitinib, sorafenib]
+    note: "Multi-kinase (VEGFR/PDGFR) inhibitor; oncology trials exist under the INN linifanib."
+
+  - key: butyrate
+    canonical_name: butyric acid
+    names_in_sources: ["sodium butyrate", Sodium butyrate, butyrate, butyric acid]
+    pubchem_cid: 264
+    inchikey: FERIUCNNQQJTOY-UHFFFAOYSA-N
+    identity_status: verified
+    expected_evidence_tier: measured_lifespan
+    drugage_names: [Sodium butyrate]
+    must_not_match: [4-phenylbutyrate, sodium phenylbutyrate, D-beta-hydroxybutyrate, tributyrin]
+    note: "Sodium salt collapses to butyric acid (PubChem parent CID 264). In DrugAge, so measured_lifespan. Phenylbutyrate and β-hydroxybutyrate are separate DrugAge compounds."
+
+  - key: akg
+    canonical_name: alpha-ketoglutaric acid
+    names_in_sources: ["alpha ketoglutarate (α-KG)", α-KG, alpha-ketoglutarate]
+    pubchem_cid: 51
+    inchikey: KPGXRSRHYNQIFN-UHFFFAOYSA-N
+    identity_status: verified
+    expected_evidence_tier: measured_lifespan
+    drugage_names: [Alpha-ketoglutarate]
+    must_not_match: []
+    note: "Same compound as the seed fixture's akg entry. In DrugAge (and ITP-null), so measured_lifespan."
+
+  - key: bfgf
+    canonical_name: basic fibroblast growth factor
+    names_in_sources: ["basic fibroblast growth factor (bFGF)", bFGF, FGF2]
+    pubchem_cid: null
+    inchikey: null
+    identity_status: needs_review
+    expected_evidence_tier: mechanistic_only
+    drugage_names: []
+    must_not_match: [FGF21, FGF1]
+    note: "A protein (FGF2), not a small molecule; no InChIKey. Whether a growth factor in a chemical cocktail counts as a 'compound' for this map is an open decision. NOT loaded."
+
+# Leads that do NOT meet the standard yet. Recorded so they are not lost; never loaded.
+pending:
+  - citation: "Hou P et al. 2013 Science 341:651, PMID 23868920"
+    reason: "Founding mouse chemical-iPSC paper ('seven small-molecule compounds'). Abstract does not name them; full text not open access. Components (likely incl. DZNep) unverified."
+  - citation: "Guan J et al. 2022 Nature 605:325, PMID 35418683"
+    reason: "Human chemical-iPSC paper. Abstract does not list the cocktails; full text not open access."
+  - citation: "Li Y et al. 2011 Cell Res 21, PMID 20956998"
+    reason: "Oct4 + small molecules (VC6T): not a purely chemical cocktail, and full text not yet read."
+  - citation: "Schoenfeldt L et al. 2022 bioRxiv, DOI 10.1101/2022.08.29.505222"
+    reason: "Preprint reporting a chemical reprogramming cocktail that extends C. elegans lifespan. Not peer reviewed; if published, it is LIFESPAN evidence and belongs in the measured path, not here."

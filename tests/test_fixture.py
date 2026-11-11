@@ -1,7 +1,7 @@
 import copy
 import unittest
 
-from agesdk import db, fixture
+from agesdk import db, fixture, reference
 from agesdk.sources import drugage
 
 
@@ -57,6 +57,12 @@ class FixtureInternal(unittest.TestCase):
                 if set(c["expected_paths"]) == {"extension", "harm_candidate"}}
         self.assertEqual(both, {"metformin", "canagliflozin", "aspirin", "quercetin"})
 
+    def test_aspirin_itp_is_weak_rapamycin_strong(self):
+        k = self.by_key()
+        self.assertEqual(k["aspirin"]["itp"]["cohorts"], [1, 4])
+        self.assertEqual(k["aspirin"]["itp"]["tier"]["overall"], "weak")
+        self.assertEqual(k["rapamycin"]["itp"]["tier"]["overall"], "strong")
+
     def test_nmn_is_on_no_path(self):
         self.assertEqual(self.by_key()["nmn"]["expected_paths"], [])
 
@@ -100,14 +106,14 @@ class FixtureInternal(unittest.TestCase):
         self.assertEqual(tiers["Caenorhabditis elegans"], "invertebrate")
 
 
-def _drugage_rows():
+def _drugage_raw():
     try:
-        return drugage.current_rows(db.connect())
+        return drugage.current_raw(db.connect())
     except Exception:
-        return None
+        return None, None
 
 
-ROWS = _drugage_rows()
+RAW_ID, ROWS = _drugage_raw()
 
 
 @unittest.skipIf(ROWS is None, "DrugAge not loaded; run `python -m agesdk fetch-drugage`")
@@ -115,12 +121,21 @@ class FixtureVsDrugAge(unittest.TestCase):
     """The fixture's claims about DrugAge must match DrugAge as downloaded."""
 
     def test_fixture_agrees_with_drugage(self):
-        problems = fixture.check_against_drugage(fixture.load(), ROWS, fixture.load_species_tiers())
+        problems = fixture.check_against_drugage(fixture.load(), RAW_ID, ROWS)
         self.assertEqual(problems, [])
 
     def test_every_drugage_species_has_a_tier(self):
         tiers = fixture.load_species_tiers()
         self.assertEqual({r["species"] for r in ROWS} - set(tiers), set())
+
+    def test_reprogramming_tiers_agree_with_drugage(self):
+        spec = reference.load_reprogramming_spec()
+        self.assertEqual(reference.check_reprogramming_vs_drugage(spec, ROWS), [])
+
+    def test_four_direction_conflicts_in_drugage(self):
+        from agesdk.evidence import direction_of_drugage_row
+        conflicts = sorted(r["compound_name"] for r in ROWS if direction_of_drugage_row(r).conflict)
+        self.assertEqual(conflicts, ["Beta-aminopropionitrile fumarate"] * 2 + ["Epitalon", "Levodopa"])
 
     def test_no_glp1_agonist_in_drugage(self):
         # Basis of the semaglutide negative class test.

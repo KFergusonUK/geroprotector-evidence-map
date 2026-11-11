@@ -1,9 +1,22 @@
 # Geroprotector Human Evidence Map — Specification
 
-**Status:** v0.3 draft spec
+**Status:** v0.4 draft spec
 **Owner:** Kevin Ferguson
 
-**Changes since v0.2** (2026-11-11):
+**Changes since v0.3** (2026-11-11):
+- `compound.evidence_tier` (measured_lifespan | inherited_class | mechanistic_only) is the
+  evidential grade; `entry_route` stays the mechanism of entry. Every compound-level view
+  carries the tier (§1, §4.4).
+- Third entry path: chemical reprogramming cocktail components, recorded to DrugAge's
+  standard and reported only in `v_mechanistic_human_dossier`, never the gold cell (§5.8).
+- Direction rule v2: direction per measure; where average and maximum point opposite ways
+  the row is a `conflict` for human review, not resolved by precedence (§5.4).
+- ITP unit corrected from arms to **cohorts** (one sex in one independent experiment), with
+  strong / mixed / weak tiers (§5.4). Cohort duplication checked (§5.4).
+- Harm review sees ATC class-mates (`v_harm_review_context`); entry stays direct (§5.7).
+- Reviewed source-error corrections; exact duplicate source rows counted once (§5.4).
+
+**Changes in v0.3** (2026-11-11):
 - Direction of effect is first-class (`animal_evidence.direction`); every row is kept.
 - Entry is now **two co-equal paths**: extension (conservative) and harm (sensitive,
   mandatory human review). Their counts are never merged (§1, §5.4, §5.7).
@@ -27,21 +40,37 @@ Deliberately **not** filtered by whether anyone has labelled the compound a
 "longevity drug". A compound enters on its animal evidence and brings its entire
 human trial dossier with it, whatever indication produced it.
 
-### Two entry paths, co-equal outputs
+### Entry paths and evidence tiers
 
-Lifespan effects run both ways, and both matter. The map has two entry paths.
-They are separate deliverables of equal standing. **No view, table or headline
-figure ever merges their counts**: a compound on both paths (metformin, aspirin,
-canagliflozin, quercetin) appears in both outputs, counted separately in each.
+Lifespan effects run both ways, and both matter. The map has two co-equal lifespan
+paths and a third, explicitly weaker, mechanistic path. They are separate deliverables.
+**No view, table or headline figure ever merges their counts**: a compound on both
+lifespan paths (metformin, aspirin, canagliflozin, quercetin) appears in both outputs,
+counted separately in each.
 
-| | **Extension path** | **Harm path** |
+| | **Extension path** | **Harm path** | **Mechanistic path** |
+|---|---|---|---|
+| Question | Which compounds extend animal lifespan, and what human data exists? | Which compounds shorten mammalian lifespan while having substantial human exposure? | What human data exists for named components of chemical reprogramming cocktails? |
+| Enters on | ≥1 animal result with significant lifespan **extension** (any species) | ≥1 **mammalian** result with significant lifespan **shortening** | Named component of a **published chemical reprogramming cocktail**, cited (§5.8) |
+| Threshold | **Conservative.** Replication matters; tiers by species and replication | **Sensitive.** A single credible mammalian signal surfaces a candidate | **Tight.** Not "regenerative medicine" broadly |
+| Review | Automated, from documented thresholds | **Mandatory human review**, enforced in the schema (§5.7) | Curated to DrugAge's standard, enforced in the schema (§5.8) |
+| Class entry (ATC) | Yes, one hop, labelled (§5.5) | No; class-mates shown to the reviewer as context | No |
+| Deliverable | Gold cell, null cell, untested candidates | `v_harm_signal` | `v_mechanistic_human_dossier` — never the gold cell |
+
+**Evidence tier** (`compound.evidence_tier`) is the evidential grade, distinct from
+the mechanism of entry (`entry_route`):
+
+| `evidence_tier` | `entry_route` | Premise |
 |---|---|---|
-| Question | Which compounds extend animal lifespan, and what human data exists? | Which compounds shorten mammalian lifespan while having substantial human exposure? |
-| Enters on | ≥1 animal result with significant lifespan **extension** (any species) | ≥1 **mammalian** result with significant lifespan **shortening** |
-| Threshold | **Conservative.** Replication matters; tiers by species and replication | **Sensitive.** A single credible mammalian signal surfaces a candidate: missing one costs more than a false alarm |
-| Review | Automated, from documented thresholds | **Mandatory human review.** Nothing reaches the output automatically, ever (§5.7) |
-| Class entry (ATC) | Yes, one hop, labelled `entry_route = 'class'` (§5.5) | No: direct evidence only |
-| Deliverable | Gold cell, null cell, untested candidates | `v_harm_signal` |
+| `measured_lifespan` | `direct` | The compound's own lifespan measured in animals (DrugAge) |
+| `inherited_class` | `class` | Shares a specific ATC class with a compound that extends lifespan |
+| `mechanistic_only` | `reprogramming_cocktail` | Component of a chemical reprogramming cocktail; no lifespan evidence |
+
+The pairing is enforced. Where a compound qualifies several ways the strongest grade
+wins (valproic acid is in DrugAge, so it is `measured_lifespan` even though it is also a
+cocktail component). **Every compound-level view carries `evidence_tier`**, and no view
+shows a `mechanistic_only` compound in a count without the label; a test enforces this
+across all views.
 
 A compound in DrugAge with neither significant extension nor significant mammalian
 shortening (e.g. NMN: one fly study, not significant) stays in the data and is on
@@ -89,11 +118,13 @@ Deliverables, all first-class:
 
 1. **Gold cell** — replicated animal extension AND human trials exist.
 2. **Null cell** — strong human interest AND a high-quality animal null (ITP cohorts
-   below the ITP threshold). Examples: metformin (0/2), resveratrol (0/6), nicotinamide
-   riboside (0/2), fisetin (0/4), alpha-ketoglutarate (0/2).
+   below the ITP threshold). Examples (cohorts positive / tested): metformin (0/2),
+   resveratrol (0/4), nicotinamide riboside (0/2), fisetin (0/2), alpha-ketoglutarate (0/2).
 3. **Harm signal** — shortens mammalian lifespan AND widely used in humans, after
    mandatory human review.
 4. **Untested candidates** — replicated extension that nobody has tried in humans, and why.
+5. **Mechanistic human dossier** — human trial data for chemical reprogramming components,
+   labelled throughout as resting on a mechanistic premise, not lifespan evidence.
 
 Each extension-path cell is produced separately for `entry_route = 'direct'` and `'class'`.
 
@@ -102,11 +133,16 @@ Each extension-path cell is produced separately for `entry_route = 'direct'` and
 The headline universe is the **159 compounds with any mammal evidence** in DrugAge
 Build 5 (`species_taxon.tier = 'mammal'`). Within it (as of 2026-11-11):
 
-- **78** have significant mammal **extension**: the extension-path headline.
-- **20** have significant mammal **shortening**: harm-path candidates (11 of them are
+- **77** have significant mammal **extension**: the extension-path headline.
+- **19** have significant mammal **shortening**: harm-path candidates (10 of them are
   also on the extension path).
+- **4** mammal results are direction conflicts awaiting review (levodopa, epitalon,
+  β-aminopropionitrile ×2); they count toward no path until resolved.
 - The remainder have only null or unassessed mammal results; those with ITP data
   feed the null cell.
+
+The mechanistic path sits outside this universe by definition: its compounds have no
+lifespan evidence.
 
 Worm, fly, yeast and all other rows are loaded into the normalised layer
 regardless. **Tiering is a view, not a deletion.**
@@ -197,8 +233,21 @@ compound(
   inchikey TEXT,                 -- full 27 chars, enforced (see §5.1)
   chembl_id TEXT,
   is_mixture BOOLEAN DEFAULT 0,
-  entry_route TEXT NOT NULL,     -- 'direct' | 'class'  (§1, §5.5)
+  entry_route TEXT NOT NULL,     -- 'direct' | 'class' | 'reprogramming_cocktail'  (§1)
+  evidence_tier TEXT NOT NULL,   -- 'measured_lifespan' | 'inherited_class' | 'mechanistic_only'
   notes TEXT
+)
+
+reprogramming_evidence(          -- §5.8; no bare names, enforced
+  compound_id, source_component_name,
+  citation_pmid, citation_doi,   -- at least one, format-checked
+  cocktail_name, cocktail_components,   -- JSON array, ≥2 components
+  composition_complete,
+  cell_type, cell_species, in_vivo,
+  demonstration_kind,            -- full_pluripotency | partial_reprogramming_rejuvenation | transdifferentiation
+  demonstrated,                  -- what was actually shown (≥40 chars)
+  verified_from,                 -- full_text | abstract
+  recorded_by, recorded_at, reviewed_by, reviewed_at, note
 )
 
 compound_component(mixture_id, component_id)   -- mixtures → parents
@@ -228,9 +277,11 @@ animal_evidence(
   dosage, age_at_initiation, treatment_duration TEXT,
   avg_lifespan_change_pct REAL, avg_lifespan_significance TEXT,   -- 'S' | 'NS' | NULL
   max_lifespan_change_pct REAL, max_lifespan_significance TEXT,
-  direction TEXT NOT NULL,       -- 'extension' | 'shortening' | 'null' | 'unassessed' (§5.4)
-  direction_basis TEXT NOT NULL, -- 'avg' | 'max' | 'none'
+  avg_direction, max_direction TEXT NOT NULL,  -- per measure: extension | shortening | null | unassessed
+  direction TEXT NOT NULL,       -- combined, + 'conflict' (§5.4)
+  direction_conflict BOOLEAN,    -- = (direction = 'conflict'), enforced
   direction_rule_version TEXT NOT NULL,
+  evidence_key TEXT NOT NULL,    -- stable content hash; reviews attach to this
   is_itp BOOLEAN,
   pmid TEXT,
   source TEXT NOT NULL DEFAULT 'drugage',
@@ -245,6 +296,12 @@ publication_author(pmid, position, full_name, orcid, affiliation)
 
 analysis_threshold(name, value, rationale)        -- documented thresholds views apply
 
+direction_review(evidence_key, reason,            -- 'conflict_resolution' | 'source_error'
+                 resolved_direction, rationale,
+                 citation,                        -- required for source_error
+                 reviewed_by, reviewed_at)        -- named human, enforced
+itp_experiment_override(evidence_key, experiment_id, reviewed_by, reviewed_at, note)
+
 harm_review(                     -- the ONLY route into v_harm_signal (§5.7)
   compound_id INTEGER PRIMARY KEY,
   decision TEXT NOT NULL,        -- 'surface' | 'reject'
@@ -252,7 +309,7 @@ harm_review(                     -- the ONLY route into v_harm_signal (§5.7)
   rationale TEXT NOT NULL,
   reviewed_by TEXT NOT NULL,     -- a named human; 'auto'/'system'/'pipeline' rejected
   reviewed_at TEXT NOT NULL,
-  evidence_row_ids TEXT NOT NULL -- JSON array: the animal_evidence rows reviewed
+  evidence_keys TEXT NOT NULL    -- JSON array: evidence_key of the rows reviewed
 )
 
 trial(
@@ -298,15 +355,22 @@ repo so review history is diffable.
 ### 4.4 Derived layer
 
 Views only. Nothing here is a source of truth. **Every compound-level view
-carries `entry_route`**, output is produced per route, and **no view combines
-extension-path and harm-path counts**.
+carries `entry_route` and `evidence_tier`** (for views showing two compounds, a
+prefixed pair such as `basis_evidence_tier`; a test checks every view), output is
+produced per route, and **no view combines counts across paths**.
 
 Built:
-- `v_itp_summary` — ITP cohorts positive / tested, overall and by sex, vs threshold
+- `v_animal_evidence` — evidence rows with effective direction (reviews applied), tier, duplicate flag
+- `v_evidence_counted` — the same, exact duplicates removed: every count reads this
+- `v_direction_review_needed` — unresolved direction conflicts, mammal first
+- `v_itp_cohort` — ITP results grouped into cohorts (sex × experiment)
+- `v_itp_summary` — ITP arms, cohorts and experiments; ratios overall and by sex; tiers; threshold
 - `v_extension_evidence` — extension-path evidence: extension rows only, lab groups, ITP ratio, replication
 - `v_itp_null` — ITP-tested compounds below the ITP threshold (null-cell evidence)
 - `v_harm_candidates` — harm-path review queue (detection only; surfaces nothing)
+- `v_harm_review_context` — each harm candidate's ATC class-mates and their evidence (context only)
 - `v_harm_signal` — harm-path deliverable; reads only reviewed `surface` decisions
+- `v_mechanistic_human_dossier` — mechanistic path: cocktail premise + human trial counts, labelled
 - `v_class_entry_basis` — which direct compound and ATC class justify each class entry
 - `v_atc_review_needed` — multi-class compounds awaiting an ATC decision (§5.5)
 - `v_entry_route_check` — stored `entry_route` disagreeing with the data (should be empty)
@@ -388,19 +452,44 @@ not reproducible and the whole point is a defensible map.
 ### 5.4 Direction of effect, extension path, replication
 
 **Direction.** Every animal result carries a direction, derived from the source's
-significance flags (`agesdk/evidence.py`, rule `direction-v1`), never from effect
-size alone:
+significance flags (`agesdk/evidence.py`, rule `direction-v2`), never from effect
+size alone. First **per measure** (average and maximum lifespan separately):
 
-1. Average lifespan significant, with a value → sign of the average change
-2. Otherwise max lifespan significant, with a value → sign of the max change
-3. Otherwise any measure reported not significant → `null`
-4. Otherwise (no significance reported, or a flag with no value) → `unassessed`
+- significant, with a value → `extension` / `shortening` by sign (a significant 0 is `null`)
+- not significant → `null` (*measured, no effect detected*)
+- anything else → `unassessed` (*significance not reported, or a flag with no value*).
+  **Not** negative evidence: it never feeds the null cell.
 
-`null` means *measured and not significant*. `unassessed` means *significance not
-reported* and is **not** negative evidence: it never feeds the null cell. A
-significant change of exactly 0 is `null`. All rows are kept, whatever their direction.
+Then **combined, symmetrically — no precedence of one measure over the other**:
 
-In DrugAge Build 5: 1,673 extension, 399 shortening, 1,130 null, 221 unassessed rows.
+- **`conflict`** when one measure is significant in one direction and the other measure,
+  also assessed (S or NS), has a point estimate in the opposite direction. Levodopa
+  (mean +7% NS, max −14% S) is the defining case: that is a disagreement, not a tie to
+  break, and maximum lifespan is the more fragile statistic, often resting on the last
+  few survivors. Conflicts go to human review (`v_direction_review_needed`,
+  `direction_review`) and **count toward no path until resolved**.
+- otherwise the significant direction if any measure is significant; else `null` if any
+  measure was assessed; else `unassessed`.
+
+Same direction with different significance (17-α-estradiol 2014 males: mean +12% S, max
++5% NS) is agreement measured with different power, not a conflict. A measure without
+reported significance cannot create a conflict (sodium cyclamate: mean +9.8% S, max
+−11.3% with no significance reported).
+
+In DrugAge Build 5: 1,670 extension, 398 shortening, 1,130 null, 221 unassessed and
+**4 conflict** rows (all mammal: levodopa, epitalon, β-aminopropionitrile ×2). All rows
+are kept, whatever their direction.
+
+**Reviews attach to evidence, not row numbers.** Each row carries an `evidence_key`, a
+content hash of the source row, so a direction or harm review survives a reload of the
+normalised layer. `direction_review` also records **source-error corrections**
+(`reason = 'source_error'`, citation required) where the source misreports the paper;
+the raw and normalised layers are never edited. Known case awaiting a decision: DrugAge
+marks the female meclizine ITP arm (+3%) significant, but the paper (PMID 38041783)
+states female lifespan "was not significantly affected".
+
+**Exact duplicate source rows** (every field identical; 7 in DrugAge Build 5, all
+*C. elegans*) are kept but counted once (`v_evidence_counted`).
 
 **Extension-path entry** requires ≥1 result with significant lifespan **extension**.
 "Measured lifespan effect" was underspecified and admitted diethylnitrosamine, a
@@ -411,19 +500,49 @@ and never carry class entry.
 - ≥ `replication_min_lab_groups` (2) independent lab groups with significant extension, OR
 - the compound meets the **ITP threshold**.
 
-**ITP evidence is a ratio, not a boolean.** For each compound the map reports
-`itp_cohorts_positive / itp_cohorts_total`, overall and separately for males and
-females. A cohort is one ITP result row in the source (one sex × one dose/start
-age × one study); a positive cohort is one with `direction = 'extension'`. Views
-apply a documented threshold held in `analysis_threshold`:
+**ITP evidence is a ratio, not a boolean — and the unit matters.** Three units:
 
-- `itp_min_positive_cohorts` = 1
-- `itp_min_positive_fraction` = 0.0
+- **arm** — one ITP result row in the source (one sex × one dose / start age / regimen);
+- **experiment** — one independent ITP study: the PMID by default, overridable in
+  `itp_experiment_override` where one paper holds several experiments or one experiment
+  is reported across papers;
+- **cohort** — one sex within one experiment. **This is the unit of the ratio.** Arms
+  in the same experiment share a control group and are not independent. A cohort is
+  positive if any of its arms shows significant extension.
 
-The threshold is applied by the views, not by anyone judging individual compounds,
-and the ratio is always shown beside it. Aspirin reads 1/6 (male 1/3, female 0/3);
-rapamycin 14/16 (male 7/8, female 7/8); canagliflozin 3/6 (male 3/3, female 0/3).
-The reader sees the difference; changing the threshold is a one-row data change.
+The map reports arms, cohorts and experiments, cohorts overall and by sex, and a tier.
+
+*Duplication check (2026-11-11).* DrugAge's 164 ITP rows come from 15 papers. No ITP
+cohort is entered twice across papers; the one probable cross-paper re-report (the
+three-dose NDGA experiment, described in both PMID 24245565 and PMID 27312235) appears
+once, under 27312235. Canagliflozin's two papers are independent (the 2024 study used
+mice born in 2020 and repeated the 6-month arm). The distortion was arms vs cohorts:
+aspirin's 1/6 arms is 1/4 cohorts across 2 experiments.
+
+**Threshold and tiers** (all held as data in `analysis_threshold`; the views apply
+them, nobody adjudicates compounds):
+
+- *meets threshold*: ≥ `itp_min_positive_cohorts` (1) positive cohort, positive
+  fraction ≥ `itp_min_positive_fraction` (0.0).
+- *tier*, overall and per sex:
+  - **strong** — ≥2 positive cohorts and ≥0.5 of cohorts positive
+  - **weak** — a single positive cohort and fewer than half positive
+  - **mixed** — any other result with ≥1 positive (including a lone 1/1)
+  - **none** — tested, no positive cohort
+
+| Compound | Experiments | Arms | Cohorts | Male | Female | Tier (overall / M / F) |
+|---|---|---|---|---|---|---|
+| rapamycin | 4 | 14/16 | 8/8 | 4/4 | 4/4 | strong / strong / strong |
+| acarbose | 3 | 9/10 | 6/6 | 3/3 | 3/3 | strong / strong / strong |
+| 17-α-estradiol | 3 | 4/6 | 3/5 | 3/3 | 0/2 | strong / strong / none |
+| canagliflozin | 2 | 3/6 | 2/4 | 2/2 | 0/2 | strong / strong / none |
+| aspirin | 2 | 1/6 | 1/4 | 1/2 | 0/2 | **weak** / mixed / none |
+| captopril | 1 | 2/2 | 2/2 | 1/1 | 1/1 | strong / mixed / mixed |
+| resveratrol | 2 | 0/6 | 0/4 | 0/2 | 0/2 | none |
+
+Note: "≥2 positive cohorts" can be met by the two sexes of a **single** experiment
+(captopril, glycine, meclizine). The `itp_experiments` column is always shown beside
+the tier so the reader can see it.
 
 **ITP nulls are evidence, not absence of evidence.** ITP-tested compounds below
 the threshold form the **null cell** when human trials exist. A compound can have
@@ -503,7 +622,13 @@ rule is:
 - Surfacing additionally requires a stated **human exposure basis**: why exposure is
   substantial (approved drug in wide use, common supplement, dietary or occupational
   exposure).
-- `v_harm_candidates` is the review queue. Appearing in it surfaces nothing.
+- `v_harm_candidates` is the review queue. Appearing in it surfaces nothing. Unresolved
+  mammalian direction conflicts are counted beside each candidate but never qualify one.
+- **Class context.** Class-related harm is a real and historically important pattern
+  (the COX-2 withdrawals were a class story). `v_harm_review_context` shows the reviewer
+  each candidate's ATC class-mates (specific classes only, never residual) with their own
+  mammal shortening, extension and conflict counts and their harm-review state. The
+  reviewer sees the class; **entry still requires the compound's own direct evidence**.
 - If evidence changes after review (rows added or withdrawn), `v_harm_signal` flags
   `evidence_changed_since_review` and `still_meets_threshold`; the decision is
   revisited, not silently kept.
@@ -514,6 +639,63 @@ humans.
 
 **Never merged.** A compound on both paths is reported in both, with each path's
 counts computed from its own direction only.
+
+### 5.8 Mechanistic path: chemical reprogramming
+
+**Inclusion rule, deliberately tight:** the compound appeared as a **named component of a
+published chemical reprogramming cocktail**. Not "regenerative medicine" broadly; not
+single agents; not compounds used only as inhibitor controls.
+
+**Standard: the same as DrugAge's — no bare names.** Every row in
+`reprogramming_evidence` must carry, and the schema rejects a row without:
+
+- a PMID or DOI (format-checked);
+- the cocktail's name and its components as the paper wrote them (≥2 components);
+- the cell type and species, and whether in vivo;
+- the kind of demonstration (`full_pluripotency` | `partial_reprogramming_rejuvenation` |
+  `transdifferentiation`) and **what was actually demonstrated**, in words;
+- whether that was verified from full text or abstract; who recorded it and when.
+
+Curated in `data/reference/reprogramming_evidence.yaml`, version controlled. Component
+identity follows §5.1 (full InChIKey); unresolved identities are recorded but not loaded.
+
+**Grading.** Components with no lifespan evidence are `mechanistic_only`, entry route
+`reprogramming_cocktail`. A component already in DrugAge (valproic acid, sodium
+butyrate, alpha-ketoglutarate) stays `measured_lifespan`; its cocktail rows are context.
+
+**Output.** These compounds **never enter the gold cell**, which requires measured
+lifespan evidence. Their deliverable is `v_mechanistic_human_dossier`: cocktails,
+citations, cell types, whether anything was shown in vivo, review state, and systemic
+human trial counts — every row stating the premise: *"Mechanistic premise only: named
+component of a published chemical reprogramming cocktail. No measured lifespan evidence."*
+
+**Seeded from** Yang et al. 2023, *Aging* (PMID 37437248, DOI 10.18632/aging.204896),
+read in full text. Six cocktails, all in replicatively senescent human fibroblasts in
+vitro over 4 days; they restored nucleocytoplasmic compartmentalization and reduced
+transcriptomic age without pluripotency markers. No lifespan was measured.
+
+| Cocktail | Components (as written) | Composition |
+|---|---|---|
+| C1 (VC6TF) | valproic acid, CHIR-99021, E-616452 (RepSox), tranylcypromine, forskolin | complete |
+| C2 | C1 + sodium butyrate | additives in Suppl. Table 2, not read |
+| C3 | C1 + bFGF | additives in Suppl. Table 2, not read |
+| C4 (C6NYSA) | CHIR-99021, E-616452, TTNPB, Y-27632, Smoothened Agonist, ABT-869 (linifanib) | complete |
+| C5 | C4 + sodium butyrate | additives in Suppl. Table 2, not read |
+| C6 | C4 + alpha-ketoglutarate | additives in Suppl. Table 2, not read |
+
+Loaded as `mechanistic_only`: CHIR-99021, RepSox, tranylcypromine, forskolin, TTNPB,
+Y-27632, linifanib. Not loaded pending decisions: "Smoothened Agonist" (the paper does
+not say which; SAG is likely) and bFGF (a protein, not a small molecule).
+
+Identity trap found: PubChem titles Y-27632's record (CID 448042) "Ximelegatran", one
+letter from ximelagatran, an unrelated withdrawn anticoagulant.
+
+**Not yet meeting the standard** (recorded under `pending`, never loaded): the founding
+chemical-iPSC papers, Hou et al. 2013 *Science* (PMID 23868920) and Guan et al. 2022
+*Nature* (PMID 35418683), whose cocktails are not named in their abstracts and whose full
+text is not open access; and a 2022 bioRxiv preprint reporting a chemical cocktail that
+extends *C. elegans* lifespan — if published, that is lifespan evidence for the measured
+path, not this one.
 
 ---
 
@@ -621,3 +803,11 @@ collaborate. That is the realistic route to the data behind governance walls
 - Should observational studies (not just RCTs) be in scope? Probably v2.
 - What evidence establishes "substantial human exposure" for the harm path beyond
   reviewer judgement (e.g. ChEMBL approval status, prescription volume)?
+- Meclizine female ITP arm: record the suspected DrugAge source error as a
+  `direction_review` correction? (Tier would fall from strong to mixed.)
+- Should "strong" require ≥2 independent *experiments*, not just ≥2 positive cohorts?
+  Today the two sexes of one experiment can satisfy it.
+- Mechanistic path: is a growth factor (bFGF) a "compound" here? Which "Smoothened
+  Agonist" did Yang 2023 use (Supplementary Table 1)?
+- Full text of Hou 2013 and Guan 2022 is needed before their cocktails can be recorded.
+

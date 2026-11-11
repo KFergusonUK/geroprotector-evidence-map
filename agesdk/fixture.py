@@ -15,7 +15,6 @@ from pathlib import Path
 import yaml
 
 from agesdk.db import PROJECT_ROOT
-from agesdk.evidence import direction_of_drugage_row, sex_of_drugage_row
 
 FIXTURE_PATH = PROJECT_ROOT / "data" / "fixtures" / "seed_compounds.yaml"
 SPECIES_PATH = PROJECT_ROOT / "data" / "reference" / "species_taxon.csv"
@@ -23,7 +22,7 @@ SPECIES_PATH = PROJECT_ROOT / "data" / "reference" / "species_taxon.csv"
 INCHIKEY_RE = re.compile(r"^[A-Z]{14}-[A-Z]{10}-[A-Z]$")
 ATC_RE = re.compile(r"^[A-Z]\d\d[A-Z][A-Z]\d\d$")
 REQUIRED = ("key", "canonical_name", "group", "role", "expected_entry_route", "expected_paths",
-            "itp_cohorts", "mammal_evidence", "mammal_extension", "pubchem_cid", "inchikey",
+            "itp", "mammal_evidence", "mammal_extension", "pubchem_cid", "inchikey",
             "chembl_id", "atc_codes", "drugage_names", "must_match", "must_not_match",
             "needs_review", "route_excluded", "decisions", "review")
 ENTRY_ROUTES = {"direct", "class", "excluded"}
@@ -36,16 +35,26 @@ def load(path: Path = FIXTURE_PATH) -> dict:
         return yaml.safe_load(fh)
 
 
+TIERS = {"none", "weak", "mixed", "strong"}
+ITP_KEYS = {"experiments", "arms", "cohorts", "male", "female", "tier"}
+
+
 def _check_itp(k: str, itp, errs: list[str]) -> None:
-    if not isinstance(itp, dict) or set(itp) != {"positive", "total", "male", "female"}:
-        errs.append(f"{k}: itp_cohorts must have positive, total, male, female")
+    if itp == "untested":
         return
-    pairs = [(itp["positive"], itp["total"]), tuple(itp["male"]), tuple(itp["female"])]
-    for pos, tot in pairs:
+    if not isinstance(itp, dict) or set(itp) != ITP_KEYS:
+        errs.append(f'{k}: itp must be "untested" or have {sorted(ITP_KEYS)}')
+        return
+    for field in ("arms", "cohorts", "male", "female"):
+        pos, tot = itp[field]
         if not (isinstance(pos, int) and isinstance(tot, int) and 0 <= pos <= tot):
-            errs.append(f"{k}: bad ITP ratio {pos}/{tot}")
-    if itp["male"][1] + itp["female"][1] > itp["total"]:
-        errs.append(f"{k}: ITP male+female cohorts exceed total")
+            errs.append(f"{k}: bad ITP {field} ratio {pos}/{tot}")
+    if itp["male"][1] + itp["female"][1] > itp["cohorts"][1]:
+        errs.append(f"{k}: ITP male+female cohorts exceed total cohorts")
+    if not (itp["experiments"] <= itp["cohorts"][1] <= itp["arms"][1]):
+        errs.append(f"{k}: ITP units out of order: need experiments <= cohorts <= arms")
+    if set(itp["tier"]) != {"overall", "male", "female"} or not set(itp["tier"].values()) <= TIERS:
+        errs.append(f"{k}: bad ITP tier {itp['tier']!r}")
 
 
 def validate(fx: dict) -> list[str]:
@@ -72,7 +81,7 @@ def validate(fx: dict) -> list[str]:
             errs.append(f"{k}: bad role {c['role']!r}")
         if not set(c["expected_paths"]) <= PATHS:
             errs.append(f"{k}: bad expected_paths {c['expected_paths']!r}")
-        _check_itp(k, c["itp_cohorts"], errs)
+        _check_itp(k, c["itp"], errs)
         if c["mammal_extension"] and not c["mammal_evidence"]:
             errs.append(f"{k}: mammal_extension without mammal_evidence")
         if "harm_candidate" in c["expected_paths"] and not c["mammal_evidence"]:
@@ -134,46 +143,67 @@ def load_species_tiers(path: Path = SPECIES_PATH) -> dict[str, str]:
         return {r["species"]: r["tier"] for r in csv.DictReader(fh)}
 
 
-def drugage_facts(rows: list[dict], names: list[str], tiers: dict[str, str]) -> dict:
-    """What DrugAge actually says about the given exact names."""
-    sel = [(r, direction_of_drugage_row(r)[0]) for r in rows if r["compound_name"] in names]
-    itp = [(sex_of_drugage_row(r), d == "extension") for r, d in sel if r["ITP"] == "Yes"]
+def build_seed_db(fx: dict, raw_id: int, rows: list[dict]) -> sqlite3.Connection:
+    """In-memory database holding the fixture's direct compounds and their real
+    DrugAge rows, so expectations are checked by the production SQL views rather
+    than by a second implementation of the same rules."""
+    from agesdk import db, normalise, reference
+    conn = db.connect(":memory:")
+    db.init_db(conn)
+    reference.load_species(conn)
+    conn.execute("INSERT INTO raw_response (id, source, endpoint, request_params, response_body, "
+                 "fetched_at, content_sha256) VALUES (?, 'drugage', 'fixture-check', '{}', '', '', '')",
+                 (raw_id,))
+    ids: dict[str, int] = {}
+    for c in fx["compounds"]:
+        if c["drugage_names"]:
+            cid = conn.execute("INSERT INTO compound (canonical_name, entry_route, evidence_tier, inchikey) "
+                               "VALUES (?, 'direct', 'measured_lifespan', ?)",
+                               (c["canonical_name"], c["inchikey"])).lastrowid
+            ids.update({n: cid for n in c["drugage_names"]})
+    normalise.load_drugage_evidence(conn, raw_id, rows, ids)
+    return conn
 
-    def ratio(sex=None):
-        x = [pos for s, pos in itp if sex is None or s == sex]
-        return [sum(x), len(x)]
 
-    mammal = [(r, d) for r, d in sel if tiers.get(r["species"]) == "mammal"]
+def facts_from_views(conn: sqlite3.Connection, canonical_name: str) -> dict:
+    one = lambda sql: conn.execute(sql, (canonical_name,)).fetchone()
     paths = []
-    if any(d == "extension" for _, d in sel):
+    if one("SELECT 1 FROM v_extension_evidence WHERE canonical_name = ?"):
         paths.append("extension")
-    if any(d == "shortening" for _, d in mammal):
+    if one("SELECT 1 FROM v_harm_candidates WHERE canonical_name = ?"):
         paths.append("harm_candidate")
-    overall = ratio()
-    return {
-        "n_rows": len(sel),
-        "paths": paths,
-        "itp_cohorts": {"positive": overall[0], "total": overall[1],
-                        "male": ratio("M"), "female": ratio("F")},
-        "mammal_evidence": bool(mammal),
-        "mammal_extension": any(d == "extension" for _, d in mammal),
+    i = one("SELECT * FROM v_itp_summary WHERE canonical_name = ?")
+    itp = "untested" if i is None else {
+        "experiments": i["itp_experiments"],
+        "arms": [i["itp_arms_positive"], i["itp_arms_total"]],
+        "cohorts": [i["itp_cohorts_positive"], i["itp_cohorts_total"]],
+        "male": [i["itp_male_positive"] or 0, i["itp_male_total"]],
+        "female": [i["itp_female_positive"] or 0, i["itp_female_total"]],
+        "tier": {"overall": i["itp_tier"], "male": i["itp_male_tier"], "female": i["itp_female_tier"]},
     }
+    mammal = conn.execute("""SELECT count(*) AS n, coalesce(sum(effective_direction = 'extension'), 0) AS ext
+                             FROM v_evidence_counted v JOIN compound c USING (compound_id)
+                             WHERE c.canonical_name = ? AND v.tier = 'mammal'""",
+                          (canonical_name,)).fetchone()
+    return {"paths": paths, "itp": itp,
+            "mammal_evidence": mammal["n"] > 0, "mammal_extension": mammal["ext"] > 0}
 
 
-def check_against_drugage(fx: dict, rows: list[dict], tiers: dict[str, str]) -> list[str]:
+def check_against_drugage(fx: dict, raw_id: int, rows: list[dict]) -> list[str]:
     errs = []
     all_names = {r["compound_name"] for r in rows}
+    conn = build_seed_db(fx, raw_id, rows)
     for c in fx["compounds"]:
         k = c["key"]
         for n in c["drugage_names"] + c.get("drugage_names_needs_review", []):
             if n not in all_names:
                 errs.append(f"{k}: DrugAge name {n!r} not found in the loaded CSV")
-        facts = drugage_facts(rows, c["drugage_names"], tiers)
-        for field, expected in (("paths", c["expected_paths"]), ("itp_cohorts", c["itp_cohorts"]),
+        facts = facts_from_views(conn, c["canonical_name"])
+        for field, expected in (("paths", c["expected_paths"]), ("itp", c["itp"]),
                                 ("mammal_evidence", c["mammal_evidence"]),
                                 ("mammal_extension", c["mammal_extension"])):
             if facts[field] != expected:
-                errs.append(f"{k}: fixture {field}={expected!r}, DrugAge says {facts[field]!r}")
+                errs.append(f"{k}: fixture {field}={expected!r}, views say {facts[field]!r}")
     return errs
 
 

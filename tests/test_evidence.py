@@ -1,42 +1,64 @@
 import unittest
 
-from agesdk.evidence import derive_direction, sex_of_drugage_row
+from agesdk.evidence import derive_direction, evidence_key, measure_direction, sex_of_drugage_row
 
 
-class Direction(unittest.TestCase):
-    def check(self, args, expected):
-        self.assertEqual(derive_direction(*args), expected, msg=repr(args))
+def d(*args):
+    r = derive_direction(*args)
+    return r.avg, r.max, r.combined
 
-    def test_significant_average_sets_direction(self):
-        self.check(("13", "S", "", "NA"), ("extension", "avg"))
-        self.check(("-9.8", "S", "", "NA"), ("shortening", "avg"))
 
-    def test_significant_zero_is_null(self):
-        self.check(("0", "S", "", "NA"), ("null", "avg"))
+class MeasureDirection(unittest.TestCase):
+    def test_per_measure(self):
+        self.assertEqual(measure_direction("13", "S"), "extension")
+        self.assertEqual(measure_direction("-9.8", "S"), "shortening")
+        self.assertEqual(measure_direction("0", "S"), "null")
+        self.assertEqual(measure_direction("7", "NS"), "null")
+        self.assertEqual(measure_direction("-23", "NA"), "unassessed")
+        self.assertEqual(measure_direction("", "S"), "unassessed")      # flag without value
+        self.assertEqual(measure_direction("n/a", "S"), "unassessed")
 
-    def test_average_wins_over_max(self):
-        self.check(("10", "S", "-5", "S"), ("extension", "avg"))
 
-    def test_significant_max_used_when_average_not_significant(self):
-        # Levodopa in DrugAge: mean +7% NS, max -14% significant.
-        self.check(("7", "NS", "-14", "S"), ("shortening", "max"))
-        self.check(("", "NA", "13", "S"), ("extension", "max"))
+class CombinedDirection(unittest.TestCase):
+    def test_single_significant_measure(self):
+        self.assertEqual(d("13", "S", "", "NA"), ("extension", "unassessed", "extension"))
+        self.assertEqual(d("-9.8", "S", "", "NA"), ("shortening", "unassessed", "shortening"))
+        self.assertEqual(d("", "NA", "13", "S"), ("unassessed", "extension", "extension"))
 
-    def test_not_significant_is_null(self):
-        self.check(("7", "NS", "", "NA"), ("null", "avg"))
-        self.check(("", "NA", "4", "NS"), ("null", "max"))
+    def test_same_direction_different_significance_is_agreement(self):
+        # 17a-estradiol 2014 male: mean +12% S, max +5% NS.
+        self.assertEqual(d("12", "S", "5", "NS")[2], "extension")
+        # Acarbose 2016 female: mean +2% NS, max +6% S.
+        self.assertEqual(d("2", "NS", "6", "S")[2], "extension")
 
-    def test_no_significance_reported_is_unassessed_not_null(self):
-        # 'null' would turn an untested result into negative evidence.
-        self.check(("-23", "NA", "", "NA"), ("unassessed", "none"))
-        self.check(("", "", "", ""), ("unassessed", "none"))
+    def test_opposite_directions_are_a_conflict_not_a_precedence(self):
+        # Levodopa: mean +7% NS, max -14% S.
+        self.assertEqual(d("7", "NS", "-14", "S"), ("null", "shortening", "conflict"))
+        # Epitalon: mean -5% NS, max +13% S.
+        self.assertEqual(d("-5", "NS", "13", "S")[2], "conflict")
+        # Mirror image: mean significant, max points the other way.
+        self.assertEqual(d("6", "S", "-1", "NS")[2], "conflict")
+        self.assertEqual(d("10", "S", "-5", "S")[2], "conflict")
 
-    def test_significance_flag_without_value_is_unassessed(self):
-        # DrugAge has 'S' rows with no effect size (e.g. Vitamin E): direction unknowable.
-        self.check(("", "S", "", "NA"), ("unassessed", "none"))
+    def test_unassessed_measure_cannot_conflict(self):
+        # Sodium cyclamate: mean +9.77% S, max -11.28% with no significance reported.
+        self.assertEqual(d("9.77", "S", "-11.28", "NA")[2], "extension")
 
-    def test_garbage_values_do_not_crash(self):
-        self.check(("n/a", "S", "", "NA"), ("unassessed", "none"))
+    def test_zero_point_estimate_does_not_conflict(self):
+        self.assertEqual(d("8", "S", "0", "NS")[2], "extension")
+
+    def test_nothing_significant(self):
+        self.assertEqual(d("7", "NS", "-2", "NS")[2], "null")
+        self.assertEqual(d("-23", "NA", "", "NA")[2], "unassessed")
+        self.assertEqual(d("", "", "", "")[2], "unassessed")
+
+
+class EvidenceKey(unittest.TestCase):
+    def test_stable_and_content_based(self):
+        a = {"compound_name": "X", "species": "Mus musculus"}
+        self.assertEqual(evidence_key("drugage", a), evidence_key("drugage", dict(reversed(list(a.items())))))
+        self.assertNotEqual(evidence_key("drugage", a), evidence_key("drugage", {**a, "species": "Rattus"}))
+        self.assertTrue(evidence_key("drugage", a).startswith("drugage:"))
 
 
 class Sex(unittest.TestCase):

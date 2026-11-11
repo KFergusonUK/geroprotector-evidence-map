@@ -27,14 +27,19 @@
 #                    extension (>=1 significant extension, any species) and/or
 #                    harm_candidate (>=1 significant mammalian shortening; surfacing
 #                    still needs human review). [] = in the data, on no path.
-#   itp_cohorts      ITP cohorts with significant extension / ITP cohorts tested,
-#                    overall and by sex. Ratios, not a verdict (SPEC §5.4).
+#   itp              ITP evidence (SPEC §5.4), or "untested". Units:
+#                      arm        one ITP row (one sex x dose/start age/regimen)
+#                      experiment one independent study (PMID unless overridden)
+#                      cohort     one sex within one experiment: THE unit of the ratio,
+#                                 since arms in one experiment share a control group
+#                    [positive, total] for arms, cohorts, male and female cohorts, and
+#                    the tier (none | weak | mixed | strong) overall and per sex.
 #   mammal_evidence  any mammal row, any direction (the 159-compound universe)
 #   mammal_extension >=1 significant mammal extension row
 #   decisions        Decisions made by a named person, with date. Distinct from the
 #                    entry-level review sign-off.
 
-fixture_version: 0.2.0
+fixture_version: 0.3.0
 pubchem_checked_at: "2026-11-11"
 drugage_version: "Build 5 (2024-11-29); archive sha256 d12f59717de60a207748f53bdbcdb484ed07e30d8608eb8e4a101e2a08d7fa80"
 
@@ -47,7 +52,13 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension]
-    itp_cohorts: {positive: 14, total: 16, male: [7, 8], female: [7, 8]}
+    itp:
+      experiments: 4
+      arms: [14, 16]
+      cohorts: [8, 8]
+      male: [4, 4]
+      female: [4, 4]
+      tier: {overall: "strong", male: "strong", female: "strong"}
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 5284616
@@ -75,7 +86,13 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension]
-    itp_cohorts: {positive: 4, total: 6, male: [4, 4], female: [0, 2]}
+    itp:
+      experiments: 3
+      arms: [4, 6]
+      cohorts: [3, 5]
+      male: [3, 3]
+      female: [0, 2]
+      tier: {overall: "strong", male: "strong", female: "none"}
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 68570
@@ -93,7 +110,7 @@ compounds:
       THE stereo trap. 17-beta-estradiol (CID 5757, VOXZDWNPVJITMN-ZBRFXRBCSA-N) shares the
       InChIKey first block and has a massive HRT trial dossier; a false join would put this
       compound straight into the gold cell. Bare 'estradiol' always means 17-beta.
-      ITP effect is male-only (4/4 male, 0/2 female). Human use is topical alfatradiol for
+      ITP: 3 experiments; male 3/3 cohorts, female 0/2. Human use is topical alfatradiol for
       alopecia (EU), which the systemic exposure rule excludes: expect almost no qualifying trials.
       DrugAge's string uses U+2010 hyphens; ASCII matching alone will miss it.
     route_excluded: ["alfatradiol topical solution", "Ell-Cranell alpha", "topical 17-alpha-estradiol"]
@@ -106,7 +123,13 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension]
-    itp_cohorts: {positive: 4, total: 6, male: [4, 4], female: [0, 2]}
+    itp:
+      experiments: 2
+      arms: [4, 6]
+      cohorts: [2, 4]
+      male: [2, 2]
+      female: [0, 2]
+      tier: {overall: "strong", male: "strong", female: "none"}
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 4534
@@ -137,7 +160,7 @@ compounds:
     role: linked_compound
     expected_entry_route: excluded
     expected_paths: []
-    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    itp: "untested"
     mammal_evidence: false
     mammal_extension: false
     pubchem_cid: 71398
@@ -164,7 +187,13 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension]
-    itp_cohorts: {positive: 0, total: 2, male: [0, 1], female: [0, 1]}
+    itp:
+      experiments: 1
+      arms: [0, 2]
+      cohorts: [0, 2]
+      male: [0, 1]
+      female: [0, 1]
+      tier: {overall: "none", male: "none", female: "none"}
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 51
@@ -195,7 +224,13 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension, harm_candidate]
-    itp_cohorts: {positive: 0, total: 2, male: [0, 1], female: [0, 1]}
+    itp:
+      experiments: 1
+      arms: [0, 2]
+      cohorts: [0, 2]
+      male: [0, 1]
+      female: [0, 1]
+      tier: {overall: "none", male: "none", female: "none"}
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 4091
@@ -225,7 +260,13 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension, harm_candidate]
-    itp_cohorts: {positive: 3, total: 6, male: [3, 3], female: [0, 3]}
+    itp:
+      experiments: 2
+      arms: [3, 6]
+      cohorts: [2, 4]
+      male: [2, 2]
+      female: [0, 2]
+      tier: {overall: "strong", male: "strong", female: "none"}
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 24812758
@@ -237,7 +278,9 @@ compounds:
     must_not_match: [dapagliflozin, empagliflozin, ertugliflozin, sotagliflozin, ipragliflozin, Jardiance, Farxiga]
     needs_review: [Invokamet, "canagliflozin/metformin", "SGLT2 inhibitor", "SGLT2i"]
     notes: >
-      ITP: male 3/3, female 0/3, and one female cohort -6% significant: also a harm candidate.
+      ITP: 2 independent experiments (2020; 2024, mice born 2020, which repeated the 6-month
+      arm 'as in our previous study' and added a 16-month start). Male 2/2 cohorts, female 0/2,
+      and the 16-month female arm is -6% significant: also a harm candidate.
       The basis compound for class entry of other SGLT2 inhibitors (empagliflozin test case).
       Class-level strings ('SGLT2 inhibitor') are not compound matches.
     route_excluded: []
@@ -250,7 +293,13 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension, harm_candidate]
-    itp_cohorts: {positive: 1, total: 6, male: [1, 3], female: [0, 3]}
+    itp:
+      experiments: 2
+      arms: [1, 6]
+      cohorts: [1, 4]
+      male: [1, 2]
+      female: [0, 2]
+      tier: {overall: "weak", male: "mixed", female: "none"}
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 2244
@@ -270,8 +319,10 @@ compounds:
       '5-ASA' (mesalamine) vs 'ASA' (aspirin) is a substring trap. Salicylic acid is
       aspirin's metabolite but a different compound. Lysine acetylsalicylate and carbasalate
       calcium are aspirin salts/complexes and collapse to aspirin (note the salt).
-      Aluminum acetylsalicylate (DrugAge, flies) does not resolve in PubChem: unresolvable. ITP: 1/6 cohorts (male 1/3, female 0/3). Also a harm
-      candidate: one non-ITP female mouse study, -10% (significant).
+      Aluminum acetylsalicylate (DrugAge, flies) does not resolve in PubChem: unresolvable. ITP: 2 experiments (2008, 2019), 1/6 arms but 1/4 cohorts
+      (male 1/2, female 0/2): tier WEAK. The 2019 experiment's two dose arms share a control
+      group, so they are one cohort per sex, not two. Also a harm candidate: one non-ITP
+      female mouse study, -10% (significant).
       Multi-class (B01AC + N02BA + others): will be flagged for ATC review.
     route_excluded: []
     decisions:
@@ -284,7 +335,7 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension]
-    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    itp: "untested"
     mammal_evidence: false
     mammal_extension: false
     pubchem_cid: 28486
@@ -315,7 +366,13 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension]
-    itp_cohorts: {positive: 9, total: 10, male: [5, 5], female: [4, 5]}
+    itp:
+      experiments: 3
+      arms: [9, 10]
+      cohorts: [6, 6]
+      male: [3, 3]
+      female: [3, 3]
+      tier: {overall: "strong", male: "strong", female: "strong"}
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 9811704
@@ -342,7 +399,13 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension]
-    itp_cohorts: {positive: 2, total: 2, male: [1, 1], female: [1, 1]}
+    itp:
+      experiments: 1
+      arms: [2, 2]
+      cohorts: [2, 2]
+      male: [1, 1]
+      female: [1, 1]
+      tier: {overall: "strong", male: "mixed", female: "mixed"}
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 44093
@@ -367,7 +430,13 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension]
-    itp_cohorts: {positive: 2, total: 2, male: [1, 1], female: [1, 1]}
+    itp:
+      experiments: 1
+      arms: [2, 2]
+      cohorts: [2, 2]
+      male: [1, 1]
+      female: [1, 1]
+      tier: {overall: "strong", male: "mixed", female: "mixed"}
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 4034
@@ -382,6 +451,10 @@ compounds:
       'Meclozine' is the INN; 'meclizine' the USAN. Plain 'Dramamine' is dimenhydrinate;
       'Dramamine Less Drowsy' is meclizine (brand-extension trap). Cyclizine is in DrugAge
       separately ('Cyclizine HCl', parent CID 6726) and probably shares ATC class R06AE.
+      SOURCE ERROR SUSPECTED: DrugAge marks the female ITP arm (+3%) significant, but the paper
+      (PMID 38041783) says female lifespan 'was not significantly affected'. Values below are
+      DrugAge as published; if corrected via direction_review (reason source_error), female
+      becomes 0/1 and the overall tier falls from strong to mixed.
     route_excluded: []
     decisions: []
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
@@ -393,7 +466,7 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension, harm_candidate]
-    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    itp: "untested"
     mammal_evidence: true
     mammal_extension: false
     pubchem_cid: 5280343
@@ -421,7 +494,13 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension]
-    itp_cohorts: {positive: 0, total: 4, male: [0, 2], female: [0, 2]}
+    itp:
+      experiments: 1
+      arms: [0, 4]
+      cohorts: [0, 2]
+      male: [0, 1]
+      female: [0, 1]
+      tier: {overall: "none", male: "none", female: "none"}
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 5281614
@@ -444,7 +523,7 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: []
-    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    itp: "untested"
     mammal_evidence: false
     mammal_extension: false
     pubchem_cid: 14180
@@ -473,7 +552,13 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension]
-    itp_cohorts: {positive: 0, total: 2, male: [0, 1], female: [0, 1]}
+    itp:
+      experiments: 1
+      arms: [0, 2]
+      cohorts: [0, 2]
+      male: [0, 1]
+      female: [0, 1]
+      tier: {overall: "none", male: "none", female: "none"}
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 439924
@@ -501,7 +586,13 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension]
-    itp_cohorts: {positive: 0, total: 6, male: [0, 3], female: [0, 3]}
+    itp:
+      experiments: 2
+      arms: [0, 6]
+      cohorts: [0, 4]
+      male: [0, 2]
+      female: [0, 2]
+      tier: {overall: "none", male: "none", female: "none"}
     mammal_evidence: true
     mammal_extension: false
     pubchem_cid: 445154
@@ -528,7 +619,7 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension]
-    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    itp: "untested"
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 1102
@@ -552,7 +643,7 @@ compounds:
     role: seed
     expected_entry_route: direct
     expected_paths: [extension]
-    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    itp: "untested"
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 1123
@@ -579,7 +670,7 @@ compounds:
     role: class_test_case
     expected_entry_route: class
     expected_paths: []
-    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    itp: "untested"
     mammal_evidence: false
     mammal_extension: false
     expected_class_basis: {atc_level4: A10BK, basis: canagliflozin}
@@ -606,7 +697,7 @@ compounds:
     role: class_test_case
     expected_entry_route: excluded
     expected_paths: []
-    itp_cohorts: {positive: 0, total: 0, male: [0, 0], female: [0, 0]}
+    itp: "untested"
     mammal_evidence: false
     mammal_extension: false
     expected_class_basis: {atc_level4: A10BJ, basis: null}

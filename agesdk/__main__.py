@@ -31,8 +31,8 @@ def cmd_fixture_check(conn, args):
     problems = fixture.validate(fx)
     print(f"internal: {len(problems)} problem(s)")
     try:
-        rows = drugage.current_rows(conn)
-        p = fixture.check_against_drugage(fx, rows, fixture.load_species_tiers())
+        raw_id, rows = drugage.current_raw(conn)
+        p = fixture.check_against_drugage(fx, raw_id, rows)
         print(f"vs DrugAge: {len(p)} problem(s)")
         problems += p
     except LookupError as e:
@@ -45,6 +45,33 @@ def cmd_fixture_check(conn, args):
         print("  -", p)
     unreviewed = [c["key"] for c in fx["compounds"] if not c["review"].get("reviewed_by")]
     print(f"{len(fx['compounds'])} entries; {len(unreviewed)} awaiting human review")
+    sys.exit(1 if problems else 0)
+
+
+def cmd_reprogramming_check(conn, args):
+    spec = reference.load_reprogramming_spec()
+    problems = reference.validate_reprogramming(spec)
+    print(f"file: {len(problems)} problem(s)")
+    raw_id, rows = drugage.current_raw(conn)
+    p = reference.check_reprogramming_vs_drugage(spec, rows)
+    print(f"vs DrugAge: {len(p)} problem(s)")
+    problems += p
+    if not problems:
+        # Load into a scratch database alongside the DrugAge rows they link to, so the
+        # schema's no-bare-names rules and the dossier view are exercised for real.
+        mem = fixture.build_seed_db({"compounds": [
+            {"canonical_name": c["canonical_name"], "inchikey": c["inchikey"], "drugage_names": c["drugage_names"]}
+            for c in spec["compounds"] if c["drugage_names"]]}, raw_id, rows)
+        report = reference.load_reprogramming(mem, spec)
+        print(json.dumps(report, indent=2))
+        for r in mem.execute("SELECT canonical_name, evidence_tier, n_cocktails, citations, n_systemic_trials "
+                             "FROM v_mechanistic_human_dossier ORDER BY canonical_name"):
+            print("  dossier:", dict(r))
+        bad = [dict(r) for r in mem.execute("SELECT * FROM v_entry_route_check")]
+        if bad:
+            problems += [f"entry route check: {b}" for b in bad]
+    for p in problems:
+        print("  -", p)
     sys.exit(1 if problems else 0)
 
 
@@ -61,12 +88,14 @@ def main(argv=None):
     p = sub.add_parser("fixture-check", help="validate the seed fixture")
     p.add_argument("--pubchem", action="store_true", help="also verify CIDs/InChIKeys via PubChem")
     sub.add_parser("fixture-chembl", help="report ChEMBL IDs + ATC codes for fixture entries")
+    sub.add_parser("reprogramming-check", help="validate data/reference/reprogramming_evidence.yaml")
     args = ap.parse_args(argv)
 
     conn = db.connect()
     db.init_db(conn)
     {"init-db": cmd_init_db, "fetch-drugage": cmd_fetch_drugage,
-     "fixture-check": cmd_fixture_check, "fixture-chembl": cmd_fixture_chembl}[args.cmd](conn, args)
+     "fixture-check": cmd_fixture_check, "fixture-chembl": cmd_fixture_chembl,
+     "reprogramming-check": cmd_reprogramming_check}[args.cmd](conn, args)
 
 
 if __name__ == "__main__":

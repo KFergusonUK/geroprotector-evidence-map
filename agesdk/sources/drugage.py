@@ -132,9 +132,15 @@ def fetch(conn: sqlite3.Connection, *, refresh: bool = False,
     return ingest_archive(conn, body, http_meta=http_meta)
 
 
-def current_rows(conn: sqlite3.Connection) -> list[dict]:
-    """Parsed rows of the current DrugAge CSV in the raw layer."""
+def current_raw(conn: sqlite3.Connection) -> tuple[int, list[dict]]:
+    """(raw_response id, parsed rows) of the current DrugAge CSV in the raw layer."""
     row = RawStore(conn).latest(SOURCE, f"{ARCHIVE}!{CSV_MEMBER}", {"url": URL})
     if row is None:
         raise LookupError("DrugAge not loaded; run `python -m agesdk fetch-drugage`")
-    return list(csv.DictReader(io.StringIO(row["response_body"])))
+    return row["id"], list(csv.DictReader(io.StringIO(row["response_body"])))
+
+
+def current_rows(conn: sqlite3.Connection) -> list[dict]:
+    """Parsed rows of the current DrugAge CSV in the raw layer."""
+    return current_raw(conn)[1]
+

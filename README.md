@@ -13,8 +13,9 @@ A compound on both paths appears in both, counted separately.
 
 - **Enters on:** ≥1 animal result with significant lifespan extension.
 - **Threshold:** conservative; replication matters (≥2 independent lab groups, or the
-  ITP threshold). ITP evidence is shown as a ratio by sex, e.g. aspirin 1/6
-  (male 1/3, female 0/3), rapamycin 14/16.
+  ITP threshold). ITP evidence is shown as cohorts positive / tested (one sex in one
+  independent experiment), by sex, with a tier: aspirin 1/4 cohorts across 2 experiments
+  (**weak**), rapamycin 8/8 across 4 (**strong**).
 - **Outputs:** the **gold cell** (replicated extension + human trials), the **null cell**
   (well-powered ITP null + human trials), and **untested candidates**.
 - **Class entry:** compounds sharing a specific ATC level-4 class with a direct
@@ -26,8 +27,23 @@ A compound on both paths appears in both, counted separately.
 - **Threshold:** sensitive; a single credible mammalian signal surfaces a candidate.
 - **Review:** mandatory and human. Nothing reaches `v_harm_signal` without a named
   reviewer, a rationale and a stated human-exposure basis; the schema enforces it.
+- **Context:** the reviewer sees each candidate's ATC class-mates and their evidence;
+  entry still needs the compound's own evidence.
 - **Output:** the **harm signal**: a pointer to evidence that deserves attention,
   not a verdict that a drug is unsafe in humans.
+
+### Mechanistic path — a weaker premise, labelled as such
+
+Named components of published chemical reprogramming cocktails (e.g. CHIR-99021, RepSox,
+tranylcypromine from Yang et al. 2023) have no lifespan evidence. They never enter the
+gold cell. Their output, the **mechanistic human dossier**, shows what human trial data
+exists for them, with every row stating that it rests on a mechanistic premise.
+
+### Evidence tiers
+
+Every compound carries an evidential grade, and every view shows it:
+`measured_lifespan` (DrugAge), `inherited_class` (ATC class-mate), `mechanistic_only`
+(reprogramming cocktail component).
 
 ## Quick start
 
@@ -38,6 +54,7 @@ python -m agesdk init-db              # create/upgrade schema, load reference da
 python -m agesdk fetch-drugage        # DrugAge → raw layer (no-op if already present)
 python -m agesdk fixture-check --pubchem   # validate the seed fixture
 python -m agesdk fixture-chembl       # ChEMBL IDs + ATC codes for the fixture, for hand entry
+python -m agesdk reprogramming-check  # validate reprogramming evidence, preview the dossier
 python -m unittest discover -s tests -t .
 ```
 
@@ -55,6 +72,8 @@ committed; everything in it is rebuilt from the sources and the reviewed data in
 | `agesdk/fixture.py` | Seed fixture loading and checks |
 | `data/fixtures/seed_compounds.yaml` | Hand-resolved seed compounds: resolver ground truth |
 | `data/reference/species_taxon.csv` | Species → tier (mammal / invertebrate / …) |
+| `data/reference/reprogramming_evidence.yaml` | Curated chemical reprogramming cocktails, cited |
+| `agesdk/normalise.py` | Raw → normalised loaders (DrugAge evidence) |
 
 ## Data sources and attribution
 
