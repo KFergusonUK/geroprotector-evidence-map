@@ -1,0 +1,39 @@
+species,tier,note
+Acheta domesticus,invertebrate,house cricket
+Adineta vaga,invertebrate,bdelloid rotifer
+Aedes aegypti,invertebrate,mosquito
+Aedes albopictus,invertebrate,mosquito
+Aeolosoma viride,invertebrate,annelid
+Anastrepha ludens,invertebrate,Mexican fruit fly
+Anopheles stephensi,invertebrate,mosquito
+Apis mellifera,invertebrate,honey bee
+Asplanchna brightwelli,invertebrate,rotifer
+Bombyx mori,invertebrate,silkworm
+Brachionus manjavacas,invertebrate,rotifer
+Caenorhabditis briggsae,invertebrate,nematode
+Caenorhabditis elegans,invertebrate,nematode
+Caenorhabditis tropicalis,invertebrate,nematode
+Canis lupus familiaris,mammal,dog
+Ceriodaphnia affinis,invertebrate,water flea
+Daphnia pulex,invertebrate,water flea
+Drosophila bipectinata,invertebrate,fruit fly
+Drosophila kikkawai,invertebrate,fruit fly
+Drosophila melanogaster,invertebrate,fruit fly
+Drosophila mojavensis,invertebrate,fruit fly
+Drosophila virilis,invertebrate,fruit fly
+Mesocricetus auratus,mammal,Syrian hamster
+Mus Musculus,mammal,mouse (case variant in DrugAge)
+Mus musculus,mammal,mouse
+Musca Domestica,invertebrate,housefly (case variant in DrugAge)
+Musca domestica,invertebrate,housefly
+Mytilina brevispina,invertebrate,rotifer
+Nothobranchius furzeri,other_vertebrate,turquoise killifish
+Nothobranchius guentheri,other_vertebrate,killifish
+Paramecium tetraurelia,other,ciliate protist
+Philodina acuticornis,invertebrate,bdelloid rotifer
+Podospora anserina,fungus,filamentous fungus
+Rattus Norvegicus,mammal,rat (case variant in DrugAge)
+Rattus norvegicus,mammal,rat
+Saccharomyces cerevisiae,fungus,budding yeast
+Tribolium castaneum,invertebrate,red flour beetle
+Zaprionus paravittiger,invertebrate,fruit fly

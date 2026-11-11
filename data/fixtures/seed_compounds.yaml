@@ -1,0 +1,499 @@
+# Seed compound fixture — hand-resolved ground truth for the resolver (SPEC §6, §7 step 1).
+#
+# STATUS: DRAFT. Identifiers below were looked up in PubChem on 2026-11-11 and every
+# lookup is stored in raw_response (source='pubchem'). Every entry still needs a
+# human sign-off: set review.reviewed_by / reviewed_at when you have checked it.
+#
+# Conventions
+#   canonical_name   ASCII, lowercase, the name a reader of the map recognises.
+#                    Identity is the full 27-char InChIKey, never the name, never the
+#                    14-char first block (17a- and 17b-estradiol share it).
+#   pubchem_cid      The parent compound (salts and hydrates collapsed, §5.1).
+#   chembl_id,
+#   atc_codes        PENDING: the ChEMBL API was returning HTTP 500s / timeouts on
+#                    2026-11-11. ATC codes must come from ChEMBL (SPEC §5.5), so they
+#                    are null until `python -m agesdk fixture-chembl` succeeds.
+#   drugage_names    Exact strings from the DrugAge CSV, byte-for-byte (note U+2010
+#                    hyphens in 17-alpha-estradiol). Checked by tests against the raw layer.
+#   must_match       Strings the resolver MUST map to this compound.
+#   must_not_match   Strings the resolver MUST NOT map to this compound (precision tests).
+#   needs_review     Strings the resolver must route to manual review, never auto-map
+#                    (combination products, mixtures, extracts, stereo ambiguity).
+#   expected_entry_route  direct | class | excluded
+#   expected_itp     positive (>=1 ITP cohort with significant extension) | null_result | untested
+#   headline_v1      true if the compound has mammal evidence (v1 headline scope)
+
+fixture_version: 0.1.0
+pubchem_checked_at: "2026-11-11"
+drugage_version: "Build 5 (2024-11-29); archive sha256 d12f59717de60a207748f53bdbcdb484ed07e30d8608eb8e4a101e2a08d7fa80"
+
+compounds:
+
+  # ------------------------------------------------------------------ naming nightmares
+  - key: rapamycin
+    canonical_name: sirolimus
+    group: naming_nightmare
+    role: seed
+    expected_entry_route: direct
+    expected_itp: positive
+    headline_v1: true
+    pubchem_cid: 5284616
+    inchikey: QFJCIRLUMZQUOT-HPLJOQBZSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Rapamycin]
+    must_match: [rapamycin, Rapamycin, sirolimus, Sirolimus, Rapamune, AY-22989, AY 22989, RAPA, Fyarro,
+                 "Sirolimus 0.5 mg", "Rapamune 2mg tablet", "nab-sirolimus", "encapsulated rapamycin"]
+    must_not_match: [everolimus, Everolimus, temsirolimus, zotarolimus, ridaforolimus, umirolimus,
+                     tacrolimus, FK506, pimecrolimus, RAD001, Afinitor, Zortress, Torisel]
+    needs_review: ["sirolimus-eluting stent", "rapamycin topical"]
+    notes: >
+      Rapalogs are different molecules; never merge. A future 'analogue_of' link may relate
+      them. Drug-eluting stents deliver sirolimus locally to the coronary artery; whether a
+      stent trial counts as a sirolimus trial is a scope decision, so it goes to review.
+      nab-sirolimus (Fyarro) is a formulation of the same molecule.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: 17a-estradiol
+    canonical_name: 17-alpha-estradiol
+    group: naming_nightmare
+    role: seed
+    expected_entry_route: direct
+    expected_itp: positive
+    headline_v1: true
+    pubchem_cid: 68570
+    inchikey: VOXZDWNPVJITMN-SFFUCWETSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: ["17‐alpha‐estradiol"]
+    must_match: [17-alpha-estradiol, "17‐alpha‐estradiol", "17α-estradiol",
+                 17alpha-estradiol, alfatradiol, epiestradiol, "17-alpha estradiol", Ell-Cranell alpha]
+    must_not_match: [estradiol, Estradiol, 17-beta-estradiol, "17β-estradiol", Beta-estradiol,
+                     estradiol valerate, estradiol cypionate, ethinylestradiol, ethinyl estradiol,
+                     16-alpha-hydroxyestradiol, estrone, estriol, Estrace]
+    needs_review: []
+    notes: >
+      THE stereo trap. 17-beta-estradiol (CID 5757, VOXZDWNPVJITMN-ZBRFXRBCSA-N) shares the
+      InChIKey first block and has a massive HRT trial dossier; a false join would put this
+      compound straight into the gold cell. Bare 'estradiol' always means 17-beta.
+      ITP effect is male-only (females NS). Human use: topical alfatradiol for alopecia (EU).
+      DrugAge's string uses U+2010 hyphens; ASCII matching alone will miss it.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: ndga
+    canonical_name: nordihydroguaiaretic acid
+    group: naming_nightmare
+    role: seed
+    expected_entry_route: direct
+    expected_itp: positive
+    headline_v1: true
+    pubchem_cid: 4534
+    inchikey: HCZKYJDFEPMADG-UHFFFAOYSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Nordihydroguaiaretic acid]
+    must_match: [nordihydroguaiaretic acid, NDGA, Nordihydroguaiaretic acid]
+    must_not_match: [guaiaretic acid, dihydroguaiaretic acid, tetra-O-methyl nordihydroguaiaretic acid,
+                     terameprocol, M4N, EM-1421]
+    needs_review: [masoprocol, Actinex, meso-NDGA, chaparral, Larrea tridentata extract]
+    notes: >
+      DECISION NEEDED. CID 4534 has undefined stereo. Masoprocol (CID 71398,
+      HCZKYJDFEPMADG-TXEJJXNPSA-N) is the meso stereoisomer and was an approved topical drug
+      (Actinex). Same first block, different full key. Commercial NDGA is predominantly meso,
+      so they are probably the same substance in practice, but that is a manual call, not an
+      InChIKey match. Terameprocol (M4N) is a methylated derivative: a different molecule.
+      Chaparral is the plant source: an extract, never a match.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: akg
+    canonical_name: alpha-ketoglutaric acid
+    group: naming_nightmare
+    role: seed
+    expected_entry_route: direct
+    expected_itp: null_result
+    headline_v1: true
+    pubchem_cid: 51
+    inchikey: KPGXRSRHYNQIFN-UHFFFAOYSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Alpha-ketoglutarate]
+    must_match: [alpha-ketoglutarate, Alpha-ketoglutarate, alpha-ketoglutaric acid, 2-oxoglutarate, 2-oxoglutaric acid,
+                 AKG, aKG, calcium alpha-ketoglutarate, Ca-AKG, CaAKG, calcium oxoglurate, oxoglurate]
+    must_not_match: [Alpha-ketoisovalerate, "Alpha‐ketoisovalerate", "Alpha‐keto‐beta‐methylvalerate",
+                     "4‐methyl‐2‐oxovalerate", glutamate, glutamine, alpha-ketoglutaramate,
+                     dimethyl alpha-ketoglutarate]
+    needs_review: [ornithine alpha-ketoglutarate, OKG, "Rejuvant", "AKG + vitamin A", "arginine alpha-ketoglutarate"]
+    notes: >
+      DrugAge string resolves in PubChem to the dianion (CID 164533), parent CID 51; the
+      calcium salt (CID 3018235) also collapses to 51. Record the salt in compound.notes.
+      Ornithine / arginine AKG are salts with a second active amino acid: mixtures, review.
+      Dimethyl-AKG is a cell-permeable ester (different molecule). ITP: NS both sexes, but
+      non-ITP mouse data exist: a real test of the ITP-null cell.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  # ------------------------------------------------- heavy human data, other indications
+  - key: metformin
+    canonical_name: metformin
+    group: heavy_human_data
+    role: seed
+    expected_entry_route: direct
+    expected_itp: null_result
+    headline_v1: true
+    pubchem_cid: 4091
+    inchikey: XZWYZXLIPXDOLR-UHFFFAOYSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Metformin]
+    must_match: [metformin, Metformin, metformin hydrochloride, metformin HCl, Glucophage,
+                 Glucophage XR, "metformin extended release", "Metformin 500 mg", Fortamet, Glumetza, Riomet]
+    must_not_match: [phenformin, buformin, Phenformin, Buformin, metoprolol, metronidazole]
+    needs_review: [Janumet, Jentadueto, Synjardy, Invokamet, Xigduo, Kombiglyze, "sitagliptin/metformin",
+                   "metformin + rapamycin", "TAME"]
+    notes: >
+      Expect metformin as background therapy in thousands of diabetes trials; arm role
+      matters more than name matching here. Fixed-dose combination products contain
+      metformin but test another drug: review. ITP: NS both sexes (metformin alone).
+      Phenformin and buformin are in DrugAge as separate biguanides: separate compounds,
+      and probable class-mates via ATC A10BA.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: canagliflozin
+    canonical_name: canagliflozin
+    group: heavy_human_data
+    role: seed
+    expected_entry_route: direct
+    expected_itp: positive
+    headline_v1: true
+    pubchem_cid: 24812758
+    inchikey: XTNGUQKDFGDXSJ-ZXGKGEBGSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Canagliflozin]
+    must_match: [canagliflozin, Canagliflozin, Invokana, JNJ-28431754, "canagliflozin 100 mg", "canagliflozin 300mg"]
+    must_not_match: [dapagliflozin, empagliflozin, ertugliflozin, sotagliflozin, ipragliflozin, Jardiance, Farxiga]
+    needs_review: [Invokamet, "canagliflozin/metformin", "SGLT2 inhibitor", "SGLT2i"]
+    notes: >
+      ITP: male-only extension; females NS (one cohort female -6%, significant).
+      The basis compound for class entry of other SGLT2 inhibitors (empagliflozin test case).
+      Class-level strings ('SGLT2 inhibitor') are not compound matches.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: aspirin
+    canonical_name: aspirin
+    group: heavy_human_data
+    role: seed
+    expected_entry_route: direct
+    expected_itp: positive
+    headline_v1: true
+    pubchem_cid: 2244
+    inchikey: BSYNRYMUTXBXSQ-UHFFFAOYSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Aspirin]
+    drugage_names_needs_review: [Aluminum acetylsalicylate]
+    must_match: [aspirin, Aspirin, acetylsalicylic acid, ASA, "low-dose aspirin", "aspirin 81 mg",
+                 "Aspirin 100mg", Ecotrin, "enteric-coated aspirin", lysine acetylsalicylate, carbasalate calcium]
+    must_not_match: [salicylic acid, Salicylic acid, sodium salicylate, Sodium salicylate, salsalate,
+                     5-ASA, mesalamine, mesalazine, sulfasalazine, diflunisal, Salicylamide, Salicylamine,
+                     5-octanoyl salicylic acid, "3:1 Mixture: salicyl-salicylic acid + aspirin"]
+    needs_review: [Aggrenox, "aspirin/dipyridamole", "Yosprala", "polypill", "aspirin + clopidogrel",
+                   Aluminum acetylsalicylate]
+    notes: >
+      '5-ASA' (mesalamine) vs 'ASA' (aspirin) is a substring trap. Salicylic acid is
+      aspirin's metabolite but a different compound. Lysine acetylsalicylate and carbasalate
+      calcium are aspirin salts/complexes and collapse to aspirin (note the salt).
+      Aluminum acetylsalicylate (DrugAge, flies) does not resolve in PubChem by name:
+      manual salt-collapse decision. ITP: one male cohort significant (+8%), other cohorts
+      NS. Under the corrected §5.4 rule this still counts as ITP-positive; it is the weakest
+      such case and a good test of whether the rule is too permissive.
+      Multi-class (B01AC + N02BA + others): will be flagged for ATC review.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: lithium
+    canonical_name: lithium
+    group: heavy_human_data
+    role: seed
+    expected_entry_route: direct
+    expected_itp: untested
+    headline_v1: false
+    pubchem_cid: 28486
+    inchikey: HBBGRARXTFLTSG-UHFFFAOYSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Lithium Chloride]
+    must_match: [lithium, lithium carbonate, Lithium Chloride, lithium chloride, lithium citrate,
+                 Lithobid, Priadel, Camcolit, Eskalith, "lithium carbonate 300 mg"]
+    must_not_match: [lithium heparin, "lithium dilution", LiDCO, lithium-ion, "lithium battery"]
+    needs_review: [lithium orotate, lithium aspartate, "microdose lithium", "lithium in drinking water"]
+    notes: >
+      MANUAL IDENTITY DECISION. The active moiety is the Li+ ion (CID 28486). PubChem's
+      parent lookup fails here: lithium carbonate -> carbonic acid (CID 767), lithium
+      chloride -> no parent. All lithium salts collapse to Li+ by hand; record the salt.
+      'Lithium heparin' is a blood-tube anticoagulant that appears in lab procedures: a
+      real false-positive source. Orotate/aspartate are supplement salts with weak
+      evidence of equivalence: review. DrugAge evidence is worms/flies only, so lithium is
+      outside the v1 headline despite a large human psychiatric dossier.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: acarbose
+    canonical_name: acarbose
+    group: heavy_human_data
+    role: seed
+    expected_entry_route: direct
+    expected_itp: positive
+    headline_v1: true
+    pubchem_cid: 9811704
+    inchikey: CEMXHAPUFJOOSV-XGWNLRGSSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Acarbose]
+    must_match: [acarbose, Acarbose, Precose, Glucobay, BAY g 5421, "acarbose 50 mg"]
+    must_not_match: [miglitol, voglibose, Miglitol, Glyset]
+    needs_review: []
+    notes: >
+      PubChem name lookup returns CID 9811704. A second record, CID 41774
+      (XUFXOAAUWZOOIT-UGEKTDRHSA-N, same formula C25H43NO18) also exists; confirm against
+      ChEMBL's standard InChIKey before accepting. ITP: strongest male effect in DrugAge
+      (up to +22%), females smaller. Large human RCTs (STOP-NIDDM, ACE): gold-cell candidate.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: captopril
+    canonical_name: captopril
+    group: heavy_human_data
+    role: seed
+    expected_entry_route: direct
+    expected_itp: positive
+    headline_v1: true
+    pubchem_cid: 44093
+    inchikey: FAKRSMQSSFJEIM-RQJHMYQMSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Captopril]
+    must_match: [captopril, Captopril, Capoten, SQ 14225, "captopril 25 mg"]
+    must_not_match: [enalapril, Enalapril, lisinopril, ramipril, perindopril, enalaprilat]
+    needs_review: [Capozide, "captopril/hydrochlorothiazide"]
+    notes: >
+      ITP-positive. Enalapril is also in DrugAge and is ITP-null: an ACE-inhibitor class
+      with one positive and one null direct member, which tests whether class entry and
+      the null cell stay distinct.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: meclizine
+    canonical_name: meclizine
+    group: heavy_human_data
+    role: seed
+    expected_entry_route: direct
+    expected_itp: positive
+    headline_v1: true
+    pubchem_cid: 4034
+    inchikey: OCJYIGYOJCODJL-UHFFFAOYSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Meclizine]
+    must_match: [meclizine, Meclizine, meclozine, meclizine hydrochloride, meclizine HCl, Antivert, Bonine, Dramamine Less Drowsy]
+    must_not_match: [cyclizine, "Cyclizine HCl", buclizine, hydroxyzine, cetirizine, dimenhydrinate, Dramamine]
+    needs_review: []
+    notes: >
+      'Meclozine' is the INN; 'meclizine' the USAN. Plain 'Dramamine' is dimenhydrinate;
+      'Dramamine Less Drowsy' is meclizine (brand-extension trap). Cyclizine is in DrugAge
+      separately ('Cyclizine HCl', parent CID 6726) and probably shares ATC class R06AE.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  # ---------------------------------------------------------------------------- senolytics
+  - key: quercetin
+    canonical_name: quercetin
+    group: senolytic
+    role: seed
+    expected_entry_route: direct
+    expected_itp: untested
+    headline_v1: true
+    pubchem_cid: 5280343
+    inchikey: REFJWTPEDVJJIY-UHFFFAOYSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Quercetin, Quercetin dihydrate]
+    must_match: [quercetin, Quercetin, Quercetin dihydrate, quercetin dihydrate, sophoretin, "quercetin 500 mg"]
+    must_not_match: [Rutin, rutin, isoquercetin, isoquercitrin, quercitrin, hyperoside, kaempferol, fisetin]
+    needs_review: ["dasatinib + quercetin", "D+Q", "Dasatinib and Quercetin", "quercetin phytosome", "Quercefit"]
+    notes: >
+      Dihydrate collapses to the parent (PubChem confirms). Rutin and isoquercetin are
+      glycosides: different molecules, and rutin is itself in DrugAge. D+Q is excluded as
+      a mixture (SPEC §6) but trial strings containing it must go to review, not silently
+      map to quercetin. Phytosome = formulation: review.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: fisetin
+    canonical_name: fisetin
+    group: senolytic
+    role: seed
+    expected_entry_route: direct
+    expected_itp: null_result
+    headline_v1: true
+    pubchem_cid: 5281614
+    inchikey: XHEFDIBZLJXQHF-UHFFFAOYSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Fisetin]
+    must_match: [fisetin, Fisetin, "fisetin 20 mg/kg"]
+    must_not_match: [quercetin, kaempferol, fisetinidol, luteolin]
+    needs_review: []
+    notes: ITP-null both sexes despite non-ITP mouse data. Null-cell candidate.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  # --------------------------------------------------------------- supplement-adjacent
+  - key: nmn
+    canonical_name: nicotinamide mononucleotide
+    group: supplement_adjacent
+    role: seed
+    expected_entry_route: direct
+    expected_itp: untested
+    headline_v1: false
+    pubchem_cid: 14180
+    inchikey: DAYLJWODMCOQEW-TURQNECASA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Nicotinamide mononucleotide]
+    must_match: [nicotinamide mononucleotide, NMN, beta-NMN, "β-NMN", beta-nicotinamide mononucleotide,
+                 "Nicotinamide mononucleotide", "NMN 250 mg"]
+    must_not_match: [nicotinamide, niacinamide, nicotinamide riboside, NR, NAD+, NAD, NADH, nicotinic acid,
+                     niacin, NMNH, reduced nicotinamide mononucleotide, "Nicotinamide adenine dinucleotide"]
+    needs_review: ["NAD+ precursor", "NAD booster"]
+    notes: >
+      PubChem name lookup -> CID 14180 (neutral/zwitterion); PubChem's 'parent' points to
+      CID 14181, a protonated cation (-O suffix). Keep 14180. NMNH is the reduced form:
+      different molecule. DrugAge has one fly entry only, so outside v1 headline.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: nr
+    canonical_name: nicotinamide riboside
+    group: supplement_adjacent
+    role: seed
+    expected_entry_route: direct
+    expected_itp: null_result
+    headline_v1: true
+    pubchem_cid: 439924
+    inchikey: JLEBZPBDRKPWTD-TURQNECASA-O
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Nicotinamide riboside]
+    must_match: [nicotinamide riboside, Nicotinamide riboside, NR, nicotinamide riboside chloride, NRCl,
+                 Niagen, Tru Niagen, ChromaDex NR]
+    must_not_match: [nicotinamide mononucleotide, NMN, nicotinamide, niacin, NRH, dihydronicotinamide riboside,
+                     nicotinic acid riboside, NAR]
+    needs_review: [NRPT, Basis, "nicotinamide riboside + pterostilbene", "NR + pterostilbene"]
+    notes: >
+      PubChem's canonical entity is the cation (InChIKey ends -O, i.e. protonated); the
+      chloride salt (CID 90480033) collapses to it. 'NR' is a dangerous abbreviation
+      (also 'not reported', 'normal range'): exact-token, context-checked only.
+      NRPT/Basis is NR + pterostilbene: mixture, review. ITP: NS.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: resveratrol
+    canonical_name: resveratrol
+    group: supplement_adjacent
+    role: seed
+    expected_entry_route: direct
+    expected_itp: null_result
+    headline_v1: true
+    pubchem_cid: 445154
+    inchikey: LUKBXSAWLPMMSZ-OWOJBTEDSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Resveratrol]
+    must_match: [resveratrol, Resveratrol, trans-resveratrol, SRT501, "resveratrol 500 mg", Resvida]
+    must_not_match: [pterostilbene, Oxyresveratrol, oxyresveratrol, piceid, polydatin, SRT2104, SRT1720,
+                     piceatannol]
+    needs_review: [cis-resveratrol, "grape seed extract", "red wine extract", "Longevinex", "Japanese knotweed extract"]
+    notes: >
+      CID 445154 is trans. cis-resveratrol (CID 1548910) shares the first block: review,
+      not auto-match. SRT501 is a resveratrol formulation; SRT2104/SRT1720 are different
+      synthetic SIRT1 activators. Polydatin/piceid is the glucoside. ITP: NS. Null-cell candidate.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: spermidine
+    canonical_name: spermidine
+    group: supplement_adjacent
+    role: seed
+    expected_entry_route: direct
+    expected_itp: untested
+    headline_v1: true
+    pubchem_cid: 1102
+    inchikey: ATHGHQPFGPMSJY-UHFFFAOYSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Spermidine]
+    must_match: [spermidine, Spermidine, spermidine trihydrochloride]
+    must_not_match: [spermine, Spermine, putrescine, Putrescine, norspermidine, cadaverine]
+    needs_review: [spermidineLIFE, "spermidine-rich wheat germ extract", "wheat germ extract", "spermidine-enriched food"]
+    notes: >
+      Most human trials use wheat-germ extracts, not pure spermidine: extracts go to review
+      and probably do not map. Spermine and putrescine are separate DrugAge compounds.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: taurine
+    canonical_name: taurine
+    group: supplement_adjacent
+    role: seed
+    expected_entry_route: direct
+    expected_itp: untested
+    headline_v1: true
+    pubchem_cid: 1123
+    inchikey: XOAAWQZATWQOTB-UHFFFAOYSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [Taurine]
+    must_match: [taurine, Taurine, "taurine 3 g", "L-taurine"]
+    must_not_match: [Hypotaurine, hypotaurine, taurolidine, tauroursodeoxycholic acid, TUDCA,
+                     taurocholic acid, taurodeoxycholate, acamprosate, homotaurine, tramiprosate]
+    needs_review: ["energy drink", "Red Bull", "taurine-containing beverage"]
+    notes: >
+      TUDCA and taurolidine contain 'taur' and appear in many trials: substring traps.
+      Acamprosate is N-acetylhomotaurine. Note: 'L-taurine' is a common but chemically
+      meaningless label (taurine is achiral); still must match.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  # ---------------------------------------------- class-layer test cases (not seeds)
+  - key: empagliflozin
+    canonical_name: empagliflozin
+    group: class_test_case
+    role: class_test_case
+    expected_entry_route: class
+    expected_itp: untested
+    headline_v1: false
+    expected_class_basis: {atc_level4: A10BK, basis: canagliflozin}
+    pubchem_cid: 11949646
+    inchikey: OBWASQILIWPZMG-QZMOQZSNSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: []
+    must_match: [empagliflozin, Empagliflozin, Jardiance, BI 10773, "empagliflozin 10 mg"]
+    must_not_match: [canagliflozin, dapagliflozin, ertugliflozin, Invokana]
+    needs_review: [Synjardy, Glyxambi, Trijardy]
+    notes: >
+      POSITIVE class test. Not in DrugAge; should enter via ATC A10BK (SGLT2 inhibitors)
+      because canagliflozin is a direct member. Must appear with entry_route='class' and
+      never be merged with direct-entry output. headline_v1 refers to direct mammal
+      evidence, which it has none of.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: semaglutide
+    canonical_name: semaglutide
+    group: class_test_case
+    role: class_test_case
+    expected_entry_route: excluded
+    expected_itp: untested
+    headline_v1: false
+    expected_class_basis: {atc_level4: A10BJ, basis: null}
+    pubchem_cid: 56843331
+    inchikey: DLSWIYLPEUIQAV-CCUURXOWSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: []
+    must_match: [semaglutide, Semaglutide, Ozempic, Wegovy, Rybelsus, NN9535, "oral semaglutide"]
+    must_not_match: [liraglutide, tirzepatide, dulaglutide, exenatide, Victoza, Mounjaro, Zepbound, Saxenda]
+    needs_review: [CagriSema, "cagrilintide/semaglutide", "GLP-1 receptor agonist", "GLP-1 RA"]
+    notes: >
+      NEGATIVE class test. Not in DrugAge, and no GLP-1 receptor agonist is in DrugAge
+      Build 5, so class A10BJ has no direct basis: must NOT enter, despite an enormous
+      human dossier. If it appears in any output, class entry is leaking.
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}

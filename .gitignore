@@ -1,0 +1,6 @@
+# Database is rebuilt from the raw layer; the raw layer itself is the cache.
+data/*.sqlite
+data/*.sqlite-*
+__pycache__/
+*.pyc
+.venv/
