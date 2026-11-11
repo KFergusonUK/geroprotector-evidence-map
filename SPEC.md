@@ -1,11 +1,23 @@
 # Geroprotector Human Evidence Map — Specification
 
-**Status:** v0.5 draft spec
+**Status:** v0.6 draft spec
 **Owner:** Kevin Ferguson
 
-**Changes since v0.4** (2026-11-11):
+**Changes since v0.5** (2026-11-11):
+- ITP **strong** tier now requires positive cohorts in ≥2 independent experiments; the two
+  sexes of one experiment read mixed (§5.4).
+- **Replication** requires two (mammal) lab groups or a **strong** ITP tier; one positive
+  cohort is a single result (§5.4, §11.2).
+- Reviewed corrections live in `data/reviews/direction_reviews.yaml`. Two DrugAge source
+  errors corrected (meclizine, Protandim) after a check of all ITP rows against primary
+  sources (`docs/drugage_itp_audit.md`).
+- Pipeline state saved as dated releases, pruned to the newest 12 plus monthly (§11.5).
+- Refresh workflow is **manual-only** until trial normalisation exists (§11.5).
+- Y-27632 / "Ximelegatran" added to the fixture as an identity trap.
+
+**Changes in v0.5** (2026-11-11):
 - New §11: refresh and change detection as a diff — source refresh with change detection,
-  snapshot history, `v_cell_transitions`, literature curation queue, weekly GitHub Action,
+  snapshot history, `v_cell_transitions`, literature curation queue, GitHub Action,
   and the guard that a refresh never silently changes a reviewed decision.
 - Derived cells built: gold, untested candidates, under-tested, null, unreported.
 
@@ -495,10 +507,22 @@ are kept, whatever their direction.
 **Reviews attach to evidence, not row numbers.** Each row carries an `evidence_key`, a
 content hash of the source row, so a direction or harm review survives a reload of the
 normalised layer. `direction_review` also records **source-error corrections**
-(`reason = 'source_error'`, citation required) where the source misreports the paper;
-the raw and normalised layers are never edited. Known case awaiting a decision: DrugAge
-marks the female meclizine ITP arm (+3%) significant, but the paper (PMID 38041783)
-states female lifespan "was not significantly affected".
+(`reason = 'source_error'`, citation quoting the primary source required) where the
+source misreports the paper; the raw and normalised layers are never edited. Reviews live
+in `data/reviews/direction_reviews.yaml` (version controlled; the table is rebuilt from
+it). Each names its row by `evidence_key` and by a readable locator; if the source later
+changes that row, the check fails and the review surfaces as orphaned rather than
+silently re-attaching.
+
+*Corrected so far* (from a check of all 164 DrugAge ITP rows against the papers,
+`docs/drugage_itp_audit.md`): female meclizine (DrugAge +3% S; paper log-rank p = 0.40)
+and female Protandim (DrugAge +3% S; paper p = 0.291). Each is a verifiable discrepancy
+against the primary source. No pattern is claimed: two errors in 98 table-checked rows,
+with an error in the other direction alongside (female low-dose acarbose: DrugAge NS,
+paper log-rank p = 0.03), is not a finding; the audit document sets out the study that
+would test it. Flagged but deliberately **unresolved**: female mycophenolic acid (−1% at
+p = 0.05 exactly; its only harm-path evidence) — the case the mandatory harm review
+exists for.
 
 **Exact duplicate source rows** (every field identical; 7 in DrugAge Build 5, all
 *C. elegans*) are kept but counted once (`v_evidence_counted`).
@@ -510,7 +534,10 @@ and never carry class entry.
 
 **Replicated** extension means either:
 - ≥ `replication_min_lab_groups` (2) independent lab groups with significant extension, OR
-- the compound meets the **ITP threshold**.
+- an ITP tier of **strong**.
+
+A weak or mixed ITP tier is a single result, not replication. The ITP *threshold* (≥1
+positive cohort) is used only to separate ITP nulls (the null cell) from everything else.
 
 **ITP evidence is a ratio, not a boolean — and the unit matters.** Three units:
 
@@ -537,7 +564,9 @@ them, nobody adjudicates compounds):
 - *meets threshold*: ≥ `itp_min_positive_cohorts` (1) positive cohort, positive
   fraction ≥ `itp_min_positive_fraction` (0.0).
 - *tier*, overall and per sex:
-  - **strong** — ≥2 positive cohorts and ≥0.5 of cohorts positive
+  - **strong** — ≥2 positive cohorts, ≥0.5 of cohorts positive, **and positive cohorts in
+    ≥2 independent experiments** (two sexes of one experiment share cohort, housing and
+    conditions: not replication)
   - **weak** — a single positive cohort and fewer than half positive
   - **mixed** — any other result with ≥1 positive (including a lone 1/1)
   - **none** — tested, no positive cohort
@@ -549,12 +578,13 @@ them, nobody adjudicates compounds):
 | 17-α-estradiol | 3 | 4/6 | 3/5 | 3/3 | 0/2 | strong / strong / none |
 | canagliflozin | 2 | 3/6 | 2/4 | 2/2 | 0/2 | strong / strong / none |
 | aspirin | 2 | 1/6 | 1/4 | 1/2 | 0/2 | **weak** / mixed / none |
-| captopril | 1 | 2/2 | 2/2 | 1/1 | 1/1 | strong / mixed / mixed |
+| captopril | 1 | 2/2 | 2/2 | 1/1 | 1/1 | **mixed** / mixed / mixed |
+| meclizine (corrected) | 1 | 1/2 | 1/2 | 1/1 | 0/1 | **mixed** / mixed / none |
 | resveratrol | 2 | 0/6 | 0/4 | 0/2 | 0/2 | none |
 
-Note: "≥2 positive cohorts" can be met by the two sexes of a **single** experiment
-(captopril, glycine, meclizine). The `itp_experiments` column is always shown beside
-the tier so the reader can see it.
+Strong in DrugAge Build 5 (with corrections): rapamycin, acarbose, 17-α-estradiol,
+canagliflozin, NDGA. Single-experiment results (captopril, glycine, meclizine,
+Protandim, astaxanthin and others) read mixed; aspirin reads weak.
 
 **ITP nulls are evidence, not absence of evidence.** ITP-tested compounds below
 the threshold form the **null cell** when human trials exist. A compound can have
@@ -815,10 +845,10 @@ collaborate. That is the realistic route to the data behind governance walls
 - Should observational studies (not just RCTs) be in scope? Probably v2.
 - What evidence establishes "substantial human exposure" for the harm path beyond
   reviewer judgement (e.g. ChEMBL approval status, prescription volume)?
-- Meclizine female ITP arm: record the suspected DrugAge source error as a
-  `direction_review` correction? (Tier would fall from strong to mixed.)
-- Should "strong" require ≥2 independent *experiments*, not just ≥2 positive cohorts?
-  Today the two sexes of one experiment can satisfy it.
+- How often do DrugAge significance flags disagree with primary sources? The ITP pilot
+  (`docs/drugage_itp_audit.md`) found two clear errors and one in the opposite direction
+  in 98 rows — too few to characterise; a stratified, double-extracted study of
+  mammalian rows is outlined there.
 - Mechanistic path: is a growth factor (bFGF) a "compound" here? Which "Smoothened
   Agonist" did Yang 2023 use (Supplementary Table 1)?
 - Full text of Hou 2013 and Guan 2022 is needed before their cocktails can be recorded.
@@ -879,7 +909,7 @@ included) for audit. The first run is a baseline and reports nothing.
 
 The derived cells behind these (`v_gold_cell`, `v_untested_candidates`,
 `v_under_tested`, `v_null_cell`, `v_unreported`) use *mammal* replication: ≥2 mammal lab
-groups or the ITP threshold. Class-entered compounds inherit their basis compound's
+groups or a **strong** ITP tier. Class-entered compounds inherit their basis compound's
 replication and carry `inherited_class` throughout.
 
 ### 11.3 Snapshots
@@ -896,7 +926,8 @@ upgrades.
 
 ### 11.4 Literature scan for pre-database signals
 
-Weekly Europe PMC search on lifespan-extension terms, query versioned in
+Europe PMC search on lifespan-extension terms, run with each refresh over the window
+since the previous scan (7 days on a first run), query versioned in
 `data/rules/literature_scan.yaml` (`litscan-v1`). For each hit, Europe PMC's text-mined
 chemical annotations are compared against compound names and synonyms already in the map
 and against DrugAge; papers naming only known compounds, or only reagents on the
@@ -914,20 +945,42 @@ every change so each candidate records the query that found it.
 
 ### 11.5 Scheduling
 
-`.github/workflows/weekly-refresh.yml`: GitHub Action, Mondays 06:17 UTC, plus manual
-dispatch. It lives with the code and leaves a commit trail.
+`.github/workflows/weekly-refresh.yml`: GitHub Action. It lives with the code and leaves a
+commit trail. **It is currently manual-only (`workflow_dispatch`); there is no schedule.**
 
-1. Restore the database from the `pipeline-state` release asset (absent on first run:
-   that run is the baseline).
+*Why not weekly, yet.* The job cannot detect transitions until the normalised layer
+exists: with no compound mappings or normalised trials, `v_cell_transitions` cannot fire,
+so a weekly run would produce near-empty output. A recurring job that mostly reports
+nothing is one you stop reading, which is how you miss the run that matters. Nor does the
+tempo of the data justify weekly: DrugAge releases roughly annually, and trial state
+changes are slow.
+
+*When to turn it back on.* After trial normalisation (§7 step 5) is complete and
+`v_cell_transitions` can actually fire. **Reassess the cadence then** rather than
+defaulting to weekly. Re-enabling is one line (uncomment the `schedule:` line in the
+workflow); the Action, state backups and literature scan are kept intact and tested
+(`tests/test_workflow.py`, `tests/test_refresh.py`, `tests/test_state_backups.py`).
+
+Each run, whether manual or scheduled:
+
+1. Restore the database from the newest `pipeline-state-YYYY-MM-DD-run<N>` release
+   (none on first run: that run is the baseline).
 2. Run the tests, then `refresh`.
 3. **If `v_cell_transitions` is non-empty for the run:** commit
    `changelog/<date>-run<id>.md` and open an issue with the same text. **Otherwise do
    nothing** — no commit, no issue.
-4. Save the database back to the release asset. Publishing happens before saving, so a
-   failed save repeats a changelog next week rather than losing one.
+4. Save the database as a **new dated release** — never overwrite. Only after the new
+   asset is confirmed present, prune older backups: keep the newest 12, and beyond those
+   the newest backup of each calendar month, indefinitely (`agesdk/state_backups.py`).
+   Counts are of backups, not weeks, so the policy holds at any cadence.
+   Publishing happens before saving, so a failed save repeats a changelog next week
+   rather than losing one.
 
-State lives in a release asset because the database (raw layer, snapshot history,
-reviews) is too large and binary for git.
+State lives in releases because the database (raw layer, snapshot history, reviews) is
+too large and binary for git. The snapshot design's value is its history, so no single
+mutable artefact holds it: one bad upload costs at most one run. Release assets of a
+public repository are public; the database holds only public-source data, reviews and
+the literature queue.
 
 ### 11.6 Guard: a refresh never silently changes a reviewed decision
 

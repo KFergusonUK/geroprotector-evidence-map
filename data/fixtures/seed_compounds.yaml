@@ -21,7 +21,7 @@
 #                    (combination products, mixtures, extracts, stereo ambiguity).
 #   route_excluded   Strings that DO resolve to this compound but fail the systemic
 #                    exposure criterion (SPEC §5.6): stents, topicals, implants, ...
-#   expected_entry_route  direct | class | excluded
+#   expected_entry_route  direct | class | reprogramming_cocktail | excluded
 #   expected_paths   Entry paths from the compound's OWN DrugAge evidence (SPEC §1);
 #                    class entry is recorded separately in expected_entry_route:
 #                    extension (>=1 significant extension, any species) and/or
@@ -39,7 +39,7 @@
 #   decisions        Decisions made by a named person, with date. Distinct from the
 #                    entry-level review sign-off.
 
-fixture_version: 0.3.0
+fixture_version: 0.4.0
 pubchem_checked_at: "2026-11-11"
 drugage_version: "Build 5 (2024-11-29); archive sha256 d12f59717de60a207748f53bdbcdb484ed07e30d8608eb8e4a101e2a08d7fa80"
 
@@ -405,7 +405,7 @@ compounds:
       cohorts: [2, 2]
       male: [1, 1]
       female: [1, 1]
-      tier: {overall: "strong", male: "mixed", female: "mixed"}
+      tier: {overall: "mixed", male: "mixed", female: "mixed"}
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 44093
@@ -417,7 +417,9 @@ compounds:
     must_not_match: [enalapril, Enalapril, lisinopril, ramipril, perindopril, enalaprilat]
     needs_review: [Capozide, "captopril/hydrochlorothiazide"]
     notes: >
-      ITP-positive. Enalapril is also in DrugAge and is ITP-null: an ACE-inhibitor class
+      ITP: one experiment (2022), both sexes positive: tier MIXED, not strong. Two sexes
+      of one experiment share cohort, housing and conditions; not independent replication.
+      Enalapril is also in DrugAge and is ITP-null: an ACE-inhibitor class
       with one positive and one null direct member, which tests whether class entry and
       the null cell stay distinct.
     route_excluded: []
@@ -432,11 +434,11 @@ compounds:
     expected_paths: [extension]
     itp:
       experiments: 1
-      arms: [2, 2]
-      cohorts: [2, 2]
+      arms: [1, 2]
+      cohorts: [1, 2]
       male: [1, 1]
-      female: [1, 1]
-      tier: {overall: "strong", male: "mixed", female: "mixed"}
+      female: [0, 1]
+      tier: {overall: "mixed", male: "mixed", female: "none"}
     mammal_evidence: true
     mammal_extension: true
     pubchem_cid: 4034
@@ -451,12 +453,13 @@ compounds:
       'Meclozine' is the INN; 'meclizine' the USAN. Plain 'Dramamine' is dimenhydrinate;
       'Dramamine Less Drowsy' is meclizine (brand-extension trap). Cyclizine is in DrugAge
       separately ('Cyclizine HCl', parent CID 6726) and probably shares ATC class R06AE.
-      SOURCE ERROR SUSPECTED: DrugAge marks the female ITP arm (+3%) significant, but the paper
-      (PMID 38041783) says female lifespan 'was not significantly affected'. Values below are
-      DrugAge as published; if corrected via direction_review (reason source_error), female
-      becomes 0/1 and the overall tier falls from strong to mixed.
+      SOURCE ERROR, CORRECTED: DrugAge marks the female ITP arm (+3%) significant; the paper
+      (PMID 38041783, Table 1) reports median +3%, log-rank p = 0.40. Recorded in
+      data/reviews/direction_reviews.yaml; values above include the correction. One experiment,
+      male-only: tier MIXED.
     route_excluded: []
-    decisions: []
+    decisions:
+    - {decision: "Record DrugAge's female ITP significance flag as a source error (PMID 38041783 Table 1, p = 0.40).", decided_by: "Kevin Ferguson", decided_at: "2026-11-11"}
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   # ---------------------------------------------------------------------------- senolytics
@@ -715,4 +718,36 @@ compounds:
       human dossier. If it appears in any output, class entry is leaking.
     route_excluded: []
     decisions: []
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  # ------------------------------------------- identity traps from other paths
+  - key: y27632
+    canonical_name: Y-27632
+    group: naming_nightmare
+    role: identity_trap
+    expected_entry_route: reprogramming_cocktail
+    expected_paths: []
+    itp: "untested"
+    mammal_evidence: false
+    mammal_extension: false
+    pubchem_cid: 448042
+    inchikey: IYOZTVGMEWJPKR-VOMCLLRMSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: []
+    must_match: [Y-27632, Y27632, "Y 27632", "Y-27632 dihydrochloride", "Y-27632 (Y)"]
+    must_not_match: [ximelagatran, Ximelagatran, Exanta, Exarta, melagatran, H 376/95,
+                     fasudil, ripasudil, netarsudil, hydroxyfasudil]
+    needs_review: [Ximelegatran]
+    route_excluded: []
+    decisions:
+    - {decision: "Encode the PubChem 'Ximelegatran' title as a must-not-match trap for Y-27632.", decided_by: "Kevin Ferguson", decided_at: "2026-11-11"}
+    notes: >
+      THE near-miss. PubChem titles Y-27632's record (CID 448042) 'Ximelegatran', one letter
+      from ximelagatran (Exanta), an oral thrombin inhibitor withdrawn in 2006 for liver
+      toxicity with a large human trial dossier. A resolver that trusts PubChem titles, or a
+      fuzzy matcher at edit distance 1, would join ximelagatran trials to a reprogramming
+      compound. Identity confirmed by formula C14H21N3O, IUPAC name and CAS 146986-50-7.
+      'Ximelegatran' itself (a PubChem synonym of CID 448042) goes to review, never auto-match.
+      Not in DrugAge; enters only via the reprogramming path (Yang 2023 C4).
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}

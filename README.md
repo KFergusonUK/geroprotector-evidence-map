@@ -15,7 +15,8 @@ A compound on both paths appears in both, counted separately.
 - **Threshold:** conservative; replication matters (≥2 independent lab groups, or the
   ITP threshold). ITP evidence is shown as cohorts positive / tested (one sex in one
   independent experiment), by sex, with a tier: aspirin 1/4 cohorts across 2 experiments
-  (**weak**), rapamycin 8/8 across 4 (**strong**).
+  (**weak**), rapamycin 8/8 across 4 (**strong**). Strong needs positive results in ≥2
+  independent experiments; replication needs a strong tier or two independent labs.
 - **Outputs:** the **gold cell** (replicated extension + human trials), the **null cell**
   (well-powered ITP null + human trials), and **untested candidates**.
 - **Class entry:** compounds sharing a specific ATC level-4 class with a direct
@@ -45,15 +46,19 @@ Every compound carries an evidential grade, and every view shows it:
 `measured_lifespan` (DrugAge), `inherited_class` (ATC class-mate), `mechanistic_only`
 (reprogramming cocktail component).
 
-## Weekly refresh
+## Refresh and change detection
 
-A GitHub Action runs every Monday: it refreshes DrugAge (only if the archive changed),
-ClinicalTrials.gov (only records updated since the last run) and a literature scan,
-snapshots which compounds sit in which output cell, and compares with last week. If a
-compound crossed into a cell (entered the gold cell, became a harm candidate, an ITP tier
-changed, trial results became overdue...), it commits a dated file under `changelog/` and
-opens an issue. Otherwise it does nothing. Refreshes never change a reviewed decision;
-they flag it for a human. See SPEC §11.
+A GitHub Action refreshes DrugAge (only if the archive changed), ClinicalTrials.gov (only
+records updated since the last run) and a literature scan, snapshots which compounds sit
+in which output cell, and compares with the previous run. If a compound crossed into a
+cell (entered the gold cell, became a harm candidate, an ITP tier changed, trial results
+became overdue...), it commits a dated file under `changelog/` and opens an issue;
+otherwise it does nothing. Refreshes never change a reviewed decision; they flag it for a
+human.
+
+It is **run manually for now**: until trials are normalised it cannot detect transitions,
+and the sources change slowly. Scheduling returns, at a reassessed cadence, once it can
+fire (SPEC §11.5).
 
 ## Quick start
 
@@ -88,7 +93,10 @@ committed; everything in it is rebuilt from the sources and the reviewed data in
 | `agesdk/refresh.py` | Refresh runs, snapshots, transitions, changelog |
 | `agesdk/litscan.py` | Literature scan → curation queue (never an entry route) |
 | `data/rules/literature_scan.yaml` | Versioned literature query and stoplist |
-| `.github/workflows/weekly-refresh.yml` | Weekly scheduled refresh |
+| `.github/workflows/weekly-refresh.yml` | Refresh workflow (manual-only for now) |
+| `agesdk/state_backups.py` | Dated state backups and retention (newest 12 + monthly) |
+| `data/reviews/direction_reviews.yaml` | Reviewed direction corrections, cited |
+| `docs/drugage_itp_audit.md` | DrugAge ITP significance flags vs primary sources |
 
 ## Data sources and attribution
 

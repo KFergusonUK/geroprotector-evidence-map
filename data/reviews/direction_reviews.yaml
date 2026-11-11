@@ -1,0 +1,49 @@
+# Reviewed overrides of a source row's direction (SPEC §5.4). Source of truth for the
+# direction_review table, which is rebuilt from this file.
+#
+# Each entry names the row twice: by evidence_key (a hash of the exact source row) and
+# by a human-readable locator. The loader refuses an entry whose locator no longer
+# matches its key: if the source changes the row, the review is surfaced as orphaned
+# (v_orphaned_reviews), never silently re-attached.
+#
+# reason: conflict_resolution | source_error. A source_error needs a citation that
+# quotes the primary source.
+
+reviews:
+  - evidence_key: "drugage:6c4b3a053f6cca860b2798ed8f4799b9"
+    locator: {source: drugage, compound_name: Meclizine, pubmed_id: "38041783", gender: Female,
+              dosage: "800 ppm food", ITP: "Yes"}
+    reason: source_error
+    source_says: "avg +3% significant (S); max +1% NS"
+    resolved_direction: "null"
+    citation: >-
+      Harrison DE et al. 2024, GeroScience, PMID 38041783, PMC10828146,
+      DOI 10.1007/s11357-023-01011-0. Table 1 (pooled across the three sites), females, Mec:
+      median +3%, log-rank p = 0.40; 90th percentile +1%, Wang–Allison p = 1.00.
+      Abstract: "Late life weights were lower in females fed Asta and Mec, but lifespan was
+      not significantly affected in these females."
+    rationale: >-
+      DrugAge marks the female meclizine ITP arm as a significant extension; the primary
+      source reports no significant effect on either median (p = 0.40) or 90th-percentile
+      lifespan. Verifiable discrepancy, not a judgement call. Effect: female cohort 0/1;
+      meclizine ITP tier strong -> mixed.
+    reviewed_by: "Claude Opus 5.5 (AI), on the basis of Kevin Ferguson's instruction"
+    reviewed_at: "2026-11-11"
+
+  - evidence_key: "drugage:3400e6f808493517f2594cfb480b93ed"
+    locator: {source: drugage, compound_name: Protandim, pubmed_id: "27312235", gender: Female,
+              dosage: "600 ppm food 10-17 months, 1200 ppm food (17 months-death)", ITP: "Yes"}
+    reason: source_error
+    source_says: "avg +3% significant (S); max +6% NS"
+    resolved_direction: "null"
+    citation: >-
+      Strong R et al. 2016, Aging Cell, PMID 27312235, PMC5013015. Table 1 (C2011 mice,
+      pooled across sites), females, Prot: median 896 vs 874 days (+3%), log-rank
+      p = 0.291; 90th percentile +6%, Wang–Allison p = 0.163. Title: "Longer lifespan in
+      male mice treated with ...".
+    rationale: >-
+      Found in the systematic check of DrugAge ITP rows against primary sources
+      (docs/drugage_itp_audit.md). DrugAge marks the female Protandim arm as a significant
+      extension; the paper reports p = 0.291 and frames the effect as male-only.
+    reviewed_by: "Claude Opus 5.5 (AI), on the basis of Kevin Ferguson's instruction"
+    reviewed_at: "2026-11-11"

@@ -12,7 +12,8 @@ from agesdk.sources import drugage
 def cmd_init_db(conn, args):
     db.init_db(conn)
     n = reference.load_species(conn)
-    print(f"schema v{db.SCHEMA_VERSION} ready at {db.db_path()}; {n} species tiers loaded")
+    r = reference.load_direction_reviews(conn)
+    print(f"schema v{db.SCHEMA_VERSION} ready at {db.db_path()}; {n} species tiers, {r} direction reviews loaded")
 
 
 def cmd_fetch_drugage(conn, args):
@@ -34,6 +35,9 @@ def cmd_fixture_check(conn, args):
         raw_id, rows = drugage.current_raw(conn)
         p = fixture.check_against_drugage(fx, raw_id, rows)
         print(f"vs DrugAge: {len(p)} problem(s)")
+        problems += p
+        p = reference.check_direction_reviews(reference.load_direction_review_spec(), rows)
+        print(f"direction reviews vs DrugAge: {len(p)} problem(s)")
         problems += p
     except LookupError as e:
         print(f"vs DrugAge: skipped ({e})")
@@ -91,6 +95,21 @@ def cmd_refresh(conn, args):
         with open(out, "a", encoding="utf-8") as fh:
             fh.write(f"transitions={len(result.transitions)}\n")
             fh.write(f"changelog={result.changelog_path or ''}\n")
+            fh.write(f"run_id={result.run_id}\n")
+
+
+def cmd_state_backups(args):
+    """No database needed: works on `gh release list --json tagName` output from stdin."""
+    from datetime import date
+    from agesdk import state_backups
+    if args.action == "tag":
+        print(state_backups.tag_for(date.today(), args.run_id))
+        return
+    tags = [r["tagName"] for r in json.load(sys.stdin)]
+    if args.action == "latest":
+        print(state_backups.latest(tags) or "")
+    else:
+        print("\n".join(state_backups.to_prune(tags)))
 
 
 def cmd_fixture_chembl(conn, args):
@@ -111,7 +130,12 @@ def main(argv=None):
     p.add_argument("--changelog-dir", default="changelog")
     p.add_argument("--no-ctgov", action="store_true")
     p.add_argument("--no-litscan", action="store_true")
+    p = sub.add_parser("state-backups", help="dated pipeline-state release names and pruning (reads gh JSON)")
+    p.add_argument("action", choices=["tag", "latest", "prune"])
+    p.add_argument("--run-id", type=int, default=0)
     args = ap.parse_args(argv)
+    if args.cmd == "state-backups":
+        return cmd_state_backups(args)
 
     conn = db.connect()
     db.init_db(conn)

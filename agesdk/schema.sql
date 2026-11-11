@@ -172,7 +172,9 @@ INSERT OR IGNORE INTO analysis_threshold (name, value, rationale) VALUES
   ('itp_tier_strong_min_positive', 2,
    'Tier strong: at least this many positive cohorts, and ...'),
   ('itp_tier_strong_min_fraction', 0.5,
-   '... at least this fraction of cohorts positive.'),
+   '... at least this fraction of cohorts positive, and ...'),
+  ('itp_tier_strong_min_experiments', 2,
+   '... positive cohorts in at least this many independent experiments. The two sexes of one experiment share cohort, housing and conditions: not independent replication.'),
   ('itp_tier_weak_max_positive', 1,
    'Tier weak: at most this many positive cohorts, and ...'),
   ('itp_tier_weak_below_fraction', 0.5,
@@ -535,11 +537,13 @@ WITH t AS (
          (SELECT value FROM analysis_threshold WHERE name = 'itp_min_positive_fraction')    AS min_frac,
          (SELECT value FROM analysis_threshold WHERE name = 'itp_tier_strong_min_positive') AS s_pos,
          (SELECT value FROM analysis_threshold WHERE name = 'itp_tier_strong_min_fraction') AS s_frac,
+         (SELECT value FROM analysis_threshold WHERE name = 'itp_tier_strong_min_experiments') AS s_exp,
          (SELECT value FROM analysis_threshold WHERE name = 'itp_tier_weak_max_positive')   AS w_pos,
          (SELECT value FROM analysis_threshold WHERE name = 'itp_tier_weak_below_fraction') AS w_frac),
 agg AS (
   SELECT compound_id,
          count(DISTINCT experiment_id)                AS itp_experiments,
+         count(DISTINCT CASE WHEN is_positive THEN experiment_id END) AS itp_experiments_positive,
          sum(n_arms_positive)                         AS itp_arms_positive,
          sum(n_arms)                                  AS itp_arms_total,
          sum(is_positive)                             AS itp_cohorts_positive,
@@ -556,24 +560,27 @@ tiered AS (
          -- tier(p, n): none | weak | mixed | strong; NULL when nothing tested
          CASE WHEN itp_cohorts_total = 0 THEN NULL
               WHEN itp_cohorts_positive = 0 THEN 'none'
-              WHEN itp_cohorts_positive >= s_pos AND 1.0 * itp_cohorts_positive / itp_cohorts_total >= s_frac THEN 'strong'
+              WHEN itp_cohorts_positive >= s_pos AND 1.0 * itp_cohorts_positive / itp_cohorts_total >= s_frac
+                   AND itp_experiments_positive >= s_exp THEN 'strong'
               WHEN itp_cohorts_positive <= w_pos AND 1.0 * itp_cohorts_positive / itp_cohorts_total < w_frac THEN 'weak'
               ELSE 'mixed' END AS itp_tier,
          CASE WHEN itp_male_total = 0 THEN NULL
               WHEN itp_male_positive = 0 THEN 'none'
-              WHEN itp_male_positive >= s_pos AND 1.0 * itp_male_positive / itp_male_total >= s_frac THEN 'strong'
+              WHEN itp_male_positive >= s_pos AND 1.0 * itp_male_positive / itp_male_total >= s_frac
+                   AND itp_male_positive >= s_exp THEN 'strong'
               WHEN itp_male_positive <= w_pos AND 1.0 * itp_male_positive / itp_male_total < w_frac THEN 'weak'
               ELSE 'mixed' END AS itp_male_tier,
          CASE WHEN itp_female_total = 0 THEN NULL
               WHEN itp_female_positive = 0 THEN 'none'
-              WHEN itp_female_positive >= s_pos AND 1.0 * itp_female_positive / itp_female_total >= s_frac THEN 'strong'
+              WHEN itp_female_positive >= s_pos AND 1.0 * itp_female_positive / itp_female_total >= s_frac
+                   AND itp_female_positive >= s_exp THEN 'strong'
               WHEN itp_female_positive <= w_pos AND 1.0 * itp_female_positive / itp_female_total < w_frac THEN 'weak'
               ELSE 'mixed' END AS itp_female_tier,
          (itp_cohorts_positive >= min_pos
           AND 1.0 * itp_cohorts_positive / itp_cohorts_total >= min_frac) AS meets_itp_threshold
   FROM agg CROSS JOIN t)
 SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
-       tiered.itp_experiments, tiered.itp_arms_positive, tiered.itp_arms_total,
+       tiered.itp_experiments, tiered.itp_experiments_positive, tiered.itp_arms_positive, tiered.itp_arms_total,
        tiered.itp_cohorts_positive, tiered.itp_cohorts_total,
        tiered.itp_male_positive, tiered.itp_male_total,
        tiered.itp_female_positive, tiered.itp_female_total,
@@ -613,11 +620,13 @@ SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
        i.itp_tier, i.itp_male_tier, i.itp_female_tier,
        coalesce(i.meets_itp_threshold, 0)  AS meets_itp_threshold,
        (ext.n_extension_lab_groups >= t.min_groups)             AS replicated_by_lab_groups,
+       coalesce(i.itp_tier = 'strong', 0)                       AS replicated_by_itp,
+       -- Replication (§5.4): independent lab groups, or a STRONG ITP tier. One positive
+       -- cohort (weak) or one experiment's two sexes (mixed) is a single result, not replication.
        (ext.n_extension_lab_groups >= t.min_groups
-        OR coalesce(i.meets_itp_threshold, 0))                  AS replicated,
-       -- Headline replication (§1.1): mammal lab groups, or the ITP (mammal by design).
+        OR coalesce(i.itp_tier = 'strong', 0))                  AS replicated,
        (ext.n_mammal_extension_lab_groups >= t.min_groups
-        OR coalesce(i.meets_itp_threshold, 0))                  AS replicated_mammal,
+        OR coalesce(i.itp_tier = 'strong', 0))                  AS replicated_mammal,
        (ext.n_extension_rows_mammal > 0)                        AS has_mammal_extension
 FROM ext
 JOIN compound c USING (compound_id)
@@ -1048,4 +1057,4 @@ SELECT * FROM (
   FROM v_membership_changes WHERE cell_class = 'derived_cell')
 WHERE transition IS NOT NULL;
 
-PRAGMA user_version = 5;
+PRAGMA user_version = 6;

@@ -25,9 +25,9 @@ REQUIRED = ("key", "canonical_name", "group", "role", "expected_entry_route", "e
             "itp", "mammal_evidence", "mammal_extension", "pubchem_cid", "inchikey",
             "chembl_id", "atc_codes", "drugage_names", "must_match", "must_not_match",
             "needs_review", "route_excluded", "decisions", "review")
-ENTRY_ROUTES = {"direct", "class", "excluded"}
+ENTRY_ROUTES = {"direct", "class", "reprogramming_cocktail", "excluded"}
 PATHS = {"extension", "harm_candidate"}
-ROLES = {"seed", "class_test_case", "linked_compound"}
+ROLES = {"seed", "class_test_case", "linked_compound", "identity_trap"}
 
 
 def load(path: Path = FIXTURE_PATH) -> dict:
@@ -162,6 +162,7 @@ def build_seed_db(fx: dict, raw_id: int, rows: list[dict]) -> sqlite3.Connection
                                (c["canonical_name"], c["inchikey"])).lastrowid
             ids.update({n: cid for n in c["drugage_names"]})
     normalise.load_drugage_evidence(conn, raw_id, rows, ids)
+    reference.load_direction_reviews(conn)      # reviewed corrections apply, as in production
     return conn
 
 

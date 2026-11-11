@@ -1,16 +1,20 @@
-# Weekly refresh and change detection (SPEC §11). A diff, not a monitor:
+# Refresh and change detection (SPEC §11). A diff, not a monitor:
 # refresh sources, snapshot derived-cell membership, compare with the previous run.
 # Opens an issue and commits a dated changelog ONLY when v_cell_transitions is
 # non-empty for this run; otherwise it leaves no trace beyond the saved state.
 #
 # State: the SQLite database (raw layer, fetch log, snapshot history, reviews) is
-# persisted as an asset on a release tagged `pipeline-state`, because it is too large
-# and too binary for git. Snapshots are append-only inside it.
-name: weekly-refresh
+# saved after every run as a NEW dated release, pipeline-state-YYYY-MM-DD-run<N>,
+# never overwritten. Retention: newest 12, then the newest of each month, forever
+# (agesdk/state_backups.py). One bad upload can cost at most one run.
+name: refresh
 
 on:
-  schedule:
-    - cron: "17 6 * * 1"     # Mondays 06:17 UTC
+  # MANUAL ONLY for now (SPEC §11.5). Until trial normalisation (§7 step 5) exists,
+  # v_cell_transitions cannot fire, so scheduled runs would only produce near-empty
+  # output. Re-enable after §7 step 5, reassessing cadence rather than defaulting to
+  # weekly, by uncommenting this one line:
+  # schedule: [{cron: "17 6 * * 1"}]
   workflow_dispatch: {}
 
 permissions:
@@ -18,7 +22,7 @@ permissions:
   issues: write              # open an issue on transitions
 
 concurrency:
-  group: weekly-refresh
+  group: refresh
   cancel-in-progress: false  # never run two refreshes against the same state
 
 jobs:
@@ -27,7 +31,6 @@ jobs:
     timeout-minutes: 180
     env:
       GH_TOKEN: ${{ github.token }}
-      STATE_TAG: pipeline-state
     steps:
       - uses: actions/checkout@v4
 
@@ -41,7 +44,10 @@ jobs:
       - name: Restore state
         run: |
           mkdir -p data
-          if gh release download "$STATE_TAG" --pattern 'agesdk.sqlite.gz' --dir data; then
+          LATEST=$(gh release list --limit 500 --json tagName | python -m agesdk state-backups latest)
+          if [ -n "$LATEST" ]; then
+            echo "Restoring from $LATEST"
+            gh release download "$LATEST" --pattern 'agesdk.sqlite.gz' --dir data
             gunzip -f data/agesdk.sqlite.gz
           else
             echo "No saved state: this run is the baseline and will report no transitions."
@@ -70,11 +76,18 @@ jobs:
             --title "Evidence map: ${{ steps.refresh.outputs.transitions }} cell transition(s) — $(date -u +%F)" \
             --body-file "${{ steps.refresh.outputs.changelog }}"
 
-      - name: Save state
+      - name: Save state (new dated release)
         if: always() && steps.refresh.outcome != 'skipped'
         run: |
+          RUN_ID="${{ steps.refresh.outputs.run_id }}"
+          TAG=$(python -m agesdk state-backups tag --run-id "${RUN_ID:-${{ github.run_id }}}")
           gzip -kf data/agesdk.sqlite
-          gh release view "$STATE_TAG" >/dev/null 2>&1 || \
-            gh release create "$STATE_TAG" --title "Pipeline state" --latest=false \
-              --notes "SQLite state for the weekly refresh. Overwritten each run; history lives inside it."
-          gh release upload "$STATE_TAG" data/agesdk.sqlite.gz --clobber
+          gh release create "$TAG" data/agesdk.sqlite.gz --latest=false --prerelease \
+            --title "Pipeline state $TAG" \
+            --notes "SQLite state after weekly refresh run ${RUN_ID:-?} (outcome: ${{ steps.refresh.outcome }})."
+          # Prune only once the new backup is confirmed present.
+          gh release view "$TAG" --json assets --jq '.assets[].name' | grep -qx 'agesdk.sqlite.gz'
+          gh release list --limit 500 --json tagName | python -m agesdk state-backups prune | \
+            while read -r OLD; do
+              [ -n "$OLD" ] && gh release delete "$OLD" --yes --cleanup-tag
+            done

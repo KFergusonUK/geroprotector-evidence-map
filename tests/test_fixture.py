@@ -23,6 +23,7 @@ class FixtureInternal(unittest.TestCase):
         self.assertEqual(len(roles["seed"]), 18)
         self.assertEqual(roles["class_test_case"], {"empagliflozin", "semaglutide"})
         self.assertEqual(roles["linked_compound"], {"masoprocol"})
+        self.assertEqual(roles["identity_trap"], {"y27632"})
         for dropped in ("dasatinib", "glycine-nac", "dasatinib-quercetin"):
             self.assertNotIn(dropped, self.by_key())
 
@@ -62,6 +63,20 @@ class FixtureInternal(unittest.TestCase):
         self.assertEqual(k["aspirin"]["itp"]["cohorts"], [1, 4])
         self.assertEqual(k["aspirin"]["itp"]["tier"]["overall"], "weak")
         self.assertEqual(k["rapamycin"]["itp"]["tier"]["overall"], "strong")
+
+    def test_ximelegatran_trap(self):
+        y = self.by_key()["y27632"]
+        self.assertIn("ximelagatran", y["must_not_match"])
+        self.assertIn("Exanta", y["must_not_match"])
+        self.assertIn("Ximelegatran", y["needs_review"])
+        self.assertEqual(y["pubchem_cid"], 448042)
+
+    def test_single_experiment_both_sexes_is_not_strong(self):
+        k = self.by_key()
+        for key in ("captopril", "meclizine"):
+            self.assertEqual(k[key]["itp"]["experiments"], 1)
+            self.assertEqual(k[key]["itp"]["tier"]["overall"], "mixed", key)
+        self.assertEqual(k["meclizine"]["itp"]["female"], [0, 1])   # source error corrected
 
     def test_nmn_is_on_no_path(self):
         self.assertEqual(self.by_key()["nmn"]["expected_paths"], [])
@@ -127,6 +142,18 @@ class FixtureVsDrugAge(unittest.TestCase):
     def test_every_drugage_species_has_a_tier(self):
         tiers = fixture.load_species_tiers()
         self.assertEqual({r["species"] for r in ROWS} - set(tiers), set())
+
+    def test_direction_reviews_match_current_source_rows(self):
+        self.assertEqual(reference.check_direction_reviews(reference.load_direction_review_spec(), ROWS), [])
+
+    def test_changed_source_row_is_detected(self):
+        import copy
+        rows = copy.deepcopy(ROWS)
+        for r in rows:
+            if r["compound_name"] == "Meclizine" and r["gender"] == "Female" and r["ITP"] == "Yes":
+                r["avg_lifespan_significance"] = "NS"        # the source fixes the row
+        errs = reference.check_direction_reviews(reference.load_direction_review_spec(), rows)
+        self.assertTrue(any("changed since review" in e for e in errs))
 
     def test_reprogramming_tiers_agree_with_drugage(self):
         spec = reference.load_reprogramming_spec()

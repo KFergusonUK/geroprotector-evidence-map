@@ -13,6 +13,7 @@ from agesdk.db import PROJECT_ROOT
 
 SPECIES_PATH = PROJECT_ROOT / "data" / "reference" / "species_taxon.csv"
 REPROGRAMMING_PATH = PROJECT_ROOT / "data" / "reference" / "reprogramming_evidence.yaml"
+DIRECTION_REVIEWS_PATH = PROJECT_ROOT / "data" / "reviews" / "direction_reviews.yaml"
 
 INCHIKEY_RE = re.compile(r"^[A-Z]{14}-[A-Z]{10}-[A-Z]$")
 TIERS = {"measured_lifespan", "inherited_class", "mechanistic_only"}
@@ -158,3 +159,49 @@ def load_reprogramming(conn: sqlite3.Connection, spec: dict | None = None,
             report["rows_inserted"] += cur.rowcount
     conn.commit()
     return report
+
+
+# ---------------------------------------------------------------- direction reviews
+
+def load_direction_review_spec(path=DIRECTION_REVIEWS_PATH) -> list[dict]:
+    with open(path, encoding="utf-8") as fh:
+        return yaml.safe_load(fh).get("reviews", [])
+
+
+def check_direction_reviews(reviews: list[dict], drugage_rows: list[dict]) -> list[str]:
+    """Each review's locator must identify exactly one current source row, and that row's
+    evidence_key must equal the review's key. A mismatch means the source changed."""
+    from agesdk.evidence import evidence_key
+    errs = []
+    for rv in reviews:
+        loc = rv["locator"]
+        if loc.get("source") != "drugage":
+            errs.append(f"{rv['evidence_key']}: only drugage locators are supported")
+            continue
+        fields = {k: v for k, v in loc.items() if k != "source"}
+        hits = [r for r in drugage_rows if all(str(r.get(k, "")).strip() == str(v) for k, v in fields.items())]
+        if len(hits) != 1:
+            errs.append(f"{rv['evidence_key']}: locator matches {len(hits)} DrugAge rows")
+        elif evidence_key("drugage", hits[0]) != rv["evidence_key"]:
+            errs.append(f"{rv['evidence_key']}: the source row changed since review (key now "
+                        f"{evidence_key('drugage', hits[0])}); re-review required")
+        if rv["reason"] == "source_error" and len((rv.get("citation") or "").strip()) < 40:
+            errs.append(f"{rv['evidence_key']}: a source_error needs a citation quoting the source")
+    return errs
+
+
+def load_direction_reviews(conn: sqlite3.Connection, reviews: list[dict] | None = None) -> int:
+    """Rebuild direction_review from the file. Reviews whose source row has changed are
+    still loaded under their original key, so they show up in v_orphaned_reviews."""
+    reviews = load_direction_review_spec() if reviews is None else reviews
+    conn.execute("DELETE FROM direction_review")
+    for rv in reviews:
+        conn.execute(
+            """INSERT INTO direction_review (evidence_key, reason, resolved_direction, rationale,
+                                             citation, reviewed_by, reviewed_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (rv["evidence_key"], rv["reason"], rv["resolved_direction"],
+             " ".join(rv["rationale"].split()), " ".join((rv.get("citation") or "").split()) or None,
+             rv["reviewed_by"], rv["reviewed_at"]))
+    conn.commit()
+    return len(reviews)

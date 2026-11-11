@@ -532,9 +532,32 @@ class ItpCohorts(unittest.TestCase):
         self.assertEqual((s["itp_experiments"], s["itp_cohorts_total"]), (1, 2))
 
     def test_tier_thresholds_are_data(self):
-        self.conn.execute("UPDATE analysis_threshold SET value = 1 WHERE name = 'itp_tier_strong_min_positive'")
-        self.conn.execute("UPDATE analysis_threshold SET value = 0.2 WHERE name = 'itp_tier_strong_min_fraction'")
+        for name, value in (("itp_tier_strong_min_positive", 1), ("itp_tier_strong_min_fraction", 0.2),
+                            ("itp_tier_strong_min_experiments", 1)):
+            self.conn.execute("UPDATE analysis_threshold SET value = ? WHERE name = ?", (value, name))
         self.assertEqual(self.summary(self.asp)["itp_tier"], "strong")
+
+    def test_one_experiment_both_sexes_is_mixed_not_strong(self):
+        capt = add_compound(self.conn, "captopril")
+        add_evidence(self.conn, capt, "extension", sex="M", itp=1, pmid="36179270")
+        add_evidence(self.conn, capt, "extension", sex="F", itp=1, pmid="36179270")
+        s = self.summary(capt)
+        self.assertEqual((s["itp_cohorts_positive"], s["itp_experiments"], s["itp_experiments_positive"]), (2, 1, 1))
+        self.assertEqual(s["itp_tier"], "mixed")
+        add_evidence(self.conn, capt, "extension", sex="M", itp=1, pmid="99999999")   # a second experiment
+        self.assertEqual(self.summary(capt)["itp_tier"], "strong")
+
+    def test_replication_needs_strong_tier(self):
+        rows = {r["canonical_name"]: dict(r) for r in self.conn.execute("SELECT * FROM v_extension_evidence")}
+        self.assertEqual(rows["aspirin"]["itp_tier"], "weak")
+        self.assertEqual((rows["aspirin"]["replicated"], rows["aspirin"]["replicated_mammal"]), (0, 0))
+        self.assertEqual(rows["aspirin"]["meets_itp_threshold"], 1)   # still ≥1 positive: not a null-cell compound
+        strong = add_compound(self.conn, "acarbose")
+        for pmid in ("24245565", "30688027"):
+            add_evidence(self.conn, strong, "extension", sex="M", itp=1, pmid=pmid)
+        r = dict(self.conn.execute("SELECT * FROM v_extension_evidence WHERE compound_id = ?", (strong,)).fetchone())
+        self.assertEqual((r["itp_tier"], r["replicated"], r["replicated_by_itp"], r["replicated_mammal"]),
+                         ("strong", 1, 1, 1))
 
     def test_extension_view_carries_ratio_and_tier(self):
         r = dict(self.conn.execute("SELECT * FROM v_extension_evidence WHERE compound_id = ?",
