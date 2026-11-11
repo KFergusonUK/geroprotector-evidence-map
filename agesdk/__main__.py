@@ -112,6 +112,21 @@ def cmd_state_backups(args):
         print("\n".join(state_backups.to_prune(tags)))
 
 
+def cmd_ctgov_seed(conn, args):
+    from agesdk.sources import ctgov
+    out = ctgov.fetch_seed(conn, fixture.load())
+    per_term = out.pop("per_term")
+    print(json.dumps(out, indent=2))
+    trunc = [t["query_term"] for t in per_term if t["truncated"]]
+    if trunc:
+        print("TRUNCATED (raise max_pages):", trunc)
+
+
+def cmd_ctgov_report(conn, args):
+    from agesdk import ctgov_report
+    print(json.dumps(ctgov_report.build(conn), indent=2, ensure_ascii=False))
+
+
 def cmd_fixture_chembl(conn, args):
     print(json.dumps(fixture.chembl_report(fixture.load(), conn), indent=2))
 
@@ -130,6 +145,8 @@ def main(argv=None):
     p.add_argument("--changelog-dir", default="changelog")
     p.add_argument("--no-ctgov", action="store_true")
     p.add_argument("--no-litscan", action="store_true")
+    sub.add_parser("ctgov-seed", help="fetch ClinicalTrials.gov hits + full records for the seed compounds")
+    sub.add_parser("ctgov-report", help="hit volume and intervention-string quality for the seed fetch")
     p = sub.add_parser("state-backups", help="dated pipeline-state release names and pruning (reads gh JSON)")
     p.add_argument("action", choices=["tag", "latest", "prune"])
     p.add_argument("--run-id", type=int, default=0)
@@ -141,7 +158,8 @@ def main(argv=None):
     db.init_db(conn)
     {"init-db": cmd_init_db, "fetch-drugage": cmd_fetch_drugage,
      "fixture-check": cmd_fixture_check, "fixture-chembl": cmd_fixture_chembl,
-     "reprogramming-check": cmd_reprogramming_check, "refresh": cmd_refresh}[args.cmd](conn, args)
+     "reprogramming-check": cmd_reprogramming_check, "refresh": cmd_refresh,
+     "ctgov-seed": cmd_ctgov_seed, "ctgov-report": cmd_ctgov_report}[args.cmd](conn, args)
 
 
 if __name__ == "__main__":

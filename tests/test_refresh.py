@@ -220,44 +220,25 @@ def key_of_deleted(t):
     return t.conn.execute("SELECT evidence_key FROM direction_review").fetchone()[0]
 
 
-def ctgov_routes(pages_by_since):
-    def studies(url, params):
-        since = params.get("filter.advanced")
-        pages = pages_by_since[since]
-        i = int(params.get("pageToken", 0))
-        body = {"studies": pages[i]}
-        if i + 1 < len(pages):
-            body["nextPageToken"] = str(i + 1)
-        return 200, body
-    return FakeHTTP({f"{ctgov.BASE}/version": lambda u, p: (200, {"apiVersion": "2.0.5",
-                                                                  "dataTimestamp": "2026-11-10T10:00:05"}),
-                     f"{ctgov.BASE}/studies": studies})
+def ctgov_routes(pages_by_since=None):
+    """Empty registry: §11 refresh with no query plan makes only the version call."""
+    from tests.test_ctgov import FakeRegistry
+    reg = FakeRegistry({}, {})
+    return FakeHTTP({f"{ctgov.BASE}/version": lambda u, p: reg.get(u, p)[:2],
+                     f"{ctgov.BASE}/studies": lambda u, p: reg.get(u, p)[:2]})
 
 
-class CtgovIncremental(unittest.TestCase):
-    def test_full_history_then_since_watermark(self):
-        conn = fresh()
-        c1 = ctgov_routes({None: [[{"id": 1}, {"id": 2}], [{"id": 3}]]})
-        out = ctgov.refresh(conn, ["acarbose"], client=c1)
-        self.assertEqual(out["studies"], 3)
-        self.assertNotIn("filter.advanced", c1.calls[1][1])
-        wm = conn.execute("SELECT watermark FROM fetch_log WHERE source = 'ctgov'").fetchone()[0]
-        self.assertEqual(wm, "2026-11-10")
-        c2 = ctgov_routes({"AREA[LastUpdatePostDate]RANGE[2026-11-09,MAX]": [[{"id": 3}]]})
-        out = ctgov.refresh(conn, ["acarbose"], client=c2)
-        self.assertEqual(out["studies"], 1)
-        self.assertEqual(c2.calls[1][1]["filter.advanced"], "AREA[LastUpdatePostDate]RANGE[2026-11-09,MAX]")
-
+class CtgovRefreshErrors(unittest.TestCase):
     def test_error_does_not_advance_watermark(self):
+        from agesdk.raw import last_watermark
+        from tests.test_ctgov import FX, registry
         conn = fresh()
-        ctgov.refresh(conn, ["acarbose"], client=ctgov_routes({None: [[{"id": 1}]]}))
+        ctgov.fetch_seed(conn, FX, client=registry())
         broken = FakeHTTP({f"{ctgov.BASE}/version": lambda u, p: (200, {"apiVersion": "2", "dataTimestamp": "2026-11-17T00:00:00"}),
                            f"{ctgov.BASE}/studies": lambda u, p: (503, b"down")})
-        broken_client = broken
         with self.assertRaises(Exception):
-            ctgov.refresh(conn, ["acarbose"], client=broken_client)
-        from agesdk.raw import last_watermark
-        self.assertEqual(last_watermark(conn, "ctgov", "studies", {"query.intr": "acarbose"}), "2026-11-10")
+            ctgov.refresh(conn, ["metformin"], client=broken)
+        self.assertEqual(last_watermark(conn, "ctgov", "studies", {"query.intr": "metformin"}), "2026-11-10")
 
 
 def litscan_client(hits, chems):
@@ -334,7 +315,7 @@ class LiteratureScan(unittest.TestCase):
 class EndToEnd(unittest.TestCase):
     def client(self, zip_bytes):
         routes = {drugage.URL: lambda u, p: (200, zip_bytes)}
-        routes.update(ctgov_routes(defaultdict(lambda: [[]])).routes)
+        routes.update(ctgov_routes().routes)
         routes.update(litscan_client([], {}).routes)
         return FakeHTTP(routes)
 

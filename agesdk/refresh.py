@@ -132,9 +132,8 @@ def run(conn: sqlite3.Connection, *, ctgov_terms: list[str] | None = None, do_ct
         if da["changed"]:
             sources["drugage_reprocess"] = json.dumps(normalise.reprocess_drugage(conn, raw_id, rows))
         if do_ctgov:
-            terms = ctgov_terms if ctgov_terms is not None else \
-                [r[0] for r in conn.execute("SELECT canonical_name FROM compound ORDER BY canonical_name")]
-            ct = ctgov.refresh(conn, terms, run_id=run_id, client=clients.get("ctgov"))
+            # Terms default to the stored query plan (ctgov_query_plan, from the seed fetch).
+            ct = ctgov.refresh(conn, ctgov_terms, run_id=run_id, client=clients.get("ctgov"))
             sources["ctgov"] = f"{ct['api_version']} data {ct['data_timestamp']} ({ct['terms']} terms)"
         if do_litscan:
             ls = litscan.scan(conn, run_id=run_id, today=today, drugage_rows=rows, client=clients.get("litscan"))

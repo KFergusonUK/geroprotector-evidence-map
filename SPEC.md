@@ -348,6 +348,32 @@ trial_outcome(id, nct_id, outcome_type, measure, time_frame,
               ageing_adjacent, ageing_category, classifier_version)
 ```
 
+### 4.2a Registry staging (ClinicalTrials.gov)
+
+Registry records as returned, before any resolution (`agesdk/sources/ctgov.py`). Two
+fetch phases, both stored verbatim in `raw_response` with request parameters and API
+version:
+
+1. **Hits** — one search per query string (`query.intr`, NCT ID and last-update date
+   only). Query strings for the seed compounds are the canonical name plus every
+   `must_match` synonym in the fixture; strings carrying a dose are resolver test inputs,
+   not names, and are skipped; case and dash variants collapse. `ctgov_query_plan` records
+   which fixture compound supplied each string, and `ctgov_query_hit` which string found
+   each study — the evidence for the precision check (§7 step 4).
+2. **Full records** — each study once, batched by NCT ID, with `protocolSection`,
+   `derivedSection` (MeSH browse modules) and `hasResults`. The posted-results section is
+   not fetched: it is large, and results reporting is derived from status and dates (§5.2).
+
+Staging tables, rebuilt from the raw layer at any time and never edited by hand:
+`ctgov_study` (the whole record plus convenience columns; conditions, outcomes and MeSH
+arrays verbatim), `ctgov_intervention` (one row per intervention object: name, type,
+description, `otherNames`, `armGroupLabels`, and the full object as returned). Nothing in
+staging links a study to a `compound_id`; that is the resolver's job (§7 step 3).
+
+The raw layer is the cache: a re-run makes no network calls for anything stored. The
+§11 incremental refresh uses the same two phases, re-fetching full records only for
+studies updated since each query string's high-water mark.
+
 ### 4.3 Crosswalk layer
 
 **The hard part of this project.** Keep mappings as *data*, in version control,
@@ -792,7 +818,7 @@ A10BF01; NMN — take the β-anomer. **Unresolvable:** aluminium acetylsalicylat
 ## 7. Build order
 
 1. **Resolve the seed compounds by hand.** Build the fixture first.
-2. ClinicalTrials.gov client → raw layer, for the seed compounds only.
+2. ClinicalTrials.gov client → raw layer, for the seed compounds only (§4.2a). *Done.*
 3. Intervention string resolver → measure precision/recall against the fixture.
 4. **Decision point:** if matching is too noisy at seed scale, stop and rethink
    before scaling. Cheap failure is the point of this step.

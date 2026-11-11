@@ -762,6 +762,71 @@ LEFT JOIN tr USING (compound_id)
 WHERE c.evidence_tier = 'mechanistic_only';
 
 -- ===========================================================================
+-- REGISTRY STAGING (SPEC §7 step 2). ClinicalTrials.gov records as returned, before any
+-- resolution. Rebuilt from the raw layer (agesdk.sources.ctgov.stage); the raw layer stays
+-- authoritative. Nothing here links a trial to a compound_id: that is the resolver (step 3).
+-- ===========================================================================
+
+-- Which strings were searched, and for which fixture compound (query provenance, not identity).
+CREATE TABLE IF NOT EXISTS ctgov_query_plan (
+  query_term    TEXT PRIMARY KEY,
+  compound_key  TEXT NOT NULL,            -- fixture key that supplied the term
+  term_source   TEXT NOT NULL CHECK (term_source IN ('canonical_name', 'must_match')),
+  plan_version  TEXT NOT NULL
+);
+
+-- Every hit, with the query string that produced it: evidence for the precision check (step 4).
+CREATE TABLE IF NOT EXISTS ctgov_query_hit (
+  query_term            TEXT NOT NULL,
+  nct_id                TEXT NOT NULL,
+  last_update_post_date TEXT,
+  raw_response_id       INTEGER NOT NULL REFERENCES raw_response (id),
+  PRIMARY KEY (query_term, nct_id)
+);
+CREATE INDEX IF NOT EXISTS ix_ctgov_query_hit_nct ON ctgov_query_hit (nct_id);
+
+-- One row per study: the full record as returned (protocolSection, derivedSection,
+-- hasResults) plus convenience columns. Later raw responses for a study supersede earlier.
+CREATE TABLE IF NOT EXISTS ctgov_study (
+  nct_id                   TEXT PRIMARY KEY,
+  raw_response_id          INTEGER NOT NULL REFERENCES raw_response (id),
+  last_update_post_date    TEXT,
+  brief_title              TEXT,
+  overall_status           TEXT,
+  study_type               TEXT,
+  phases                   TEXT CHECK (phases IS NULL OR json_valid(phases)),
+  enrollment               INTEGER,
+  start_date               TEXT,
+  primary_completion_date  TEXT,
+  completion_date          TEXT,
+  results_first_post_date  TEXT,
+  has_results              INTEGER,
+  lead_sponsor             TEXT,
+  lead_sponsor_class       TEXT,
+  interventions            TEXT NOT NULL CHECK (json_valid(interventions)),   -- full array, verbatim
+  arm_groups               TEXT CHECK (arm_groups IS NULL OR json_valid(arm_groups)),
+  conditions_module        TEXT CHECK (conditions_module IS NULL OR json_valid(conditions_module)),
+  condition_browse         TEXT CHECK (condition_browse IS NULL OR json_valid(condition_browse)),      -- MeSH
+  intervention_browse      TEXT CHECK (intervention_browse IS NULL OR json_valid(intervention_browse)),-- MeSH
+  outcomes_module          TEXT CHECK (outcomes_module IS NULL OR json_valid(outcomes_module)),       -- raw measures
+  study_json               TEXT NOT NULL CHECK (json_valid(study_json))      -- the whole record
+);
+
+-- One row per intervention object, every field kept (name, type, description, otherNames,
+-- armGroupLabels, and anything else the API returns, in object_json).
+CREATE TABLE IF NOT EXISTS ctgov_intervention (
+  nct_id            TEXT NOT NULL REFERENCES ctgov_study (nct_id),
+  idx               INTEGER NOT NULL,      -- position in the study's interventions array
+  intervention_type TEXT,
+  name              TEXT,
+  description       TEXT,
+  other_names       TEXT CHECK (other_names IS NULL OR json_valid(other_names)),
+  arm_group_labels  TEXT CHECK (arm_group_labels IS NULL OR json_valid(arm_group_labels)),
+  object_json       TEXT NOT NULL CHECK (json_valid(object_json)),
+  PRIMARY KEY (nct_id, idx)
+);
+
+-- ===========================================================================
 -- §11 REFRESH AND CHANGE DETECTION — a diff, not a monitor.
 -- ===========================================================================
 
@@ -1057,4 +1122,4 @@ SELECT * FROM (
   FROM v_membership_changes WHERE cell_class = 'derived_cell')
 WHERE transition IS NOT NULL;
 
-PRAGMA user_version = 6;
+PRAGMA user_version = 7;
