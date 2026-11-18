@@ -1,0 +1,815 @@
+# Blind check of the step-4 precision sample — for Kevin Ferguson to adjudicate.
+#
+# Judge each claim ("This intervention object is <compound>") by the protocol's identity rule
+# (docs/step4_precision_protocol.md, "Adjudication"):
+#   CORRECT   the intervention administers the compound itself: any salt, hydrate,
+#             formulation, brand or sponsor code of that molecule (lithium salts -> Li+).
+#   INCORRECT a different molecule (incl. stereoisomers, analogues), a placebo or dummy, a
+#             fixed-dose combination presented as a single agent, an extract or food, or a
+#             class or regimen rather than the compound.
+#   Ambiguous counts as INCORRECT. Route is NOT part of identity (a sirolimus stent is sirolimus).
+#
+# Set `verdict` to correct or incorrect, optionally a `note`. Please do not open
+# data/reviews/step4_precision_sample.yaml (the original verdicts) until you have finished.
+# Then run: python3 docs/step4_blind_compare.py
+# Rows: 30 of 200, chosen by random.Random(2026111830); original verdicts committed in 2050f70.
+rows:
+- blind_id: 1
+  sample_index: 11
+  nct_id: NCT01929642
+  registry_url: https://clinicaltrials.gov/study/NCT01929642
+  claim: This intervention object is rapamycin
+  intervention:
+    type: DRUG
+    name: Sirolimus
+    otherNames:
+    - Rapamune, Rapamycin
+    description: null
+    armGroupLabels:
+    - Sirolimus or Everolimus
+  study_title: 'Rapalogues for Autism Phenotype in TSC: A Feasibility Study'
+  arm_groups:
+  - label: Sirolimus or Everolimus
+    type: EXPERIMENTAL
+    description: Oral solution or tablet,titrated to therapeutic serum trough range (sirolimus); Oral tablet, titrated
+      to therapeutic serum trough range (everolimus)
+  verdict: null
+  note: ''
+- blind_id: 2
+  sample_index: 21
+  nct_id: NCT00909506
+  registry_url: https://clinicaltrials.gov/study/NCT00909506
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames: null
+    description: 'Metformin 1000 mg/d : Receive oral metformin 500 mg dose once daily on 1\~2 weeks. (Dose-escalate)
+
+
+      Receive oral metformin 500 mg in every morning and evening on 3\~24 weeks (metformin 500 mg \* twice a day
+      = 1000 mg per day).'
+    armGroupLabels:
+    - Metformin 1000 mg/d
+  study_title: Efficacy and Safety of Adjuvant Metformin for Operable Breast Cancer Patients
+  arm_groups:
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: Placebo
+  - label: Metformin 500 mg/d
+    type: ACTIVE_COMPARATOR
+    description: Metformin 500 mg/d
+  - label: Metformin 1000 mg/d
+    type: ACTIVE_COMPARATOR
+    description: Metformin 1000 mg/d
+  verdict: null
+  note: ''
+- blind_id: 3
+  sample_index: 45
+  nct_id: NCT00654667
+  registry_url: https://clinicaltrials.gov/study/NCT00654667
+  claim: This intervention object is resveratrol
+  intervention:
+    type: DRUG
+    name: Resveratrol
+    otherNames: null
+    description: null
+    armGroupLabels:
+    - Experimental 1
+  study_title: Mechanisms of Metabolic Regulation of Resveratrol on Humans With Metabolic Syndrome
+  arm_groups:
+  - label: '2'
+    type: PLACEBO_COMPARATOR
+    description: Placebo
+  - label: Experimental 1
+    type: EXPERIMENTAL
+    description: Resveratrol
+  verdict: null
+  note: ''
+- blind_id: 4
+  sample_index: 48
+  nct_id: NCT07172867
+  registry_url: https://clinicaltrials.gov/study/NCT07172867
+  claim: This intervention object is semaglutide
+  intervention:
+    type: DRUG
+    name: Semaglutide 1 mg
+    otherNames: null
+    description: Semaglutide 1 mg, every week
+    armGroupLabels:
+    - HT-6184 2mg Matching Placebo
+    - HT-6184 2mg Treatment
+  study_title: A Ph2 Study to Evaluate the Safety, Efficacy and Tolerability of HT-6184 and Semaglutide in Obese
+    Participants With T2DM
+  arm_groups:
+  - label: HT-6184 2mg Treatment
+    type: EXPERIMENTAL
+    description: 'Ofirnoflast (2 mg): dosed once a day, orally (PO QD) + semaglutide (1 mg): dosed weekly (q1wk),
+      via subcutaneous (SC) injection for 12 weeks.'
+  - label: HT-6184 2mg Matching Placebo
+    type: PLACEBO_COMPARATOR
+    description: 'Placebo: dosed once a day, orally (PO QD) + semaglutide (1 mg): dosed weekly (q1wk), via SC injection
+      for 12 weeks.'
+  verdict: null
+  note: ''
+- blind_id: 5
+  sample_index: 54
+  nct_id: NCT03151772
+  registry_url: https://clinicaltrials.gov/study/NCT03151772
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames: null
+    description: Metformin 850 mg x 3 taken preoperatively
+    armGroupLabels:
+    - Metformin
+  study_title: Bioavailability of Disulfiram and Metformin in Glioblastomas
+  arm_groups:
+  - label: Disulfiram
+    type: EXPERIMENTAL
+    description: Disulfiram 200 mg twice daily and copper 2,5 mg once daily. For bioavailability purpose only, treatment
+      is withdrawn postoperatively
+  - label: Metformin
+    type: EXPERIMENTAL
+    description: Metformin 850 mg x 3 daily. For bioavailability purpose only, treatment is withdrawn postoperatively
+  verdict: null
+  note: ''
+- blind_id: 6
+  sample_index: 55
+  nct_id: NCT07703137
+  registry_url: https://clinicaltrials.gov/study/NCT07703137
+  claim: This intervention object is nr
+  intervention:
+    type: DIETARY_SUPPLEMENT
+    name: Nicotinamide Riboside (NR)
+    otherNames: null
+    description: Participants will be randomized to receive either oral nicotinamide riboside at a total daily dose
+      of 1 g or an identically appearing placebo for 12 weeks.
+    armGroupLabels:
+    - Active intervention
+  study_title: NAD Supplementation in Parkinson's Disease
+  arm_groups:
+  - label: Active intervention
+    type: ACTIVE_COMPARATOR
+    description: Participants will be randomized to receive either oral nicotinamide riboside at a total daily dose
+      of 1 g or an identically appearing placebo for 12 weeks.
+  - label: Placebo intervention
+    type: PLACEBO_COMPARATOR
+    description: Participants assigned to the placebo arm will take an oral placebo capsule daily for 12 weeks.
+      The placebo will appear identical to the nicotinamide riboside capsules.
+  verdict: null
+  note: ''
+- blind_id: 7
+  sample_index: 64
+  nct_id: NCT06613191
+  registry_url: https://clinicaltrials.gov/study/NCT06613191
+  claim: This intervention object is aspirin
+  intervention:
+    type: DRUG
+    name: Aspirin
+    otherNames: null
+    description: Participant will be on aspirin alone or P2Y12 inhibitor alone
+    armGroupLabels:
+    - Aspirin only
+  study_title: Colonoscopy and Antiplatelet Therapy Trial
+  arm_groups:
+  - label: Aspirin only
+    type: ACTIVE_COMPARATOR
+    description: Participants receiving aspirin only at time of the colonoscopy
+  - label: P2Y12 inhibitor only
+    type: EXPERIMENTAL
+    description: Participants receiving a P2Y12 inhibitor only at time of the colonoscopy
+  verdict: null
+  note: ''
+- blind_id: 8
+  sample_index: 73
+  nct_id: NCT00313534
+  registry_url: https://clinicaltrials.gov/study/NCT00313534
+  claim: This intervention object is masoprocol
+  intervention:
+    type: DRUG
+    name: masoprocol
+    otherNames: null
+    description: null
+    armGroupLabels: null
+  study_title: Nordihydroguaiaretic Acid in Treating Patients With Nonmetastatic Relapsed Prostate Cancer
+  arm_groups: []
+  verdict: null
+  note: ''
+- blind_id: 9
+  sample_index: 78
+  nct_id: NCT01719003
+  registry_url: https://clinicaltrials.gov/study/NCT01719003
+  claim: This intervention object is empagliflozin
+  intervention:
+    type: DRUG
+    name: Empagliflozin low dose bid
+    otherNames: null
+    description: Empagliflozin low dose split twice daily
+    armGroupLabels:
+    - Empagliflozin low dose + met 1000 mg bid
+  study_title: Safety and Efficacy Study of Empagliflozin and Metformin for 24 Weeks in Treatment Naive Patients
+    With Type 2 Diabetes
+  arm_groups:
+  - label: Empagliflozin low dose qd
+    type: EXPERIMENTAL
+    description: Empagliflozin low dose once daily
+  - label: Empagliflozin high dose qd
+    type: EXPERIMENTAL
+    description: Empagliflozin high dose once daily
+  - label: OL empa high dose + met 1000 mg bid
+    type: EXPERIMENTAL
+    description: Open label empagliflozin high dose split twice daily + metformin 1000 mg twice daily - Patients
+      are no longer enrolled into this arm because of change in the inclusion criteria in protocol version 2.0 all
+      patients are now enrolled into remaining double-blind arms. Patients already enrolled in the open-label arm
+      according to protocol version 1.0 can complete the study.
+  - label: Empagliflozin low dose + met 500 mg bid
+    type: EXPERIMENTAL
+    description: Empagliflozin low dose split twice daily + metformin 500 mg twice daily
+  - label: Empagliflozin low dose + met 1000 mg bid
+    type: EXPERIMENTAL
+    description: Empagliflozin low dose split twice daily + metformin 1000 mg twice daily
+  - label: Empagliflozin high dose + met 500 mg bid
+    type: EXPERIMENTAL
+    description: Empagliflozin high dose split twice daily + metformin 500 mg twice daily
+  - label: Empagliflozin high dose + met 1000mg bid
+    type: EXPERIMENTAL
+    description: Empagliflozin high dose split twice daily + metformin 1000 mg twice daily
+  - label: Metformin 500 mg bid
+    type: EXPERIMENTAL
+    description: Metformin 500 mg twice daily
+  - label: Metformin 1000 mg bid
+    type: EXPERIMENTAL
+    description: Metformin 1000 mg twice daily
+  verdict: null
+  note: ''
+- blind_id: 10
+  sample_index: 85
+  nct_id: NCT07871799
+  registry_url: https://clinicaltrials.gov/study/NCT07871799
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames: null
+    description: Metformin 425 mg administered orally once daily for approximately 8 weeks. Metformin was administered
+      in both randomized study arms.
+    armGroupLabels:
+    - 'Arm A: Metformin + Semaglutide + AgeBiotics'
+    - 'Arm B: Metformin + Empagliflozin + AgeBiotics'
+  study_title: 'ELITE: Deep Profiling and Algorithmic Polytherapy to Map Individual Response in Healthy Aging'
+  arm_groups:
+  - label: 'Arm A: Metformin + Semaglutide + AgeBiotics'
+    type: EXPERIMENTAL
+    description: Participants received metformin 425 mg orally once daily and semaglutide 0.25 mg by subcutaneous
+      injection once weekly for approximately 8 weeks. Participants also received investigational AgeBiotics AB-01
+      oral solution, three 19-mL sachets daily, and AB-02, five capsules twice daily.
+  - label: 'Arm B: Metformin + Empagliflozin + AgeBiotics'
+    type: EXPERIMENTAL
+    description: Participants received metformin 425 mg orally once daily and empagliflozin 10 mg orally once daily
+      for approximately 8 weeks. Participants also received investigational AgeBiotics AB-01 oral solution, three
+      19-mL sachets daily, and AB-02, five capsules twice daily.
+  verdict: null
+  note: ''
+- blind_id: 11
+  sample_index: 91
+  nct_id: NCT01563120
+  registry_url: https://clinicaltrials.gov/study/NCT01563120
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: metformin
+    otherNames: null
+    description: metformin up to 2550mg per day.
+    armGroupLabels:
+    - metformin
+  study_title: A Comparison Between Two Oral Hypoglycemics - Metformin and Glybenclamide for the Treatment of Gestational
+    Diabetes Mellitus
+  arm_groups:
+  - label: metformin
+    type: ACTIVE_COMPARATOR
+    description: metformin up to 2550mg per day
+  - label: glybenclamide
+    type: ACTIVE_COMPARATOR
+    description: glybenclamide up to 20mg per day.
+  verdict: null
+  note: ''
+- blind_id: 12
+  sample_index: 106
+  nct_id: NCT02396732
+  registry_url: https://clinicaltrials.gov/study/NCT02396732
+  claim: This intervention object is aspirin
+  intervention:
+    type: DRUG
+    name: Aspirin
+    otherNames: null
+    description: Daily dose is 81 mg oral tablet
+    armGroupLabels:
+    - Low Molecular Weight Heparin (LMWH) + Aspirin (ASA)
+  study_title: Aspirin and Enoxaparin for VTE in Trauma
+  arm_groups:
+  - label: Low Molecular Weight Heparin (LMWH) + Aspirin (ASA)
+    type: EXPERIMENTAL
+    description: Group will get both enoxaparin (standard of care) and aspirin (intervention) after consent up to
+      Intensive Care Unit (ICU) discharge.
+  - label: Low Molecular Weight Heparin (LMWH) Alone
+    type: ACTIVE_COMPARATOR
+    description: Group will get only enoxaparin (standard of care) after consent up to Intensive Care Unit (ICU)
+      discharge.
+  verdict: null
+  note: ''
+- blind_id: 13
+  sample_index: 108
+  nct_id: NCT03325322
+  registry_url: https://clinicaltrials.gov/study/NCT03325322
+  claim: This intervention object is fisetin
+  intervention:
+    type: DIETARY_SUPPLEMENT
+    name: Fisetin
+    otherNames: null
+    description: Flavonoid family
+    armGroupLabels:
+    - Treatment
+  study_title: Inflammation and Stem Cells in Diabetic and Chronic Kidney Disease
+  arm_groups:
+  - label: Treatment
+    type: EXPERIMENTAL
+    description: Fisetin 20 mg/kg/day, orally for 2 consecutive days
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: Placebo capsules orally for 2 consecutive days
+  verdict: null
+  note: ''
+- blind_id: 14
+  sample_index: 109
+  nct_id: NCT04295850
+  registry_url: https://clinicaltrials.gov/study/NCT04295850
+  claim: This intervention object is aspirin
+  intervention:
+    type: DRUG
+    name: Aspirin 81 mg
+    otherNames: null
+    description: Aspirin 81mg daily PO
+    armGroupLabels:
+    - Low Dose Aspirin
+  study_title: Antenatal Platelet Response On Aspirin and Correlation With HDP (Hypertensive Disorders of Pregnancy)
+  arm_groups:
+  - label: Low Dose Aspirin
+    type: null
+    description: 'Pregnant singletons at high risk for preeclampsia based on:
+
+
+      * at least one high risk factor for preeclampsia: prior preeclampsia, chronic hypertension, pregestational
+      diabetes, lupus, antiphospholipid antibody syndrome, or chronic kidney disease. OR
+
+      * at least two of the following: BMI\>30, black race, state insurance, IVF pregnancy, advanced maternal age,
+      nulliparous or \>10yr from last delivery, prior adverse pregnancy outcome
+
+
+      who are planning to, but have not yet started, aspirin therapy \<16 weeks'' gestation. Patients will take
+      81mg aspirin as prescribed.'
+  verdict: null
+  note: ''
+- blind_id: 15
+  sample_index: 115
+  nct_id: NCT05123781
+  registry_url: https://clinicaltrials.gov/study/NCT05123781
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Glucophage® XR 1000 mg Prolonged Release Tablets (Merck Serono Ltd, UK)
+    otherNames:
+    - Glucophage® XR 1000 mg
+    description: One tablet of the Reference product was administered orally with 240 ml of water
+    armGroupLabels:
+    - Treatment B
+  study_title: Fasting Bioequivalence Study of 2 Metformin 1000 mg Prolonged Release Tablets in 28 Healthy Male
+    and Female Volunteers
+  arm_groups:
+  - label: Treatment A
+    type: EXPERIMENTAL
+    description: Test Product Metformin 1000 mg Prolonged Release Tablets (JSC Farmak, Ukraine)
+  - label: Treatment B
+    type: ACTIVE_COMPARATOR
+    description: Reference Product Glucophage® XR 1000 mg Prolonged Release Tablets (Merck Serono Ltd, UK)
+  verdict: null
+  note: ''
+- blind_id: 16
+  sample_index: 121
+  nct_id: NCT04170959
+  registry_url: https://clinicaltrials.gov/study/NCT04170959
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames: null
+    description: Metformin 500 mg given 14 days before start until the end of radiation therapy. Once daily during
+      the first 7 days, afterwards twice daily until the end of treatment.
+    armGroupLabels:
+    - 'C: Interventional arm'
+  study_title: The Addition of Metformin to Definitive Radiotherapy in Patients With Stage III NSCLC
+  arm_groups:
+  - label: 'A: Observational arm'
+    type: NO_INTERVENTION
+    description: Radiotherapy as per standard of care without metformin, no additional biomarkers/imaging will be
+      performed
+  - label: 'B: Control arm'
+    type: OTHER
+    description: Radiotherapy as per standard of care without metformin, with additional biomarkers/imaging
+  - label: 'C: Interventional arm'
+    type: ACTIVE_COMPARATOR
+    description: Radiotherapy as per standard of care with metformin, with additional biomarkers/imaging
+  verdict: null
+  note: ''
+- blind_id: 17
+  sample_index: 123
+  nct_id: NCT07527195
+  registry_url: https://clinicaltrials.gov/study/NCT07527195
+  claim: This intervention object is semaglutide
+  intervention:
+    type: DRUG
+    name: Semaglutide
+    otherNames: null
+    description: Participants will receive semaglutide subcutaneously.
+    armGroupLabels:
+    - CagriSema
+    - Semaglutide
+  study_title: Understanding the Effect of CagriSema, Cagrilintide, and Semaglutide on Muscle Health (Role of Amylin
+    Signature in Muscle Health)
+  arm_groups:
+  - label: CagriSema
+    type: EXPERIMENTAL
+    description: Participants will receive once weekly subcutaneous (s.c.) dose of CagriSema (cagrilintide and semaglutide)
+      for up to 52 weeks.
+  - label: Semaglutide
+    type: EXPERIMENTAL
+    description: Participants will receive once weekly s.c. dose of semaglutide for up to 52 weeks.
+  - label: Cagrilintide
+    type: EXPERIMENTAL
+    description: Participants will receive once weekly s.c. dose of cagrilintide for up to 52 weeks.
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: Participants will receive once weekly s.c. dose of placebo matched to cagrilintide/semaglutide
+      for up to 52 weeks.
+  verdict: null
+  note: ''
+- blind_id: 18
+  sample_index: 124
+  nct_id: NCT06108297
+  registry_url: https://clinicaltrials.gov/study/NCT06108297
+  claim: This intervention object is lithium
+  intervention:
+    type: DIETARY_SUPPLEMENT
+    name: Lithium
+    otherNames: null
+    description: Elemental lithium as lithium aspartate.
+    armGroupLabels:
+    - Lithium
+  study_title: Lithium Long COVID Dose-finding Study
+  arm_groups:
+  - label: Lithium
+    type: EXPERIMENTAL
+    description: Lithium capsules titrated to 30-45mg/day based on individual patient subjective benefits and tolerability.
+  verdict: null
+  note: ''
+- blind_id: 19
+  sample_index: 128
+  nct_id: NCT07909889
+  registry_url: https://clinicaltrials.gov/study/NCT07909889
+  claim: This intervention object is semaglutide
+  intervention:
+    type: DRUG
+    name: Semaglutide (Wegovy®)
+    otherNames:
+    - Wegovy
+    description: Semaglutide is self-administered by subcutaneous injection once weekly for 26 weeks. Doses are
+      0.25 mg during treatment weeks 1-4, 0.5 mg during weeks 5-8, 1.0 mg during weeks 9-12, 1.7 mg during weeks
+      13-16, and a target maintenance dose of 2.4 mg during weeks 17-26. Dose escalation may be delayed or the dose
+      temporarily reduced for significant gastrointestinal symptoms. Treatment starts at randomization in the immediate-start
+      arm and at trial week 26 in the delayed-start arm.
+    armGroupLabels:
+    - Delayed-start semaglutide
+    - Immediate-start semaglutide
+  study_title: Semaglutide for Weight Management During Hormone Therapy for Early Breast Cancer
+  arm_groups:
+  - label: Immediate-start semaglutide
+    type: EXPERIMENTAL
+    description: Participants receive semaglutide once weekly for 26 weeks starting at randomization, followed by
+      26 weeks of post-treatment observation. Usual adjuvant endocrine therapy, routine oncology follow-up and standardized
+      written guidance on diet and physical activity continue throughout participation.
+  - label: Delayed-start semaglutide
+    type: EXPERIMENTAL
+    description: Participants receive standard care alone for the first 26 weeks after randomization, then semaglutide
+      once weekly for 26 weeks, followed by 26 weeks of post-treatment observation. Standard care comprises usual
+      adjuvant endocrine therapy, routine oncology follow-up and standardized written guidance on diet and physical
+      activity. Total follow-up is 78 weeks from randomization.
+  verdict: null
+  note: ''
+- blind_id: 20
+  sample_index: 131
+  nct_id: NCT01368081
+  registry_url: https://clinicaltrials.gov/study/NCT01368081
+  claim: This intervention object is empagliflozin
+  intervention:
+    type: DRUG
+    name: BI 10773
+    otherNames: null
+    description: BI 10773 high dose tablet once daily
+    armGroupLabels:
+    - BI 10773 high dose
+  study_title: Empagliflozin (BI 10773) Comprehensive add-on Study in Japanese Subjects With Type 2 Diabetes Mellitus
+  arm_groups:
+  - label: BI 10773 low dose
+    type: EXPERIMENTAL
+    description: BI 10773 low dose tablet once daily
+  - label: BI 10773 high dose
+    type: EXPERIMENTAL
+    description: BI 10773 high dose tablet once daily
+  - label: Metformin
+    type: ACTIVE_COMPARATOR
+    description: Metformin tablets 500-2250 mg a day (twice or three times per day)
+  verdict: null
+  note: ''
+- blind_id: 21
+  sample_index: 140
+  nct_id: NCT03662412
+  registry_url: https://clinicaltrials.gov/study/NCT03662412
+  claim: This intervention object is rapamycin
+  intervention:
+    type: DRUG
+    name: Sirolimus
+    otherNames:
+    - Rapamycin
+    description: Oral solution of sirolimus, 2mg, once a day.
+    armGroupLabels:
+    - Sirolimus treatment
+  study_title: Study of Sirolimus in Patients With Advanced Pancreatic Cancer
+  arm_groups:
+  - label: Sirolimus treatment
+    type: EXPERIMENTAL
+    description: Oral solution of sirolimus, 2mg, once a day. The trial will be terminated when a serious adverse
+      reaction occurred, or the tumor progressed rapidly twice in a row, or when the patient did not want to continue.
+  verdict: null
+  note: ''
+- blind_id: 22
+  sample_index: 143
+  nct_id: NCT03068065
+  registry_url: https://clinicaltrials.gov/study/NCT03068065
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames:
+    - Glucophage,Bristol-Myers Squibb
+    description: the dosage of metformin was 250 mg thrice a day during the first week, 500 mg thrice a day during
+      the second week, and 1000 mg twice a day from the third week to the conclusion of the study
+    armGroupLabels:
+    - Metformin
+  study_title: Antidiabetic Effects on Intrahepatic Fat
+  arm_groups:
+  - label: Liraglutide
+    type: ACTIVE_COMPARATOR
+    description: the dosage of liraglutide was 0.6 mg/day during the first week, 1.2 mg/day during the second week,
+      and 1.8 mg/day from the third week to the conclusion of the study
+  - label: Metformin
+    type: ACTIVE_COMPARATOR
+    description: the dosage of merformin was 250 mg thrice a day during the first week, 500 mg thrice a day during
+      the second week, and 1000 mg twice a day from the third week to the conclusion of the study
+  - label: Gliclazide
+    type: ACTIVE_COMPARATOR
+    description: the initial dosage of gliclazide was 30 mg before breakfast, which was gradually titrated to a
+      maximum of 120 mg/day to achieve a fasting capillary plasma glucose of \<7.0 mmol/L
+  verdict: null
+  note: ''
+- blind_id: 23
+  sample_index: 145
+  nct_id: NCT00996229
+  registry_url: https://clinicaltrials.gov/study/NCT00996229
+  claim: This intervention object is resveratrol
+  intervention:
+    type: DIETARY_SUPPLEMENT
+    name: Resveratrol
+    otherNames: null
+    description: daily resveratrol for 6 months
+    armGroupLabels:
+    - Resveratrol supplementation
+  study_title: Effects of Dietary Interventions on the Aging Brain
+  arm_groups:
+  - label: Caloric restriction + placebo supplementation
+    type: EXPERIMENTAL
+    description: null
+  - label: Omega-3 supplementation
+    type: EXPERIMENTAL
+    description: null
+  - label: Placebo supplementation
+    type: PLACEBO_COMPARATOR
+    description: null
+  - label: Resveratrol supplementation
+    type: EXPERIMENTAL
+    description: null
+  verdict: null
+  note: ''
+- blind_id: 24
+  sample_index: 148
+  nct_id: NCT01477853
+  registry_url: https://clinicaltrials.gov/study/NCT01477853
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin (open-label)
+    otherNames:
+    - Glucophage
+    description: Participant will remain on prestudy dose of metformin tablets (at least 1500 mg daily) throughout
+      entire study.
+    armGroupLabels:
+    - Atorvastatin/Atorvastatin + Glimepiride
+    - Sitagliptin + Atorvastatin/Sitagliptin + Atorvastatin
+    - Sitagliptin/Sitagliptin + Atorvastatin
+  study_title: A Study of the Co-administration of Sitagliptin and Atorvastatin in Inadequately Controlled Type
+    2 Diabetes Mellitus (MK-0431E-211)
+  arm_groups:
+  - label: Sitagliptin/Sitagliptin + Atorvastatin
+    type: EXPERIMENTAL
+    description: In Phase A, participants received sitagliptin 100 mg plus matching placebo to atorvastatin daily
+      for 16 weeks. Participants continuing to Phase B received sitagliptin 100 mg plus atorvastatin 80 mg plus
+      matching placebo to glimepiride daily for an additional 38 weeks.
+  - label: Atorvastatin/Atorvastatin + Glimepiride
+    type: ACTIVE_COMPARATOR
+    description: In Phase A, participants received atorvastatin 80 mg plus matching placebo to sitagliptin daily
+      for 16 weeks. Participants continuing to Phase B received atorvastatin 80 mg plus matching placebo to sitagliptin
+      plus glimepiride daily for an additional 38 weeks.
+  - label: Sitagliptin + Atorvastatin/Sitagliptin + Atorvastatin
+    type: EXPERIMENTAL
+    description: In Phase A, participants sitagliptin 100 mg plus atorvastatin 80 mg daily for 16 weeks. Participants
+      continuing to Phase B received sitagliptin 100 mg plus atorvastatin 80 mg plus matching placebo to glimepiride
+      daily for an additional 38 weeks.
+  verdict: null
+  note: ''
+- blind_id: 25
+  sample_index: 153
+  nct_id: NCT06068439
+  registry_url: https://clinicaltrials.gov/study/NCT06068439
+  claim: This intervention object is aspirin
+  intervention:
+    type: DRUG
+    name: Acetylsalicylic Acid
+    otherNames: null
+    description: aspirin 50 mg/d to be taken after dinner (in nonfasting conditions)
+    armGroupLabels:
+    - Treated group
+  study_title: Study of the Protective Effect of Low-dose Aspirin on Renal Function in Patients With Early Diabetic
+    Nephropathy
+  arm_groups:
+  - label: Treated group
+    type: EXPERIMENTAL
+    description: null
+  - label: Comparator group
+    type: PLACEBO_COMPARATOR
+    description: null
+  verdict: null
+  note: ''
+- blind_id: 26
+  sample_index: 159
+  nct_id: NCT04287387
+  registry_url: https://clinicaltrials.gov/study/NCT04287387
+  claim: This intervention object is acarbose
+  intervention:
+    type: DRUG
+    name: Acarbose Tablets
+    otherNames: null
+    description: 50mg three times daily
+    armGroupLabels:
+    - Acarbose group
+  study_title: Response of Gut Microbiota in Type 2 Diabetes to Hypoglycemic Agents
+  arm_groups:
+  - label: Glucophage group
+    type: EXPERIMENTAL
+    description: null
+  - label: Acarbose group
+    type: EXPERIMENTAL
+    description: null
+  - label: Sitagliptin group
+    type: EXPERIMENTAL
+    description: null
+  - label: Dapagliflozin group
+    type: EXPERIMENTAL
+    description: null
+  - label: Pioglitazone group
+    type: EXPERIMENTAL
+    description: null
+  - label: Glimepiride group
+    type: EXPERIMENTAL
+    description: null
+  verdict: null
+  note: ''
+- blind_id: 27
+  sample_index: 167
+  nct_id: NCT01969747
+  registry_url: https://clinicaltrials.gov/study/NCT01969747
+  claim: This intervention object is empagliflozin
+  intervention:
+    type: DRUG
+    name: Empagliflozin low
+    otherNames: null
+    description: Empagliflozin low
+    armGroupLabels:
+    - Empagliflozin low
+  study_title: Empagliflozin add-on to Insulin in Type 1 Diabetes Mellitus Over 28 Days
+  arm_groups:
+  - label: Empagliflozin low
+    type: EXPERIMENTAL
+    description: Empagliflozin low once daily
+  - label: Empagliflozin medium
+    type: EXPERIMENTAL
+    description: Empagliflozin medium once daily
+  - label: Empagliflozin high
+    type: EXPERIMENTAL
+    description: Empagliflozin high once daily
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: Placebo once daily
+  verdict: null
+  note: ''
+- blind_id: 28
+  sample_index: 169
+  nct_id: NCT02683291
+  registry_url: https://clinicaltrials.gov/study/NCT02683291
+  claim: This intervention object is rapamycin
+  intervention:
+    type: DRUG
+    name: sirolimus
+    otherNames:
+    - Rapamycin
+    - Rapamune
+    description: null
+    armGroupLabels:
+    - Tacrolimus + Sirolimus
+  study_title: Sirolimus Associated With Tacrolimus at Low Doses in Elderly Kidney Transplant Patients
+  arm_groups:
+  - label: Tacrolimus + Mycophenolate
+    type: ACTIVE_COMPARATOR
+    description: 'The investigators wil be used tacrolimus (starting with 0.1 mg/kg twice daily adjusted to target
+      serum levels by 4-8ng/ml at the third month and then 3-7ng/ml from the third month to the 12th month) and
+      mycophenolate sodium 720 mg twice daily. A dose reduction of mycophenolate sodium to 720 mg/day will be accepted
+      due to possible side effects of the drug.
+
+
+      Prednisone 30 mg/day in the first month. Induction therapy consisted of basiliximab or thymoglobulin if panel
+      reactivity class I greater than 50 %'
+  - label: Tacrolimus + Sirolimus
+    type: EXPERIMENTAL
+    description: 'The investigators will be used tacrolimus (starting with 0.1 mg/kg twice daily adjusted to target
+      serum levels by 4-8 ng/ml at the third month and then 3-7 ng/ml from the third month to the 12th month) and
+      sirolimus 2 mg/day (adjusted serum levels at 4-8 ng/ml throughout the study period).
+
+
+      Prednisone 30 mg/day in the first month. Induction therapy consisted of basiliximab or thymoglobulin if panel
+      reactivity class I greater than 50 %'
+  verdict: null
+  note: ''
+- blind_id: 29
+  sample_index: 178
+  nct_id: NCT01096082
+  registry_url: https://clinicaltrials.gov/study/NCT01096082
+  claim: This intervention object is lithium
+  intervention:
+    type: DRUG
+    name: Lithium Carbonate
+    otherNames: null
+    description: 300 mg tablets, starting dose 300 mg/day
+    armGroupLabels:
+    - Lithium Carbonate
+  study_title: Safety and Efficacy of Lithium Carbonate in Patients With Spinocerebellar Ataxia Type 3
+  arm_groups:
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: null
+  - label: Lithium Carbonate
+    type: EXPERIMENTAL
+    description: null
+  verdict: null
+  note: ''
+- blind_id: 30
+  sample_index: 181
+  nct_id: NCT01565096
+  registry_url: https://clinicaltrials.gov/study/NCT01565096
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames: null
+    description: Metformin 1000 mg BID
+    armGroupLabels:
+    - Glimepirid plus Metformin
+  study_title: Effect of Adding Vildagliptin on Beta Cell Function and Cardiovascular Risk Markers in Patients With
+    Moderate Metabolic Control During Metformin Monotherapy
+  arm_groups:
+  - label: Vildagliptin plus Metformin
+    type: EXPERIMENTAL
+    description: Metformin (1000 mg BID) + Vildagliptin 50 mg twice daily
+  - label: Glimepirid plus Metformin
+    type: ACTIVE_COMPARATOR
+    description: Metformin (1000 mg BID) + Glimepiride (individual dosage)
+  verdict: null
+  note: ''

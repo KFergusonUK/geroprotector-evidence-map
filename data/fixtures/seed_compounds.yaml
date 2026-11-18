@@ -39,7 +39,7 @@
 #   decisions        Decisions made by a named person, with date. Distinct from the
 #                    entry-level review sign-off.
 
-fixture_version: 0.5.0
+fixture_version: 0.6.0
 pubchem_checked_at: "2026-11-11"
 drugage_version: "Build 5 (2024-11-29); archive sha256 d12f59717de60a207748f53bdbcdb484ed07e30d8608eb8e4a101e2a08d7fa80"
 
@@ -243,6 +243,7 @@ compounds:
                  Glucophage XR, "metformin extended release", "Metformin 500 mg", Fortamet, Glumetza, Riomet]
     must_not_match: [phenformin, buformin, Phenformin, Buformin, metoprolol, metronidazole]
     needs_review: [Janumet, Jentadueto, Synjardy, Invokamet, Xigduo, Kombiglyze, "sitagliptin/metformin",
+                   "saxagliptin/metformin",
                    "metformin + rapamycin", "TAME"]
     notes: >
       Expect metformin as background therapy in thousands of diabetes trials; arm role
@@ -607,7 +608,8 @@ compounds:
     must_match: [resveratrol, Resveratrol, trans-resveratrol, SRT501, "resveratrol 500 mg", Resvida]
     must_not_match: [pterostilbene, Oxyresveratrol, oxyresveratrol, piceid, polydatin, SRT2104, SRT1720,
                      piceatannol]
-    needs_review: [cis-resveratrol, "grape seed extract", "red wine extract", "Longevinex", "Japanese knotweed extract"]
+    needs_review: [cis-resveratrol, "grape seed extract", "red wine extract", "Longevinex", "Japanese knotweed extract",
+                   "Polygonum cuspidatum", "resveratrol/leucine", "resveratrol /HMB"]
     notes: >
       CID 445154 is trans. cis-resveratrol (CID 1548910) shares the first block: review,
       not auto-match. SRT501 is a resveratrol formulation; SRT2104/SRT1720 are different

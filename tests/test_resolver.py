@@ -164,8 +164,72 @@ class RunOverStaging(unittest.TestCase):
                                ("NCT3", "metformin"): "background_candidate"})   # NCT4: search hit only, no row
         r = dict(conn.execute("SELECT * FROM resolver_match WHERE nct_id = 'NCT1'").fetchone())
         self.assertEqual((r["role"], r["systemic_exposure"], r["resolver_version"]),
-                         ("experimental", "systemic", "resolver-v1"))
+                         ("experimental", "systemic", resolver.load_rules()["version"]))
 
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Step4ErrorClasses(unittest.TestCase):
+    """resolver-v2: the four identity errors from the step-4 sample, verbatim, never auto-accepted."""
+
+    def test_the_four_registered_objects(self):
+        cases = [
+            ("metformin", {"type": "DRUG", "name": "Saxagliptin/Metformin, Fasting", "otherNames": ["Onglyza", "Glucophage"],
+                           "description": "Participants received a single oral dose of a fixed dose combination (FDC) "
+                                          "tablet of 2.5 mg saxagliptin/500 mg metformin IR under fasting conditions"}),
+            ("resveratrol", {"type": "DIETARY_SUPPLEMENT", "name": "Resveratrol",
+                             "description": "Daily capsule of 200 mg Polygonum cuspidatum (Solgar®, Dietimport, Lisboa, "
+                                            "Portugal) yielding 100 mg/day resveratrol"}),
+            ("resveratrol", {"type": "DIETARY_SUPPLEMENT", "name": "Resveratrol",
+                             "description": "A blend of low dose resveratrol and either leucine or HMB will be useful "
+                                            "nutraceutical strategies"}),
+            ("metformin", {"type": "DRUG", "name": "Metformin", "otherNames": ["gliclazide modified release tablets", "acarbose"],
+                           "description": "start with metformin，from 500mg bid,if metformin reach the biggest dosage，"
+                                          "added gliclazide modified release tablets，afterthat，add acarbose"}),
+        ]
+        for key, iv in cases:
+            r = {x["compound_key"]: x for x in R.resolve_intervention(iv, [])}[key]
+            self.assertEqual(r["decision"], "review", iv["name"])
+
+
+class DescriptionAsymmetry(unittest.TestCase):
+    """SPEC §5.1a: the description may only move a match to review or reject, never to accept."""
+
+    def test_description_alone_never_accepts_any_fixture_synonym(self):
+        for c in FX["compounds"]:
+            for s in c["must_match"]:
+                for r in R.resolve_intervention({"type": "DRUG", "name": "Study treatment", "description": s}, []):
+                    self.assertNotEqual(r["decision"], "auto_accept", (c["key"], s))
+
+    def test_description_cannot_upgrade_a_review(self):
+        r = decide("Metformin + Sitagliptin", description="Metformin")["metformin"]
+        self.assertEqual(r["decision"], "review")
+
+    def test_description_cannot_rescue_a_rejection(self):
+        r = decide("Everolimus", description="sirolimus")
+        self.assertNotEqual(r.get("rapamycin", {}).get("decision"), "auto_accept")
+
+    def test_disqualifier_downgrades(self):
+        for desc, why in (("standardised grape extract", "description_extract"),
+                          ("fixed-dose combination tablet", "description_fixed_combination"),
+                          ("a blend with leucine", "description_blend"),
+                          ("then add sitagliptin if needed", "description_regimen")):
+            r = decide("Resveratrol", description=desc)["resveratrol"]
+            self.assertEqual(r["decision"], "review", desc)
+            self.assertIn(why, r["reasons"])
+
+    def test_plain_descriptions_do_not_downgrade(self):
+        for desc in ("500 mg twice daily", "Metformin added to standard care", "oral tablets, once daily for 12 weeks"):
+            self.assertEqual(decide("Metformin", description=desc)["metformin"]["decision"], "auto_accept", desc)
+
+    def test_other_names_brands_ok_other_drugs_review(self):
+        self.assertEqual(decide("Metformin", ["Dabex", "Glucophage"])["metformin"]["decision"], "auto_accept")
+        r = decide("Metformin", ["sitagliptin"])["metformin"]
+        self.assertEqual(r["decision"], "review")
+        self.assertIn("other_names_list_other_drugs", r["reasons"])
+
+    def test_agree_rule_never_on_combination_names(self):
+        self.assertEqual(decide("Saxagliptin/Metformin", ["Glucophage"])["metformin"]["decision"], "review")
+        self.assertEqual(decide("NMN supplement", ["nicotinamide mononucleotide"])["nmn"]["decision"], "auto_accept")

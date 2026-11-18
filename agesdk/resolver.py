@@ -77,6 +77,9 @@ class Resolver:
         self._unclear = [re.compile(p) for p in r["unclear_route_patterns"]]
         self._systemic = [re.compile(p) for p in r["systemic_route_patterns"]]
         self.short = r["short_code_max_len"]
+        self._desc_disq = {k: re.compile(v) for k, v in r.get("description_disqualifiers", {}).items()}
+        self._other_stems = re.compile("|".join(r.get("other_drug_stems", [])) or r"(?!)")
+        self._combo_name = re.compile(r.get("combination_name_pattern") or r"(?!)")
         self.fuzzy_min = r["fuzzy_min_len"]
         self.compounds = {}
         for c in fx["compounds"]:
@@ -239,11 +242,14 @@ class Resolver:
                     other_hits[m.compound] = m
         by_field["other_names"] = other_hits
         by_field["description"] = {m.compound: m for m in self.match(iv.get("description"))}
+        n_desc = self.normalise(iv.get("description"))
+        combo_name = bool(self._combo_name.search(n_name))
         rows = []
         for key in set().union(*[set(v) for v in by_field.values()]):
             m_name, m_other, m_desc = (by_field[f].get(key) for f in ("name", "other_names", "description"))
             if (m_name and m_name.method in ("short_code", "contains", "fuzzy") and m_other
-                    and m_other.method in ("exact", "normalised") and len(other_compounds) == 1):
+                    and m_other.method in ("exact", "normalised") and len(other_compounds) == 1
+                    and not combo_name):
                 fld, m, strength = "other_names", m_other, "primary"
                 m = Match(m.compound, m.method, m.term, m.reasons + ["name_and_other_names_agree"])
                 generic_ok = True
@@ -277,6 +283,13 @@ class Resolver:
                 decision = "auto_accept"
                 if fld == "other_names":
                     reasons.append("other_names_behind_generic_name")
+            if decision == "auto_accept":
+                # Disqualifiers only: each can move auto_accept to review, never the reverse.
+                why = self._disqualify(key, iv, n_desc)
+                if why:
+                    decision, reasons = "review", reasons + why
+            # The asymmetry, enforced: acceptance only ever rests on name / otherNames.
+            assert not (decision == "auto_accept" and strength != "primary"), "description cannot accept"
             role, role_basis = self.role(iv, arms)
             mine = set(iv.get("armGroupLabels") or [])
             context = " ".join([title] + [(a.get("label") or "") + " " + (a.get("description") or "")
@@ -289,6 +302,21 @@ class Resolver:
                          "reasons": reasons, "role": role, "role_basis": role_basis,
                          "systemic_exposure": route, "route_basis": route_basis})
         return rows
+
+    def _disqualify(self, key: str, iv: dict, n_desc: str) -> list[str]:
+        """Reasons an otherwise clean match must go to review (resolver-v2). Downgrade only."""
+        why = [f"description_{k}" for k, rx in self._desc_disq.items() if rx.search(n_desc)]
+        d = self.compounds[key]
+        if n_desc and self._spans(n_desc, d["review"] | d["neg"]):
+            why.append("description_fixture_list")
+        for o in iv.get("otherNames") or []:
+            mine = {m.compound for m in self.match(o) if m.method != "negative"}
+            if key in mine:
+                continue                       # names the matched compound itself (a brand, a code)
+            if mine or self._other_stems.search(self.normalise(o)):
+                why.append("other_names_list_other_drugs")
+                break
+        return why
 
     def resolve_study_text(self, arms: list[dict], texts: list[str], exclude: set[str]) -> list[dict]:
         """Study-level weak evidence for compounds no intervention object names."""

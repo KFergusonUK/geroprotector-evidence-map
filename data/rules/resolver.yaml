@@ -1,6 +1,6 @@
 # Intervention-string resolver rules (SPEC §5.1a, §5.6, §5.9). Versioned: bump on any change;
 # every resolver_match row records the version that produced it.
-version: resolver-v1
+version: resolver-v2
 created: "2026-11-18"
 
 # Stripped before comparing a registry string with a fixture synonym, so "Metformin
@@ -62,3 +62,24 @@ local_intervention_types: [DEVICE, PROCEDURE, RADIATION]
 short_code_max_len: 4
 # Single-token typo tolerance: edit distance 1 for tokens at least this long -> review only.
 fuzzy_min_len: 6
+
+# ---- resolver-v2 (step-4 error classes, docs/step4_precision_result.md) ----------------
+#
+# ASYMMETRY (SPEC §5.1a): the intervention description may only DISQUALIFY. A match found
+# in the name or otherNames that would auto-accept is moved to review if the description
+# shows one of these; the description can never move anything towards acceptance.
+description_disqualifiers:
+  extract: '\bextracts?\b|\bstandardi[sz]ed\b|\bpolygonum\b|\bknotweed\b'
+  blend: '\bblend(s|ed)?\b|\bmixtures?\b'
+  fixed_combination: '\bfixed[- ]dose\b|\bfdc\b|\bfixed[- ]ratio\b|\bco-?formulat\w*|\bcombination (tablets?|pills?|capsules?|products?)\b|\bpolypill\b|\bsingle[- ]pill\b|\bin (one|a single) (tablet|pill|capsule)\b'
+  regimen: '\bstep[- ]?(up|wise)\b|\b(add|adds|added|adding)\b(?!\s+(on\s+)?to\b)'
+
+# A single-compound name whose otherNames list another drug is a regimen or a misused field:
+# review. "Another drug" = another fixture compound, or an entry carrying one of these INN
+# stems while not naming the matched compound itself.
+other_drug_stems: ['gliptin', 'gliflozin', 'glutide', 'gli(clazide|pizide|mepiride|benclamide|buride|quidone)',
+  'mab\b', 'tinib\b', 'statin\b', 'pril\b', 'sartan\b', 'olol\b', 'xaban\b', 'grel\b', 'parin\b',
+  'platin\b', 'taxel\b', 'insulin', 'warfarin', 'folfox', 'mycin\b', 'cillin\b', 'glitazone']
+
+# The name-and-otherNames-agree rule never applies to a name that joins drugs.
+combination_name_pattern: '/|\+|&|\band\b|\bwith\b|,'
