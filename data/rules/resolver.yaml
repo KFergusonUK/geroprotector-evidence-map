@@ -1,6 +1,6 @@
 # Intervention-string resolver rules (SPEC §5.1a, §5.6, §5.9). Versioned: bump on any change;
 # every resolver_match row records the version that produced it.
-version: resolver-v2
+version: resolver-v3
 created: "2026-11-18"
 
 # Stripped before comparing a registry string with a fixture synonym, so "Metformin
@@ -69,7 +69,8 @@ fuzzy_min_len: 6
 # in the name or otherNames that would auto-accept is moved to review if the description
 # shows one of these; the description can never move anything towards acceptance.
 description_disqualifiers:
-  extract: '\bextracts?\b|\bstandardi[sz]ed\b|\bpolygonum\b|\bknotweed\b'
+  # v3: 'extracted' / 'extraction' (step-4b error: spermidine 'extracted from ... wheat germ')
+  extract: '\bextract(s|ed|ion|ions)?\b|\bstandardi[sz]ed\b|\bpolygonum\b|\bknotweed\b|\bconcentrat(e|ed|ion)\b'
   blend: '\bblend(s|ed)?\b|\bmixtures?\b'
   fixed_combination: '\bfixed[- ]dose\b|\bfdc\b|\bfixed[- ]ratio\b|\bco-?formulat\w*|\bcombination (tablets?|pills?|capsules?|products?)\b|\bpolypill\b|\bsingle[- ]pill\b|\bin (one|a single) (tablet|pill|capsule)\b'
   regimen: '\bstep[- ]?(up|wise)\b|\b(add|adds|added|adding)\b(?!\s+(on\s+)?to\b)'

@@ -731,3 +731,16 @@ class TrialRole(unittest.TestCase):
 
     def test_background_overdue_trial_is_not_unreported_for_the_compound(self):
         self.assertEqual([r["nct_id"] for r in self.conn.execute("SELECT nct_id FROM v_unreported")], ["NCT1"])
+
+
+class CombinationCounts(unittest.TestCase):
+    def test_combinations_retained_but_not_in_primary_counts(self):
+        c = fresh()
+        met = add_compound(c, "metformin")
+        for nct, combo in (("NCT1", 0), ("NCT2", 1)):
+            c.execute("INSERT INTO trial (nct_id, results_state) VALUES (?, 'POSTED')", (nct,))
+            c.execute("INSERT INTO trial_intervention (nct_id, raw_name, compound_id, systemic_exposure, "
+                      "route_rule_version, role, is_combination) VALUES (?, 'x', ?, 'systemic', 'r1', 'experimental', ?)",
+                      (nct, met, combo))
+        r = dict(c.execute("SELECT * FROM v_compound_trials WHERE compound_id = ?", (met,)).fetchone())
+        self.assertEqual((r["n_systemic_trials"], r["n_combination_trials"]), (1, 1))

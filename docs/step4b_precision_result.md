@@ -30,13 +30,16 @@ otherNames carrying a *different* substance with no INN stem — "tresiba once d
 (insulin degludec), "Folic acid" — pass v2's other-drug rule. Identity was correct in both
 (the compound is administered), but the rule is narrower than its intent.
 
-## Follow-up (per protocol)
+## Follow-up: resolver-v3, applied after measurement
 
-The error becomes a fixture case and a test (resolver-v3: extract disqualifier covers
-"extracted"/"extraction"; "wheat germ" added to spermidine's review list). The change is
-downgrade-only: it can only move auto-accepts to review, never add one. It is still a
-change to the resolver; whether it needs its own measurement before scaling is Kevin
-Ferguson's call, recorded here rather than assumed.
+The error became a fixture case and a test: resolver-v3 widens the extract disqualifier to
+"extracted"/"extraction"/"concentrate", and adds "wheat germ" to spermidine's review list.
+The change is **downgrade-only** (it can only move auto-accepts to review; auto-accepts
+4,973 → 4,943), so under `docs/measurement_policy.md` §3 it does **not** trigger
+re-measurement (decided by Kevin Ferguson, 2026-11-18). **Under resolver-v3, 99.5% is a
+floor, not a point estimate.**
+
+**Scaling decision:** scale (§7 step 7) on this result once the blind check clears.
 
 Role (78.6% accuracy in step 4) is a separate measured problem with its own protocol, and
 is not addressed by this result.

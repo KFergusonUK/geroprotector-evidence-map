@@ -295,13 +295,35 @@ class Resolver:
             context = " ".join([title] + [(a.get("label") or "") + " " + (a.get("description") or "")
                                           for a in arms if a.get("label") in mine])
             route, route_basis = self.route(iv, key, context)
+            evidence_text = {"name": name, "other_names": next(
+                (o for o in iv.get("otherNames") or [] if any(x.compound == key for x in self.match(o))), ""),
+                "description": ""}[fld]
+            is_combination = self.is_combination(key, evidence_text, n_desc)
             rows.append({"compound_key": key, "evidence_field": fld, "evidence_strength": strength,
+                         "is_combination": is_combination,
                          "matched_text": {"name": name, "other_names": " | ".join(iv.get("otherNames") or []),
                                           "description": (iv.get("description") or "")[:500]}[fld],
                          "matched_term": m.term, "method": m.method, "decision": decision,
                          "reasons": reasons, "role": role, "role_basis": role_basis,
                          "systemic_exposure": route, "route_basis": route_basis})
         return rows
+
+    def is_combination(self, key: str, text: str, n_desc: str) -> bool:
+        """The compound given as part of a combination: a name joining it with another drug
+        ("Metformin + Sitagliptin", "Saxagliptin/Metformin"), or a description stating a
+        fixed-dose combination. Bracketed detail ("(NIAGEN TM, ChromaDex, CA, USA)") is not a
+        second drug, so separators inside brackets do not count."""
+        if "fixed_combination" in self._desc_disq and self._desc_disq["fixed_combination"].search(n_desc or ""):
+            return True
+        n = self.normalise(re.sub(r"\([^)]*\)|\[[^\]]*\]", " ", text or ""))
+        n = " ".join(self._dose.sub(" ", n).split())          # "100 mg/d" is a dose, not a separator
+        if not n or not self._combo_name.search(n):
+            return False
+        residue = n
+        for a, b, _ in sorted(self._spans(n, self.compounds[key]["syn"]), reverse=True):
+            residue = residue[:a] + " " + residue[b:]
+        residue = re.sub(r"[/+&,]|\band\b|\bwith\b|\bplacebo\b|\bmatching\b", " ", residue)
+        return bool(self.strip(" ".join(residue.split())))
 
     def _disqualify(self, key: str, iv: dict, n_desc: str) -> list[str]:
         """Reasons an otherwise clean match must go to review (resolver-v2). Downgrade only."""
@@ -381,10 +403,11 @@ def _insert(conn, nct, idx, row, version):
     conn.execute(
         """INSERT OR REPLACE INTO resolver_match (nct_id, idx, compound_key, evidence_field, evidence_strength,
              matched_text, matched_term, method, decision, reasons, role, role_basis, systemic_exposure,
-             route_basis, resolver_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+             route_basis, is_combination, resolver_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (nct, idx, row["compound_key"], row["evidence_field"], row["evidence_strength"], row["matched_text"],
          row["matched_term"], row["method"], row["decision"], json.dumps(row["reasons"]), row["role"],
-         row["role_basis"], row["systemic_exposure"], row["route_basis"], version))
+         row["role_basis"], row["systemic_exposure"], row["route_basis"], int(row.get("is_combination", False)),
+         version))
 
 
 # ---------------------------------------------------------------- fixture evaluation

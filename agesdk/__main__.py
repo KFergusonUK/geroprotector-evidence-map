@@ -14,6 +14,15 @@ def cmd_init_db(conn, args):
     n = reference.load_species(conn)
     r = reference.load_direction_reviews(conn)
     print(f"schema v{db.SCHEMA_VERSION} ready at {db.db_path()}; {n} species tiers, {r} direction reviews loaded")
+    # Staging is rebuildable and a schema upgrade drops it: rebuild it from the raw layer
+    # (no network) so the resolver never runs over silently empty staging.
+    from agesdk.sources import ctgov
+    has_raw = conn.execute("SELECT 1 FROM raw_response WHERE source = 'ctgov' LIMIT 1").fetchone()
+    staged = conn.execute("SELECT 1 FROM ctgov_study LIMIT 1").fetchone()
+    if has_raw and not staged:
+        fx, rules = fixture.load(), ctgov.load_rules()
+        ctgov.save_plan(conn, ctgov.seed_query_plan(fx, rules=rules), f"fixture-{fx.get('fixture_version')}+{rules['version']}")
+        print("staging rebuilt from raw:", ctgov.stage(conn))
 
 
 def cmd_fetch_drugage(conn, args):
@@ -137,6 +146,8 @@ def cmd_recall_check(conn, args):
 
 def cmd_resolve(conn, args):
     from agesdk import resolver
+    if not conn.execute("SELECT 1 FROM ctgov_study LIMIT 1").fetchone():
+        sys.exit("ctgov staging is empty: run `python -m agesdk init-db` (rebuilds from raw) first")
     ev = resolver.evaluate_fixture(fixture.load())
     print(f"fixture: must_match {ev['must_match']}; violations {len(ev['violations'])}")
     for v in ev["violations"]:

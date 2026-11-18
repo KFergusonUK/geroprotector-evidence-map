@@ -233,3 +233,30 @@ class DescriptionAsymmetry(unittest.TestCase):
     def test_agree_rule_never_on_combination_names(self):
         self.assertEqual(decide("Saxagliptin/Metformin", ["Glucophage"])["metformin"]["decision"], "review")
         self.assertEqual(decide("NMN supplement", ["nicotinamide mononucleotide"])["nmn"]["decision"], "auto_accept")
+
+
+class Step4bErrorClass(unittest.TestCase):
+    def test_extracted_wheat_germ_spermidine(self):
+        iv = {"type": "DRUG", "name": "Spermidine",
+              "description": "Spermidine (10 mg/day) administered as two oral capsules taken after breakfast. The "
+                             "spermidine is extracted from North American high-selenium wheat germ using a 100:1 "
+                             "concentration process. Each capsule contains 5 mg of spermidine"}
+        r = {x["compound_key"]: x for x in R.resolve_intervention(iv, [])}["spermidine"]
+        self.assertEqual(r["decision"], "review")
+        self.assertIn("description_extract", r["reasons"])
+
+
+class Combination(unittest.TestCase):
+    """SPEC §5.9: is_combination labels the compound given as part of a combination."""
+
+    def test_flags(self):
+        self.assertTrue(decide("Metformin + Sitagliptin")["metformin"]["is_combination"])
+        self.assertTrue(decide("Saxagliptin/Metformin, Fasting", ["Onglyza", "Glucophage"])["metformin"]["is_combination"])
+        self.assertTrue(decide("Resveratrol", description="fixed-dose combination tablet")["resveratrol"]["is_combination"])
+
+    def test_not_combinations(self):
+        self.assertFalse(decide("Metformin")["metformin"]["is_combination"])
+        self.assertFalse(decide("Nicotinamide riboside (NIAGEN TM, ChromaDex, CA, USA )")["nr"]["is_combination"])
+        self.assertFalse(decide("Canagliflozin (JNJ-28431754) 100 mg")["canagliflozin"]["is_combination"])
+        self.assertFalse(decide("Metformin and placebo")["metformin"]["is_combination"])
+        self.assertFalse(decide("aspirin 100 mg/d")["aspirin"]["is_combination"])     # dose unit, not a separator
