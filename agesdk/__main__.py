@@ -154,7 +154,14 @@ def cmd_resolve(conn, args):
         print("  -", v)
     if ev["violations"]:
         sys.exit(1)
-    print(json.dumps(resolver.run(conn, fixture.load())))
+    try:
+        out = resolver.run(conn, fixture.load(), downgrade_only=args.downgrade_only)
+    except resolver.NotDowngradeOnly as e:
+        print(json.dumps(e.report, indent=2))
+        sys.exit(f"NOT downgrade-only, rolled back: {e}")
+    print(json.dumps(out, indent=2))
+    if out["diff"] is None:
+        print("(no previous decisions: nothing to diff)")
 
 
 def cmd_resolve_report(conn, args):
@@ -185,7 +192,10 @@ def main(argv=None):
     sub.add_parser("ctgov-seed", help="fetch ClinicalTrials.gov hits + full records for the seed compounds")
     sub.add_parser("ctgov-report", help="hit volume and intervention-string quality for the seed fetch")
     sub.add_parser("recall-check", help="literature-sampled recall check of the ClinicalTrials.gov fetch")
-    sub.add_parser("resolve", help="run the intervention-string resolver over staging (after a fixture check)")
+    p = sub.add_parser("resolve", help="run the intervention-string resolver over staging (after a fixture check); "
+                                       "prints the diff against the previous decisions")
+    p.add_argument("--downgrade-only", action="store_true",
+                   help="roll back if the change adds any auto-accept (measurement_policy.md §3)")
     sub.add_parser("resolve-report", help="per-compound resolver outcomes and recall-sample check")
     p = sub.add_parser("state-backups", help="dated pipeline-state release names and pruning (reads gh JSON)")
     p.add_argument("action", choices=["tag", "latest", "prune"])

@@ -28,6 +28,17 @@ sample could no longer be regenerated after resolver-v2).
   downgrade-only fix would make the protocol unfalsifiable in practice — it would never end.
 - Whether a change is downgrade-only is shown by tests (e.g. the description-asymmetry
   property test), not asserted.
+- **Every resolver change is diffed against the previous decisions before it is
+  committed.** `python -m agesdk resolve` reports, row by row (intervention × compound),
+  every decision transition, rows added and gone, `is_combination` changes and the count
+  of **new auto-accepts**. A change claimed downgrade-only is run with
+  `--downgrade-only`, which **rolls the whole run back** if it would add a single
+  auto-accept. The diff, with its transitions, goes in the commit message. Every
+  transition class is read, not only the auto-accept count: the diff has caught two error
+  classes before commit (resolver-v4's first placebo rule rejected real administrations,
+  "X then placebo" and "X + placebo"; resolver-v5's showed an unexpected review → rejected
+  class, which on inspection was correct). Tests show the change does what was intended;
+  the diff shows what else it did.
 
 ## 4. Adjudicators
 

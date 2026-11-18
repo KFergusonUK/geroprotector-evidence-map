@@ -1,6 +1,6 @@
 # Intervention-string resolver rules (SPEC §5.1a, §5.6, §5.9). Versioned: bump on any change;
 # every resolver_match row records the version that produced it.
-version: resolver-v4
+version: resolver-v5
 created: "2026-11-18"
 
 # Stripped before comparing a registry string with a fixture synonym, so "Metformin
@@ -91,3 +91,10 @@ combination_name_pattern: '/|\+|&|\band\b|\bwith\b|\bplus\b|,'
 #  - "X placebo" names are placebos for X: rejected (resolver.py, placebo_for).
 #  - "plus" is a combination separator (combination_name_pattern above; is_combination).
 #  - "lithium disilicate" (dental ceramic) is a lithium must_not_match (fixture v0.8.0).
+
+# ---- resolver-v5 (2026-11-18, decided by Kevin Ferguson) --------------------------------
+#  - A name starting with "placebo" is a placebo FOR something only when nothing joins it
+#    to a drug: "Placebo", "placebo of/for/to X" -> rejected; "Placebo + Metformin",
+#    "Placebo plus X", "Placebo with X", "... on background of X" -> placebo_with (review).
+#    v1-v4 rejected all of them, silently losing real (mostly background) administrations
+#    that the harm path may need. rejected -> review only: cannot add an auto-accept.

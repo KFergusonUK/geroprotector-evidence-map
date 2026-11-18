@@ -223,7 +223,8 @@ class Resolver:
         placebo = bool(self._placebo.search(n_name))
         # A placebo FOR the compound ("X-matching placebo", "placebo of X", "dummy X") is not the
         # compound. "X and placebo" may be X given with another drug's placebo: review instead.
-        placebo_for = placebo and bool(re.search(r"\b(matching|match|dummy|sham|vehicle)\b|^placebo\b", n_name))
+        placebo_for = placebo and bool(re.search(r"\b(matching|match|dummy|sham|vehicle)\b", n_name)
+                                       or self.is_leading_placebo_for(n_name))
         class_level = self.is_class_level(n_name)
         generic = self.is_generic(n_name)
         by_field = {"name": {m.compound: m for m in self.match(name)}}
@@ -308,6 +309,19 @@ class Resolver:
                          "systemic_exposure": route, "route_basis": route_basis})
         return rows
 
+    def is_leading_placebo_for(self, n_name: str) -> bool:
+        """A name starting with "placebo". v1-v4 rejected all of them; resolver-v5 rejects
+        only a placebo FOR something: "Placebo", "Placebo tablets", "placebo of / for / to X".
+        "Placebo + Metformin", "Placebo plus metformin IR", "Placebo with mood stabilizer
+        (lithium or divalproex)" administer the compound alongside another drug's placebo:
+        placebo_with (review). Moves rejected -> review only; review can never auto-accept."""
+        stripped = self.strip(n_name)
+        if not re.match(r"placebos?\b", stripped):
+            return False
+        if re.match(r"placebos?\s+(of|for|to)\b", stripped):
+            return True
+        return not re.search(r"\+|\bplus\b|\bwith\b|\band\b|\bbackground\b", stripped)
+
     def is_x_placebo(self, key: str, n_name: str) -> bool:
         """resolver-v4: the name is "<this compound> placebo" and nothing else ("ASA placebo",
         "Empagliflozin high placebo", "Metformin DR Placebo"): a placebo FOR the compound.
@@ -389,8 +403,57 @@ def _study_texts(conn: sqlite3.Connection) -> dict[str, list[str]]:
     return out
 
 
-def run(conn: sqlite3.Connection, fx: dict, rules: dict | None = None) -> dict:
+def _snapshot(conn) -> dict:
+    return {(r[0], r[1], r[2]): {"decision": r[3], "is_combination": bool(r[4]), "version": r[5], "text": r[6]}
+            for r in conn.execute("SELECT nct_id, idx, compound_key, decision, is_combination, resolver_version, "
+                                  "matched_text FROM resolver_match")}
+
+
+def diff(old: dict, new: dict, examples: int = 8) -> dict:
+    """What a resolver change did, row by row (docs/measurement_policy.md §3: every resolver
+    change is checked against the previous decisions before it is committed). A row is
+    (nct_id, idx, compound_key). New auto-accepts are the rows that make a change NOT
+    downgrade-only: an auto-accept now that was not one before, including on a new row."""
+    both = old.keys() & new.keys()
+    trans = defaultdict(list)
+    for k in sorted(both):
+        a, b = old[k]["decision"], new[k]["decision"]
+        if a != b:
+            trans[f"{a}->{b}"].append(k)
+    added, gone = sorted(new.keys() - old.keys()), sorted(old.keys() - new.keys())
+    new_aa = [k for k in both if new[k]["decision"] == "auto_accept" and old[k]["decision"] != "auto_accept"]
+    new_aa += [k for k in added if new[k]["decision"] == "auto_accept"]
+    ex = lambda ks, src: [f"{k[0]} #{k[1]} {k[2]}: {src[k]['text'][:70]}" for k in ks[:examples]]
+    count = lambda rows, d: sum(r["decision"] == d for r in rows.values())
+    return {
+        "from_version": sorted({r["version"] for r in old.values()}),
+        "to_version": sorted({r["version"] for r in new.values()}),
+        "auto_accept": [count(old, "auto_accept"), count(new, "auto_accept")],
+        "review": [count(old, "review"), count(new, "review")],
+        "new_auto_accepts": len(new_aa), "new_auto_accept_examples": ex(sorted(new_aa), new),
+        "transitions": {t: {"rows": len(ks), "examples": ex(ks, new)} for t, ks in sorted(trans.items())},
+        "rows_added": {"rows": len(added), "by_decision": dict(Counter(new[k]["decision"] for k in added)),
+                       "examples": ex(added, new)},
+        "rows_gone": {"rows": len(gone), "by_decision": dict(Counter(old[k]["decision"] for k in gone)),
+                      "examples": ex(gone, old)},
+        "is_combination": {"0->1": sum(1 for k in both if new[k]["is_combination"] and not old[k]["is_combination"]),
+                           "1->0": sum(1 for k in both if old[k]["is_combination"] and not new[k]["is_combination"])},
+    }
+
+
+class NotDowngradeOnly(Exception):
+    """A run declared downgrade-only produced a new auto-accept; nothing was committed."""
+
+    def __init__(self, report: dict):
+        super().__init__(f"{report['new_auto_accepts']} new auto-accept(s): {report['new_auto_accept_examples']}")
+        self.report = report
+
+
+def run(conn: sqlite3.Connection, fx: dict, rules: dict | None = None, downgrade_only: bool = False) -> dict:
+    """Rebuild resolver_match and report the diff against the previous decisions. With
+    downgrade_only=True, any new auto-accept rolls the whole run back (NotDowngradeOnly)."""
     res = Resolver(fx, rules)
+    before = _snapshot(conn)
     conn.execute("DELETE FROM resolver_match")
     texts = _study_texts(conn)
     ivs = defaultdict(list)
@@ -409,8 +472,12 @@ def run(conn: sqlite3.Connection, fx: dict, rules: dict | None = None) -> dict:
         for row in res.resolve_study_text(arms, [title] + texts.get(nct, []), exclude=named):
             _insert(conn, nct, -1, row, res.version)
             n_rows += 1
+    report = diff(before, _snapshot(conn)) if before else None
+    if downgrade_only and report and report["new_auto_accepts"]:
+        conn.rollback()
+        raise NotDowngradeOnly(report)
     conn.commit()
-    return {"resolver_version": res.version, "rows": n_rows}
+    return {"resolver_version": res.version, "rows": n_rows, "diff": report}
 
 
 def _insert(conn, nct, idx, row, version):

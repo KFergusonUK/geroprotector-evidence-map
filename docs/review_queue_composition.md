@@ -65,16 +65,33 @@ v3/v4 diff caught both before commit, and both are now tests.
 
 ### Found while doing this, not fixed (needs a decision)
 
-- **The v1 rule `^placebo` over-rejects.** Any name starting with "placebo" is rejected for
-  every compound in it. That includes 70 rows such as "Placebo + Metformin", "Placebo plus
-  metformin IR" and "Placebo + (lithium or divalproex)". There the compound *is* given,
-  usually as background, and the placebo is for the drug under test. They should be
-  `review` (placebo_with), not `rejected`. Fixing this moves rejected → review, so it cannot
-  add an auto-accept and needs no re-measurement. It does put about 70 rows back in the
-  queue.
+- ~~**The v1 rule `^placebo` over-rejects.**~~ **Fixed in resolver-v5**, see below.
 - **The comma in `combination_name_pattern` never fires**, because normalisation removes
   commas first. The 30 comma names this affects are dose qualifiers ("Canagliflozin, 300
   mg"), correctly single compounds, so nothing is wrong today.
+
+## resolver-v5 (applied 2026-11-18, decided by Kevin Ferguson)
+
+A name starting with "placebo" is a placebo *for* something only when nothing joins it to
+a drug.
+- **Rejected:** "Placebo", "placebo of / for / to X".
+- **Review (`placebo_with`):** "Placebo + X", "Placebo plus X", "Placebo with X", and
+  "… on background of X".
+
+v1–v4 rejected all of them. That silently lost real, mostly background, administrations
+that the harm path may need. Run with `resolve --downgrade-only`, which passed with 0 new
+auto-accepts.
+
+| Transition | Rows | What |
+|---|---|---|
+| rejected → review | 27 | "Placebo + Metformin", "Placebo plus metformin IR", "Placebo + (lithium or divalproex)", "Placebo with Metformin and/or TZD" |
+| review → rejected | 6 | placebos whose name starts with a dose, formulation or salt word: "Daily placebo", "Calcium carbonate (placebo)", "Potassium Chloride + Placebo for Empagliflozin". The salt and formulation words are now stripped before the check. Each was inspected and is correctly rejected |
+
+The earlier estimate of "70 rows" came from a loose text search. It counted rows that are
+correctly still rejected ("Placebo tablets matching the metformin…"). The diff is the
+real figure.
+
+Auto-accepts unchanged at 4,938. Review queue 5,580 → 5,601 rows.
 
 ## Triage (standing)
 

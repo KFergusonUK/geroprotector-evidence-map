@@ -1012,6 +1012,16 @@ collaborate. That is the realistic route to the data behind governance walls
   not — venetoclax, secukinumab, an infant formula named "NR Pepti", ATC "nr."
   abbreviations. Trials naming the compound only by these abbreviations may be missed; the
   recall check is how that cost is measured. Both stay in the fixture as resolver inputs.
+- **Known gap, not measured: recall for scaled compounds (§7 step 7).** The step-7
+  precision protocol (`docs/step7_precision_protocol.md`) measures precision only. The
+  automatically generated synonyms drive the registry *queries* as well as the matching,
+  so a recall figure measured against that query set would measure the wrong thing: a
+  noisy query set over-fetches (inflating apparent recall), and a filtered one under-fetches
+  in ways that depend on the filter. Until a recall protocol exists that defines the
+  reference set independently of the generated synonyms, **scaled-compound counts carry
+  no recall figure**. The seed recall check (26/27, §4.2a) does not transfer. Its
+  literature-sampled method is the natural basis for one, provided the literature search
+  terms are not themselves the generated synonyms.
 - ~~Spermidine trials registered only as "polyamine supplementation"?~~ **Resolved:**
   searched as review queries; hits go to review (§4.2a).
 - Genetic reprogramming (Yamanaka factors, OSK/OSKM) is out of scope: the factors are

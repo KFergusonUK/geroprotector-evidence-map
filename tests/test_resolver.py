@@ -167,9 +167,6 @@ class RunOverStaging(unittest.TestCase):
                          ("experimental", "systemic", resolver.load_rules()["version"]))
 
 
-if __name__ == "__main__":
-    unittest.main()
-
 
 class Step4ErrorClasses(unittest.TestCase):
     """resolver-v2: the four identity errors from the step-4 sample, verbatim, never auto-accepted."""
@@ -304,3 +301,71 @@ class ResolverV4(unittest.TestCase):
         # metformin named only in the description of a sitagliptin placebo: not rejected by v4
         r = decide("Sitagliptin placebo", description="on stable background metformin")["metformin"]
         self.assertEqual(r["decision"], "review")
+
+
+class ResolverV5(unittest.TestCase):
+    """A leading 'placebo' is a placebo FOR something only when nothing joins it to a drug."""
+
+    def test_placebo_for_still_rejected(self):
+        for name, key in [("Placebo of metformin", "metformin"), ("Placebo Metformin", "metformin"),
+                          ("Placebo to 75 mg acetylsalicylic acid (ASA) + 1250 mg calcium carbonate", "aspirin"),
+                          ("Placebo tablets matching the metformin and pioglitazone tablets", "metformin")]:
+            self.assertEqual(decide(name)[key]["decision"], "rejected", name)
+
+    def test_placebo_with_compound_is_review(self):
+        for name, key in [("Placebo + Metformin", "metformin"), ("Placebo plus metformin IR", "metformin"),
+                          ("Placebo with mood stabilizer (either lithium or divalproex)", "lithium"),
+                          ("Placebo, aspirin (81-100 mg qd) plus hydroxyurea", "aspirin"),
+                          ("Placebo, once daily on background of glimepiride with or without metformin", "metformin")]:
+            r = decide(name)[key]
+            self.assertEqual(r["decision"], "review", name)
+            self.assertIn("placebo_with_compound", r["reasons"], name)
+
+
+class DiffAndDowngradeGuard(unittest.TestCase):
+    """measurement_policy.md §3: every resolver run reports its diff against the previous
+    decisions, and a run declared downgrade-only is rolled back if it adds an auto-accept."""
+
+    FX = lambda self, glucophage_xr_is_synonym: {"fixture_version": "t", "compounds": [
+        {"key": "metformin", "role": "seed", "canonical_name": "metformin",
+         "must_match": ["metformin", "Glucophage"] + (["Glucophage XR"] if glucophage_xr_is_synonym else []),
+         "must_not_match": [], "needs_review": [] if glucophage_xr_is_synonym else ["Glucophage XR"],
+         "route_excluded": []}]}
+
+    def setUp(self):
+        s = {"NCT1": study("NCT1", [{"type": "DRUG", "name": "Metformin", "armGroupLabels": ["A"]}]),
+             "NCT2": study("NCT2", [{"type": "DRUG", "name": "Glucophage XR", "armGroupLabels": ["A"]}])}
+        self.conn = fresh()
+        ctgov.fetch_seed(self.conn, self.FX(False), client=FakeRegistry(s, {"metformin": ["NCT1", "NCT2"]}))
+        self.decisions = lambda: dict(((r[0], r[1]) for r in self.conn.execute(
+            "SELECT nct_id, decision FROM resolver_match ORDER BY 1")))
+
+    def test_first_run_has_no_diff(self):
+        self.assertIsNone(resolver.run(self.conn, self.FX(False))["diff"])
+
+    def test_upgrade_is_refused_and_rolled_back(self):
+        resolver.run(self.conn, self.FX(False))
+        before = self.decisions()
+        self.assertEqual(before["NCT2"], "review")
+        with self.assertRaises(resolver.NotDowngradeOnly) as cm:
+            resolver.run(self.conn, self.FX(True), downgrade_only=True)
+        self.assertEqual(cm.exception.report["new_auto_accepts"], 1)
+        self.assertEqual(self.decisions(), before)                  # nothing committed
+
+    def test_downgrade_passes_and_is_reported(self):
+        resolver.run(self.conn, self.FX(True))
+        out = resolver.run(self.conn, self.FX(False), downgrade_only=True)
+        d = out["diff"]
+        self.assertEqual(d["new_auto_accepts"], 0)
+        self.assertEqual(d["transitions"]["auto_accept->review"]["rows"], 1)
+        self.assertEqual(d["auto_accept"], [2, 1])
+
+    def test_upgrade_without_the_flag_is_still_reported(self):
+        resolver.run(self.conn, self.FX(False))
+        out = resolver.run(self.conn, self.FX(True))
+        self.assertEqual(out["diff"]["new_auto_accepts"], 1)
+        self.assertEqual(out["diff"]["transitions"]["review->auto_accept"]["rows"], 1)
+
+
+if __name__ == "__main__":
+    unittest.main()
