@@ -1,0 +1,876 @@
+# Blind check of the step-4 precision sample — for Kevin Ferguson to adjudicate.
+#
+# Judge each claim ("This intervention object is <compound>") by the protocol's identity rule
+# (docs/step4_precision_protocol.md, "Adjudication"):
+#   CORRECT   the intervention administers the compound itself: any salt, hydrate,
+#             formulation, brand or sponsor code of that molecule (lithium salts -> Li+).
+#   INCORRECT a different molecule (incl. stereoisomers, analogues), a placebo or dummy, a
+#             fixed-dose combination presented as a single agent, an extract or food, or a
+#             class or regimen rather than the compound.
+#   Ambiguous counts as INCORRECT. Route is NOT part of identity (a sirolimus stent is sirolimus).
+#
+# Set `verdict` to correct or incorrect, optionally a `note`. Please do not open the
+# original verdicts (data/reviews/step4*_precision_sample.yaml) until you have finished.
+# Then run: python3 docs/step4_blind_compare.py ROUND
+# Round 4b: 30 of 200, random.Random(2026111930); original verdicts committed before this packet was generated.
+rows:
+- blind_id: 1
+  sample_index: 0
+  nct_id: NCT06058585
+  registry_url: https://clinicaltrials.gov/study/NCT06058585
+  claim: This intervention object is semaglutide
+  intervention:
+    type: DRUG
+    name: Semaglutide
+    otherNames: null
+    description: Semaglutide 1.0mg or 2.4mg pen injector, subcutaneous injection, once weekly
+    armGroupLabels:
+    - Semaglutide
+  study_title: The Chronic Kidney Disease Adaptive Platform Trial Investigating Various Agents for Therapeutic Effect
+  arm_groups:
+  - label: Finerenone
+    type: EXPERIMENTAL
+    description: Finerenone 10mg or 20mg tablets
+  - label: Placebo Finerenone
+    type: PLACEBO_COMPARATOR
+    description: Finerenone matched placebo tablets
+  - label: Semaglutide
+    type: EXPERIMENTAL
+    description: Semaglutide 1.0 mg or 2.4 mg pen injector
+  - label: Placebo Semaglutide
+    type: PLACEBO_COMPARATOR
+    description: Semaglutide matched placebo pen injector
+  verdict: null
+  note: ''
+- blind_id: 2
+  sample_index: 4
+  nct_id: NCT02484209
+  registry_url: https://clinicaltrials.gov/study/NCT02484209
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames:
+    - Glucophage
+    description: metformin 1500 mg daily for 16 weeks
+    armGroupLabels:
+    - Glimepiride + metformin
+  study_title: 'DiaFrail: A Short Duration Study in Older People ( DIAFRAIL Study)'
+  arm_groups:
+  - label: Glimepiride + metformin
+    type: EXPERIMENTAL
+    description: Glimepiride (2-4mg twice daily) + metformin (1500 mg daily) (n = 10 in total) Older subjects with
+      moderate frailty will be assigned for 16 weeks to this arm. A subgroup (n=5) will undergo 3 x 72h periods
+      of CBGM
+  - label: Metformin
+    type: ACTIVE_COMPARATOR
+    description: Metformin (1500 mg daily) (n = 10 in total) Older subjects with moderate frailty will be assigned
+      for 16 weeks to this arm. A subgroup (n=5) will undergo 3 x 72h periods of CBGM
+  verdict: null
+  note: ''
+- blind_id: 3
+  sample_index: 9
+  nct_id: NCT02733679
+  registry_url: https://clinicaltrials.gov/study/NCT02733679
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames:
+    - Glucophage
+    description: Metformin will be given orally, regularly for eight weeks. Dose starts at 500mg once daily for
+      one week, increasing by 500mg per week, to final dose of 1000mg twice daily.
+    armGroupLabels:
+    - Ataxia Telangiectasia
+    - Healthy controls
+  study_title: Response of Individuals With Ataxia-Telangiectasia to Metformin and Pioglitazone
+  arm_groups:
+  - label: Ataxia Telangiectasia
+    type: EXPERIMENTAL
+    description: Participants will receive two treatments - metformin and pioglitazone for eight weeks each, separated
+      by a one week washout period.
+  - label: Healthy controls
+    type: ACTIVE_COMPARATOR
+    description: Participants will receive two treatments - metformin and pioglitazone for eight weeks each, separated
+      by a one week washout period.
+  verdict: null
+  note: ''
+- blind_id: 4
+  sample_index: 12
+  nct_id: NCT02834403
+  registry_url: https://clinicaltrials.gov/study/NCT02834403
+  claim: This intervention object is aspirin
+  intervention:
+    type: DRUG
+    name: Enteric-coated aspirin
+    otherNames:
+    - acetylsalicylic acid
+    description: non-steroidal anti-inflammatory drug
+    armGroupLabels:
+    - L-NMMA 10 mg/kg and Docetaxel 75 mg/m2
+    - L-NMMA 12.5 mg/kg and Docetaxel 75 mg/m2
+    - L-NMMA 15 mg/kg and Docetaxel 75 mg/m2
+    - L-NMMA 17.5 mg/kg and Docetaxel 100 mg/m2
+    - L-NMMA 20 mg/kg and Docetaxel 100 mg/m2
+    - L-NMMA 7.5 mg/kg and Docetaxel 75 mg/m2
+    - 'Phase II: RP2D determined in the Phase Ib'
+  study_title: L-NMMA Plus Taxane Chemotherapy in Refractory Locally Advanced or Metastatic Triple Negative Breast
+    Cancer Patients
+  arm_groups:
+  - label: L-NMMA 7.5 mg/kg and Docetaxel 75 mg/m2
+    type: EXPERIMENTAL
+    description: 'Phase Ib: L-NMMA and docetaxel will be given for 6 21-day cycles. L-NMMA at doses of 7.5 mg/kg
+      (starting dose) will be administered IV on Days 1-5. Docetaxel will be administered at 75 mg/m2 as an IV 15
+      min after L-NMMA infusion Day 1.'
+  - label: L-NMMA 10 mg/kg and Docetaxel 75 mg/m2
+    type: EXPERIMENTAL
+    description: 'Phase Ib: L-NMMA and docetaxel will be given for 6 21-day cycles. L-NMMA at doses of 10 mg/kg
+      will be administered IV on Days 1-5. Docetaxel will be administered at 75 mg/m2 as an IV 15 min after L-NMMA
+      infusion Day 1.'
+  - label: L-NMMA 12.5 mg/kg and Docetaxel 75 mg/m2
+    type: EXPERIMENTAL
+    description: 'Phase Ib: L-NMMA and docetaxel will be given for 6 21-day cycles. L-NMMA at doses of 12.5 mg/kg
+      will be administered IV on Days 1-5. Docetaxel will be administered at 75 mg/m2 as an IV 15 min after L-NMMA
+      infusion Day 1.'
+  - label: L-NMMA 15 mg/kg and Docetaxel 75 mg/m2
+    type: EXPERIMENTAL
+    description: 'Phase Ib: L-NMMA and docetaxel will be given for 6 21-day cycles. L-NMMA at doses of 15 mg/kg
+      will be administered IV on Days 1-5. Docetaxel will be administered at 75 mg/m2 as an IV 15 min after L-NMMA
+      infusion Day 1.'
+  - label: L-NMMA 17.5 mg/kg and Docetaxel 100 mg/m2
+    type: EXPERIMENTAL
+    description: 'Phase Ib: L-NMMA and docetaxel will be given for 6 21-day cycles. L-NMMA at doses of 17.5 mg/kg
+      will be administered IV on Days 1-5. Docetaxel will be administered at 100 mg/m2 as an IV 15 min after L-NMMA
+      infusion Day 1.'
+  - label: L-NMMA 20 mg/kg and Docetaxel 100 mg/m2
+    type: EXPERIMENTAL
+    description: 'Phase Ib: L-NMMA and docetaxel will be given for 6 21-day cycles. L-NMMA at doses of 20 mg/kg
+      will be administered IV on Days 1-5. Docetaxel will be administered at 100 mg/m2 as an IV 15 min after L-NMMA
+      infusion Day 1.'
+  - label: 'Phase II: RP2D determined in the Phase Ib'
+    type: EXPERIMENTAL
+    description: 'Phase II: L-NMMA starting dose will be the RP2D determined in the Phase Ib portion of the study.'
+  verdict: null
+  note: ''
+- blind_id: 5
+  sample_index: 20
+  nct_id: NCT02073227
+  registry_url: https://clinicaltrials.gov/study/NCT02073227
+  claim: This intervention object is canagliflozin
+  intervention:
+    type: DRUG
+    name: Canagliflozin, 300 mg
+    otherNames:
+    - INVOKANA™
+    description: Each tablet contains canagliflozin (CANA) of 300 mg to be taken orally (by mouth).
+    armGroupLabels:
+    - Treatment A
+  study_title: A Bioequivalence Study of the Fixed Dose Combination Tablets of Canagliflozin and Metformin Extended
+    Release (XR) With Respect to the Individual Components
+  arm_groups:
+  - label: Treatment A
+    type: EXPERIMENTAL
+    description: Each participant will receive a single dose of 1 tablet of canagliflozin (CANA), 300 mg, and 4
+      tablets of metformin extended release (MET XR), 500 mg each, administered together under fed conditions.
+  - label: Treatment B
+    type: EXPERIMENTAL
+    description: Each participant will receive a single dose of 2 tablets of CANA/MET XR FDC, formulation 1, under
+      fed conditions.
+  - label: Treatment C
+    type: EXPERIMENTAL
+    description: Each participant will receive a single dose of 2 tablets of CANA/MET XR FDC, formulation 2, under
+      fed conditions.
+  verdict: null
+  note: ''
+- blind_id: 6
+  sample_index: 25
+  nct_id: NCT06022068
+  registry_url: https://clinicaltrials.gov/study/NCT06022068
+  claim: This intervention object is rapamycin
+  intervention:
+    type: DRUG
+    name: Sirolimus
+    otherNames:
+    - Rapamycin
+    description: 7 mg taken once per week during 26 weeks.
+    armGroupLabels:
+    - Rapamycin
+  study_title: Evaluating Rapamycin Treatment in Alzheimer's Disease Using Positron Emission Tomography
+  arm_groups:
+  - label: Rapamycin
+    type: EXPERIMENTAL
+    description: Sirolimus tablets will be administered orally, 7 mg once per week during 26 weeks
+  verdict: null
+  note: ''
+- blind_id: 7
+  sample_index: 29
+  nct_id: NCT04355429
+  registry_url: https://clinicaltrials.gov/study/NCT04355429
+  claim: This intervention object is captopril
+  intervention:
+    type: DRUG
+    name: captopril 25mg
+    otherNames:
+    - Any
+    description: Drug administration
+    armGroupLabels:
+    - CAPTOPROL
+  study_title: Efficacy of Captopril in Covid-19 Patients With Severe Acute Respiratory Syndrome (SARS) CoV-2 Pneumonia
+    (CAPTOCOVID)
+  arm_groups:
+  - label: CAPTOPROL
+    type: EXPERIMENTAL
+    description: Inhalation administration by nebulization
+  - label: STANDARS CARE
+    type: NO_INTERVENTION
+    description: According to surviving covid-Campaign guidelines
+  verdict: null
+  note: ''
+- blind_id: 8
+  sample_index: 39
+  nct_id: NCT00898222
+  registry_url: https://clinicaltrials.gov/study/NCT00898222
+  claim: This intervention object is aspirin
+  intervention:
+    type: DRUG
+    name: aspirin
+    otherNames: null
+    description: 81 mg orally daily for two weeks
+    armGroupLabels:
+    - aspirin
+  study_title: Effect of Daily Low Dose Aspirin on Exhaled Inflammatory Mediators in Normal Subjects
+  arm_groups:
+  - label: aspirin
+    type: EXPERIMENTAL
+    description: Low dose daily aspirin in healthy volunteers for two weeks
+  verdict: null
+  note: ''
+- blind_id: 9
+  sample_index: 42
+  nct_id: NCT02143050
+  registry_url: https://clinicaltrials.gov/study/NCT02143050
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames:
+    - Glucophage
+    description: null
+    armGroupLabels:
+    - Dabrafenib, Trametinib and Metformin
+  study_title: Study of Dabrafenib, Trametinib and Metformin for Melanoma Patients
+  arm_groups:
+  - label: Dabrafenib, Trametinib and Metformin
+    type: EXPERIMENTAL
+    description: Dabrafenib 150 mg PO BID until progression or unacceptable toxicity. Trametinib 2 mg PO QD until
+      progression or unacceptable toxicity. Metformin 500 mg PO BID x 2 weeks, then 850 mg PO BID until progression
+      or unacceptable toxicity.
+  verdict: null
+  note: ''
+- blind_id: 10
+  sample_index: 53
+  nct_id: NCT04885426
+  registry_url: https://clinicaltrials.gov/study/NCT04885426
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: high-dose metformin
+    otherNames: null
+    description: Metformin Pill 500mg/day
+    armGroupLabels:
+    - high-dose metformin group
+  study_title: Metformin for the Prevention of CRA Recurrence
+  arm_groups:
+  - label: low-dose metformin group
+    type: EXPERIMENTAL
+    description: low-dose metformin, 250mg/day
+  - label: high-dose metformin group
+    type: EXPERIMENTAL
+    description: high-dose metformin, 500mg/day
+  - label: control group
+    type: PLACEBO_COMPARATOR
+    description: placebo
+  verdict: null
+  note: ''
+- blind_id: 11
+  sample_index: 61
+  nct_id: NCT01755520
+  registry_url: https://clinicaltrials.gov/study/NCT01755520
+  claim: This intervention object is aspirin
+  intervention:
+    type: DRUG
+    name: Aspirin
+    otherNames:
+    - ASS
+    description: Aspirin 100mg once daily
+    armGroupLabels:
+    - Aspirin
+  study_title: Study Comparing Ticagrelor With Aspirin for Prevention of Vascular Events in Patients Undergoing
+    CABG
+  arm_groups:
+  - label: Ticagrelor
+    type: EXPERIMENTAL
+    description: 'Intervention: Drug: Ticagrelor verum + Aspirin placebo'
+  - label: Aspirin
+    type: ACTIVE_COMPARATOR
+    description: 'Intervention: Drug: Aspirin verum + Ticagrelor placebo'
+  verdict: null
+  note: ''
+- blind_id: 12
+  sample_index: 67
+  nct_id: NCT06308679
+  registry_url: https://clinicaltrials.gov/study/NCT06308679
+  claim: This intervention object is empagliflozin
+  intervention:
+    type: DRUG
+    name: Empagliflozin 10 mg tablets
+    otherNames: null
+    description: Empagliflozin 10 mg tablets (test drug)
+    armGroupLabels:
+    - ARDIANCE®
+    - Generic Empagliflozin 10 mg tablets
+  study_title: A Bioequivalence Study of Two Formulations of 10-mg Empagliflozin Tablets in Healthy Thai Volunteers
+    Under Fasting Conditions
+  arm_groups:
+  - label: Generic Empagliflozin 10 mg tablets
+    type: EXPERIMENTAL
+    description: Generic Empagliflozin 10 mg tablets (test drug)
+  - label: ARDIANCE®
+    type: ACTIVE_COMPARATOR
+    description: ARDIANCE® (Empagliflozin 10 mg tablets (reference drug))
+  verdict: null
+  note: ''
+- blind_id: 13
+  sample_index: 69
+  nct_id: NCT06059287
+  registry_url: https://clinicaltrials.gov/study/NCT06059287
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames:
+    - Metformin Hydrochloride
+    description: Metformin 1000mg bid po
+    armGroupLabels:
+    - Metformin
+  study_title: The Effect of Henagliflozin and Metformin on Myocardial Tissue-level Characteristics
+  arm_groups:
+  - label: Henagliflozin
+    type: EXPERIMENTAL
+    description: Henagliflozin 10mg qd po
+  - label: Metformin
+    type: ACTIVE_COMPARATOR
+    description: Metformin 1000mg bid po
+  verdict: null
+  note: ''
+- blind_id: 14
+  sample_index: 74
+  nct_id: NCT01289990
+  registry_url: https://clinicaltrials.gov/study/NCT01289990
+  claim: This intervention object is empagliflozin
+  intervention:
+    type: DRUG
+    name: BI 10773
+    otherNames: null
+    description: BI 10773 tablets once daily
+    armGroupLabels:
+    - BI 10773 high (pioglitazone)
+  study_title: Safety and Efficacy of Empagliflozin (BI 10773) and Sitagliptin Versus Placebo Over 76 Weeks in Patients
+    With Type 2 Diabetes
+  arm_groups:
+  - label: BI 10773 low (drug naive)
+    type: EXPERIMENTAL
+    description: BI 10773 tablets once daily
+  - label: BI 10773 high (drug naive)
+    type: EXPERIMENTAL
+    description: BI 10773 tablets once daily
+  - label: Placebo (drug naive)
+    type: PLACEBO_COMPARATOR
+    description: Placebo tablets matching BI 10773 / Sitagliptin once daily
+  - label: Sitagliptin 100mg (drug naive)
+    type: ACTIVE_COMPARATOR
+    description: Sitagliptin once daily
+  - label: BI 10773 low (pioglitazone)
+    type: EXPERIMENTAL
+    description: BI 10773 tablets once daily
+  - label: BI 10773 high (pioglitazone)
+    type: EXPERIMENTAL
+    description: BI 10773 tablets once daily
+  - label: Placebo (pioglitazone)
+    type: PLACEBO_COMPARATOR
+    description: Placebo tablets matching BI 10773 once daily
+  - label: BI 10773 low (metformin)
+    type: EXPERIMENTAL
+    description: BI 10773 tablets once daily
+  - label: BI 10773 high (metformin)
+    type: EXPERIMENTAL
+    description: BI 10773 tablets once daily
+  - label: Placebo (metformin)
+    type: PLACEBO_COMPARATOR
+    description: Placebo tablets matching BI 10773 once daily
+  - label: BI 10773 low (metformin+sulfonylurea)
+    type: EXPERIMENTAL
+    description: BI 10773 tablets once daily
+  - label: BI 10773 high (metformin+sulfonylurea)
+    type: EXPERIMENTAL
+    description: BI 10773 tablets once daily
+  - label: Placebo (metformin+sulfonylurea)
+    type: PLACEBO_COMPARATOR
+    description: Placebo tablets matching BI 10773
+  verdict: null
+  note: ''
+- blind_id: 15
+  sample_index: 92
+  nct_id: NCT03226457
+  registry_url: https://clinicaltrials.gov/study/NCT03226457
+  claim: This intervention object is empagliflozin
+  intervention:
+    type: DRUG
+    name: Empagliflozin 25mg
+    otherNames:
+    - Jardiance
+    description: Empagliflozin (SGLT2 inhibitor) 25 mg once daily for 6 weeks
+    armGroupLabels:
+    - Empagliflozin/Placebo
+    - Placebo/Empagliflozin
+  study_title: SGLT2 Inhibition in Combination With Diuretics in Heart Failure
+  arm_groups:
+  - label: Empagliflozin/Placebo
+    type: ACTIVE_COMPARATOR
+    description: Empagliflozin (SGLT2 inhibitor) 25mg capsules once daily for 6 weeks, minimum of a 2 week washout
+      period, then 6 weeks placebo
+  - label: Placebo/Empagliflozin
+    type: ACTIVE_COMPARATOR
+    description: Placebo for 6 weeks, minimum of a 2 week washout period, followed by Empagliflozin (SGLT2 inhibitor)
+      25mg capsules once daily for 6 weeks
+  verdict: null
+  note: ''
+- blind_id: 16
+  sample_index: 102
+  nct_id: NCT00457808
+  registry_url: https://clinicaltrials.gov/study/NCT00457808
+  claim: This intervention object is rapamycin
+  intervention:
+    type: DRUG
+    name: Rapamycin, sirolimus
+    otherNames: null
+    description: null
+    armGroupLabels: null
+  study_title: Rapamycin Therapy for Patients With Tuberous Sclerosis Complex and Sporadic LAM
+  arm_groups: []
+  verdict: null
+  note: ''
+- blind_id: 17
+  sample_index: 109
+  nct_id: NCT01776424
+  registry_url: https://clinicaltrials.gov/study/NCT01776424
+  claim: This intervention object is aspirin
+  intervention:
+    type: DRUG
+    name: Aspirin
+    otherNames: null
+    description: Tablet, 100 mg, once daily, oral
+    armGroupLabels:
+    - Rivaroxaban 2.5mg + Aspirin 100mg
+    - Rivaroxaban Placebo + Aspirin 100mg
+  study_title: Rivaroxaban for the Prevention of Major Cardiovascular Events in Coronary or Peripheral Artery Disease
+  arm_groups:
+  - label: Rivaroxaban 2.5mg + Aspirin 100mg
+    type: EXPERIMENTAL
+    description: Participants received rivaroxaban 2.5 mg twice daily (bid) and aspirin 100 mg once daily (od).
+      All doses were provided in tablet form for oral administration. Participants who did not have a continuous
+      need to take a proton pump inhibitor (PPI), were additionally randomized 1:1 to receive pantoprazole 40 mg
+      (tablet form for oral administration, od) or matching placebo od. Participants who consented to LTOLE part
+      received open label rivaroxaban 2.5 mg bid and aspirin 100 mg od in LTOLE part.
+  - label: Rivaroxaban 5mg + Aspirin Placebo
+    type: EXPERIMENTAL
+    description: Participants received rivaroxaban 5 mg bid and aspirin placebo od. All doses were provided in tablet
+      form for oral administration. Participants who did not have a continuous need to take a PPI, were additionally
+      randomized 1:1 to receive pantoprazole 40 mg (tablet form for oral administration, od) or matching placebo
+      od. Participants who consented to LTOLE part received open label rivaroxaban 2.5 mg bid and aspirin 100 mg
+      od in LTOLE part.
+  - label: Rivaroxaban Placebo + Aspirin 100mg
+    type: ACTIVE_COMPARATOR
+    description: Participants received rivaroxaban placebo bid and aspirin 100 mg od. All doses were provided in
+      tablet form for oral administration. Participants who did not have a continuous need to take a PPI, were randomized
+      1:1 to receive pantoprazole 40 mg (tablet form for oral administration, od) or matching placebo od. Participants
+      who consented to LTOLE part received open label rivaroxaban 2.5 mg bid and aspirin 100 mg od in LTOLE part.
+  verdict: null
+  note: ''
+- blind_id: 18
+  sample_index: 111
+  nct_id: NCT05579977
+  registry_url: https://clinicaltrials.gov/study/NCT05579977
+  claim: This intervention object is semaglutide
+  intervention:
+    type: DRUG
+    name: Rybelsus
+    otherNames: null
+    description: Oral Semaglutide
+    armGroupLabels:
+    - Rybelsus 14 mg T2DM
+  study_title: Trial to Learn About the Study Medicine (PF-07081532) and Rybelsus in People With Type 2 Diabetes
+    and Separately PF-07081532 in People With Obesity
+  arm_groups:
+  - label: PF-07081532 20 mg T2DM
+    type: EXPERIMENTAL
+    description: PF-07081532 20 mg daily in T2DM
+  - label: PF-07081532 40 mg T2DM
+    type: EXPERIMENTAL
+    description: PF-07081532 40 mg daily in T2DM
+  - label: PF-07081532 80 mg T2DM
+    type: EXPERIMENTAL
+    description: PF-07081532 80 mg daily in T2DM
+  - label: PF-07081532 160 mg T2DM
+    type: EXPERIMENTAL
+    description: PF-07081532 160 mg daily in T2DM
+  - label: PF-07081532 260 mg T2DM
+    type: EXPERIMENTAL
+    description: PF-07081532 260 mg daily in T2DM
+  - label: Placebo T2DM
+    type: PLACEBO_COMPARATOR
+    description: Placebo daily in T2DM
+  - label: PF-07081532 80 mg Obesity
+    type: EXPERIMENTAL
+    description: PF-07081532 80 mg daily in Obesity
+  - label: PF-07081532 140 mg Obesity
+    type: EXPERIMENTAL
+    description: PF-07081532 140 mg daily in Obesity
+  - label: PF-07081532 200 mg Obesity (Option 1)
+    type: EXPERIMENTAL
+    description: PF-07081532 200 mg daily in Obesity
+  - label: PF-07081532 200 mg Obesity (Option 2)
+    type: EXPERIMENTAL
+    description: PF-07081532 200 mg daily in Obesity
+  - label: PF-07081532 260 mg Obesity
+    type: EXPERIMENTAL
+    description: PF-07081532 260 mg daily in Obesity
+  - label: Rybelsus 14 mg T2DM
+    type: ACTIVE_COMPARATOR
+    description: Semaglutide 14 mg daily in T2DM
+  - label: Placebo Obesity
+    type: PLACEBO_COMPARATOR
+    description: Placebo in Obesity
+  verdict: null
+  note: ''
+- blind_id: 19
+  sample_index: 113
+  nct_id: NCT00941382
+  registry_url: https://clinicaltrials.gov/study/NCT00941382
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames:
+    - Metformin Hydrochloride
+    description: Metformin 850 mg per day for 180 days
+    armGroupLabels:
+    - Metformin
+  study_title: Sibutramine-metformin Combination Versus Sibutramine and Metformin Monotherapy in Obese Patients
+  arm_groups:
+  - label: Sibutramin-Metformin
+    type: EXPERIMENTAL
+    description: Sibutramine-metformin therapy in a single tablet
+  - label: Sibutramine
+    type: ACTIVE_COMPARATOR
+    description: Sibutramine monotherapy
+  - label: Metformin
+    type: ACTIVE_COMPARATOR
+    description: Metformin monotherapy
+  verdict: null
+  note: ''
+- blind_id: 20
+  sample_index: 116
+  nct_id: NCT00317928
+  registry_url: https://clinicaltrials.gov/study/NCT00317928
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames: null
+    description: null
+    armGroupLabels: null
+  study_title: 'Efficacy of Metformin in PCOS: Metabolic and Hormonal Factors'
+  arm_groups: []
+  verdict: null
+  note: ''
+- blind_id: 21
+  sample_index: 119
+  nct_id: NCT05981365
+  registry_url: https://clinicaltrials.gov/study/NCT05981365
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames:
+    - Glucophage
+    description: Drug drug interaction
+    armGroupLabels:
+    - Part B
+  study_title: Voxelotor CYP and Transporter Cocktail Interaction Study
+  arm_groups:
+  - label: Part A
+    type: EXPERIMENTAL
+    description: To evaluate the effect of multiple doses of voxelotor on the plasma pharmacokinetics (PK) of a
+      single dose of bupropion, repaglinide, flurbiprofen, omeprazole, and midazolam
+  - label: Part B
+    type: EXPERIMENTAL
+    description: To evaluate the effect of multiple doses of voxelotor on the plasma PK of a single dose of metformin,
+      furosemide, and rosuvastatin
+  verdict: null
+  note: ''
+- blind_id: 22
+  sample_index: 133
+  nct_id: NCT04469530
+  registry_url: https://clinicaltrials.gov/study/NCT04469530
+  claim: This intervention object is rapamycin
+  intervention:
+    type: DRUG
+    name: Sirolimus
+    otherNames:
+    - Rapamune
+    - rapamycin
+    description: Sirolimus is given at a dose of 2 mg/m2 once daily. The amber oral dose syringe should be used
+      to withdraw the prescribed amount of sirolimus oral solution from the bottle. The solution can be drunk or
+      administered at once to assure delivery of all of the medication. It is safe for administration through a
+      nasogastric or G-tube. For tablets, the tablet should not be crushed, split, or otherwise altered. As with
+      the liquid dosing form, the tablets should be given within two hours each day and should be at consistent
+      intervals with regard to meals.
+    armGroupLabels:
+    - Maintenance Chemotherapy Regimen
+  study_title: Sirolimus in Combination With Metronomic Chemotherapy in Children With High-Risk Solid Tumors
+  arm_groups:
+  - label: Maintenance Chemotherapy Regimen
+    type: EXPERIMENTAL
+    description: Participants with metastatic osteosarcoma, metastatic Ewing sarcoma, high-risk rhabdomyosarcoma,
+      metastatic non-rhabdomyosarcoma soft tissue sarcoma (NRSTS), desmoplastic small round cell tumor (DSRCT),
+      and malignant rhabdoid tumor (MRT) in first complete remission (cohort 1) or participants with recurrent solid
+      tumors (any histology) in second complete remission (cohort 2), receiving a maintenance chemotherapy regimen
+      administered as a 12-month course of continuous sirolimus with celecoxib and low-dose oral etoposide alternating
+      every 21 days with low-dose oral cyclophosphamide following the completion of "standard" therapy.
+  - label: Historical Control Cohort Receiving Standard Therapy
+    type: NO_INTERVENTION
+    description: This study arm is a historical control cohort of patients matched with cohort 1 on diagnosis, age,
+      metastatic site, and date of diagnosis. The matched historical controls will be obtained from the same treating
+      institution as the corresponding case to account for institutional differences in treatment and supportive
+      care. Patients in the historical control cohort received standard therapy.
+  verdict: null
+  note: ''
+- blind_id: 23
+  sample_index: 135
+  nct_id: NCT03341390
+  registry_url: https://clinicaltrials.gov/study/NCT03341390
+  claim: This intervention object is aspirin
+  intervention:
+    type: DRUG
+    name: Aspirin
+    otherNames:
+    - Acetylsalicylic Acid
+    description: 1 x 325 mg tablet of aspirin administered once daily
+    armGroupLabels:
+    - Aspirin
+    - BMS-986177 plus aspirin
+    - Placebo plus aspirin
+  study_title: An Investigational Study to Assess the Effect of BMS-986177 on Aspirin in Healthy Participants
+  arm_groups:
+  - label: Aspirin
+    type: ACTIVE_COMPARATOR
+    description: 325 mg tablet, once daily for 5 days (Day -5 to -1)
+  - label: BMS-986177 plus aspirin
+    type: EXPERIMENTAL
+    description: 200 mg BMS-986177 twice daily and 325 mg tablet aspirin once daily (Day 1-7)
+  - label: Placebo plus aspirin
+    type: PLACEBO_COMPARATOR
+    description: 200 mg Placebo twice daily and 325 mg tablet aspirin once daily (Day 1-7)
+  verdict: null
+  note: ''
+- blind_id: 24
+  sample_index: 148
+  nct_id: NCT07812597
+  registry_url: https://clinicaltrials.gov/study/NCT07812597
+  claim: This intervention object is semaglutide
+  intervention:
+    type: DRUG
+    name: semaglutide
+    otherNames: null
+    description: Semaglutide will be administered via subcutaneous (SC) injection.
+    armGroupLabels:
+    - semaglutide Arm
+  study_title: A Study Evaluating Safety and Tolerability of Switching From Semaglutide to Zovaglutide in Adults
+    With Obesity (HORIZON-SWITCH-SZ)
+  arm_groups:
+  - label: zovaglutide Arm1
+    type: EXPERIMENTAL
+    description: Participants will receive zovaglutide dosing schedule 1 after randomization.
+  - label: zovaglutide Arm2
+    type: EXPERIMENTAL
+    description: Participants will receive zovaglutide dosing schedule 2 after randomization.
+  - label: semaglutide Arm
+    type: ACTIVE_COMPARATOR
+    description: Participants will receive semaglutide once weekly after randomization
+  verdict: null
+  note: ''
+- blind_id: 25
+  sample_index: 159
+  nct_id: NCT06046612
+  registry_url: https://clinicaltrials.gov/study/NCT06046612
+  claim: This intervention object is empagliflozin
+  intervention:
+    type: DRUG
+    name: Participants receive 10mg Empaglifozin once daily on prescription from their treating physician. This
+      is not an intervention in this trial, but part of their normal HFpEF treatment
+    otherNames:
+    - Jardiance
+    description: The investigational medicinal product investigated in this trial (empagliflozin) is authorised
+      for use in the European Union by the European Medicines Agency and will be used in accordance with the terms
+      of the marketing authorization. The treating physician (cardiologist) will determine the indication for empagliflozin
+      use, discuss the benefits and risks with the patient, prescribe the drug, and provide follow up after starting
+      the drug, according to normal clinical practice. The study participants are not assigned to a particular therapeutic
+      strategy decided by the clinical trial protocol.
+    armGroupLabels:
+    - heart failure with preserved ejection fraction
+  study_title: Empagliflozin for Peripheral Microvascular Dysfunction in Heart Failure With Preserved Ejection Fraction
+  arm_groups:
+  - label: heart failure with preserved ejection fraction
+    type: EXPERIMENTAL
+    description: Empagliflozin 10mg, tablet, once daily
+  verdict: null
+  note: ''
+- blind_id: 26
+  sample_index: 172
+  nct_id: NCT05460416
+  registry_url: https://clinicaltrials.gov/study/NCT05460416
+  claim: This intervention object is aspirin
+  intervention:
+    type: DRUG
+    name: Acetylsalicylic acid
+    otherNames: null
+    description: 160mg once a day
+    armGroupLabels:
+    - Treatment by acetylsalicylic acid
+  study_title: Treatment Preventive for Pre-eclampsia by Acetylsalicylic Acid in Women Who Underwent Frozen Embryo
+    Transfer
+  arm_groups:
+  - label: Treatment by acetylsalicylic acid
+    type: EXPERIMENTAL
+    description: null
+  - label: No treatment
+    type: NO_INTERVENTION
+    description: null
+  verdict: null
+  note: ''
+- blind_id: 27
+  sample_index: 175
+  nct_id: NCT05797597
+  registry_url: https://clinicaltrials.gov/study/NCT05797597
+  claim: This intervention object is aspirin
+  intervention:
+    type: DRUG
+    name: Aspirin 300 Mg Oral Tablet
+    otherNames: null
+    description: 8-week treatment of aspirin, then after 2-weeks washout the next treatment arm is placebo for 8
+      weeks
+    armGroupLabels:
+    - Aspirin
+  study_title: Long-term Aspirin Therapy as a Predictor of Decreased Susceptibility to SARS-CoV-2 Infection in Aspirin-Exacerbated
+    Respiratory Disease
+  arm_groups:
+  - label: Aspirin
+    type: EXPERIMENTAL
+    description: Acard 300 mg (Acidum acetylsalicylicum). 1 tablet (300 mg) twice a day
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: Placebo 1 tablet twice a day
+  verdict: null
+  note: ''
+- blind_id: 28
+  sample_index: 189
+  nct_id: NCT02910817
+  registry_url: https://clinicaltrials.gov/study/NCT02910817
+  claim: This intervention object is metformin
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames: null
+    description: The metformin-treated group received metformin (1000 mg per day) with the start of controlled ovarian
+      stimulation (COH) until the day of the pregnancy check.
+    armGroupLabels:
+    - Metformin-treated group
+  study_title: Impact of Metformin on In Vitro Fertilization Outcomes in Overweight and Obese PCOS Women
+  arm_groups:
+  - label: Metformin-treated group
+    type: EXPERIMENTAL
+    description: 51 overweight and obese women (BMI\>24) with PCOS underwent their first fresh autologous IVF-embryo
+      transfer cycle
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: A cohort of fifty-one cross matched PCOS women
+  verdict: null
+  note: ''
+- blind_id: 29
+  sample_index: 190
+  nct_id: NCT04172922
+  registry_url: https://clinicaltrials.gov/study/NCT04172922
+  claim: This intervention object is rapamycin
+  intervention:
+    type: DRUG
+    name: Topical Sirolimus
+    otherNames:
+    - rapamycin
+    description: Open label, topical sirolimus (1%) cream will be applied to cutaneous component of complicated
+      vascular anomalies twice daily for 4 weeks and once daily thereafter- for the duration of study.
+    armGroupLabels:
+    - Open label, topical sirolimus arm
+  study_title: Topical Rapamycin/Sirolimus for Complicated Vascular Anomalies and Other Susceptible Lesions
+  arm_groups:
+  - label: Open label, topical sirolimus arm
+    type: EXPERIMENTAL
+    description: Single arm, open label study of1% sirolimus ointment applied to affected area twice daily for the
+      first four weeks followed by once daily for 5 months.
+  verdict: null
+  note: ''
+- blind_id: 30
+  sample_index: 191
+  nct_id: NCT01522820
+  registry_url: https://clinicaltrials.gov/study/NCT01522820
+  claim: This intervention object is rapamycin
+  intervention:
+    type: DRUG
+    name: Sirolimus
+    otherNames:
+    - AY 22989
+    - RAPA
+    - Rapamune
+    - RAPAMYCIN
+    - SILA 9268A
+    - WY-090217
+    description: Given PO or PEG
+    armGroupLabels:
+    - Cohort 1b (vaccine therapy and immunotherapy)
+    - Cohort 1c (vaccine therapy and immunotherapy)
+    - Cohort 1d (vaccine therapy and immunotherapy)
+    - Cohort 2 (vaccine therapy with or without immunotherapy)
+  study_title: Vaccine Therapy With or Without Sirolimus in Treating Patients With NY-ESO-1 Expressing Solid Tumors
+  arm_groups:
+  - label: Cohort 1a (vaccine therapy)
+    type: EXPERIMENTAL
+    description: Patients receive DEC-205/NY-ESO-1 fusion protein CDX-1401 protein vaccine intranodally on days
+      1, 29, 57, and 113.
+  - label: Cohort 1b (vaccine therapy and immunotherapy)
+    type: EXPERIMENTAL
+    description: Patients receive DEC-205/NY-ESO-1 fusion protein CDX-1401 as in Cohort 1a and sirolimus PO or PEG
+      on days 1-14, 29-42, and 57-70.
+  - label: Cohort 1c (vaccine therapy and immunotherapy)
+    type: EXPERIMENTAL
+    description: Patients receive DEC-205/NY-ESO-1 fusion protein CDX-1401 vaccine as in Cohort 1a and sirolimus
+      PO or PEG on days 15-28, 43-56, and 71-84.
+  - label: Cohort 1d (vaccine therapy and immunotherapy)
+    type: EXPERIMENTAL
+    description: Patients receive DEC-205/NY-ESO-1 fusion protein CDX-1401 as in Cohort 1a and sirolimus PO or PEG
+      on days 1-84.
+  - label: Cohort 2 (vaccine therapy with or without immunotherapy)
+    type: EXPERIMENTAL
+    description: Patients receive DEC-205/NY-ESO-1 fusion protein CDX-1401 as in the Cohort (1a-1d) that is determined
+      to be safe and produces optimal immunological effects and sirolimus PO on days 1-14 as in Cohort 1b dose.
+  verdict: null
+  note: ''

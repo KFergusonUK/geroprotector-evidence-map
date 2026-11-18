@@ -16,7 +16,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from agesdk import db  # noqa: E402
 
-ROUNDS = {"4": ("step4_sample.py", 2026111830, "2050f70"), "4b": ("step4b_sample.py", 2026111930, "SEE_GIT_LOG")}
+ROUNDS = {"4": ("step4_sample.py", 2026111830, "2050f70"), "4b": ("step4b_sample.py", 2026111930, "5539c40")}
 ROUND = sys.argv[1] if len(sys.argv) > 1 else "4"
 SAMPLER, BLIND_SEED, VERDICT_COMMIT = ROUNDS[ROUND]
 K = 30
