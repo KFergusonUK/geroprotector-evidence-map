@@ -13,6 +13,8 @@
 # data/reviews/step4_precision_sample.yaml (the original verdicts) until you have finished.
 # Then run: python3 docs/step4_blind_compare.py
 # Rows: 30 of 200, chosen by random.Random(2026111830); original verdicts committed in 2050f70.
+# VERDICTS (Kevin Ferguson, 2026-11-18): 6 entered directly in this file; the other 24
+# transcribed by Claude from Kevin's message "Both blind checks all correct".
 rows:
 - blind_id: 1
   sample_index: 11
@@ -33,7 +35,7 @@ rows:
     type: EXPERIMENTAL
     description: Oral solution or tablet,titrated to therapeutic serum trough range (sirolimus); Oral tablet, titrated
       to therapeutic serum trough range (everolimus)
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 2
   sample_index: 21
@@ -62,7 +64,7 @@ rows:
   - label: Metformin 1000 mg/d
     type: ACTIVE_COMPARATOR
     description: Metformin 1000 mg/d
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 3
   sample_index: 45
@@ -84,7 +86,7 @@ rows:
   - label: Experimental 1
     type: EXPERIMENTAL
     description: Resveratrol
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 4
   sample_index: 48
@@ -110,7 +112,7 @@ rows:
     type: PLACEBO_COMPARATOR
     description: 'Placebo: dosed once a day, orally (PO QD) + semaglutide (1 mg): dosed weekly (q1wk), via SC injection
       for 12 weeks.'
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 5
   sample_index: 54
@@ -133,7 +135,7 @@ rows:
   - label: Metformin
     type: EXPERIMENTAL
     description: Metformin 850 mg x 3 daily. For bioavailability purpose only, treatment is withdrawn postoperatively
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 6
   sample_index: 55
@@ -158,7 +160,7 @@ rows:
     type: PLACEBO_COMPARATOR
     description: Participants assigned to the placebo arm will take an oral placebo capsule daily for 12 weeks.
       The placebo will appear identical to the nicotinamide riboside capsules.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 7
   sample_index: 64
@@ -180,7 +182,7 @@ rows:
   - label: P2Y12 inhibitor only
     type: EXPERIMENTAL
     description: Participants receiving a P2Y12 inhibitor only at time of the colonoscopy
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 8
   sample_index: 73
@@ -195,7 +197,7 @@ rows:
     armGroupLabels: null
   study_title: Nordihydroguaiaretic Acid in Treating Patients With Nonmetastatic Relapsed Prostate Cancer
   arm_groups: []
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 9
   sample_index: 78
@@ -242,7 +244,7 @@ rows:
   - label: Metformin 1000 mg bid
     type: EXPERIMENTAL
     description: Metformin 1000 mg twice daily
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 10
   sample_index: 85
@@ -270,7 +272,7 @@ rows:
     description: Participants received metformin 425 mg orally once daily and empagliflozin 10 mg orally once daily
       for approximately 8 weeks. Participants also received investigational AgeBiotics AB-01 oral solution, three
       19-mL sachets daily, and AB-02, five capsules twice daily.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 11
   sample_index: 91
@@ -293,7 +295,7 @@ rows:
   - label: glybenclamide
     type: ACTIVE_COMPARATOR
     description: glybenclamide up to 20mg per day.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 12
   sample_index: 106
@@ -317,7 +319,7 @@ rows:
     type: ACTIVE_COMPARATOR
     description: Group will get only enoxaparin (standard of care) after consent up to Intensive Care Unit (ICU)
       discharge.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 13
   sample_index: 108
@@ -339,7 +341,7 @@ rows:
   - label: Placebo
     type: PLACEBO_COMPARATOR
     description: Placebo capsules orally for 2 consecutive days
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 14
   sample_index: 109
@@ -369,7 +371,7 @@ rows:
 
       who are planning to, but have not yet started, aspirin therapy \<16 weeks'' gestation. Patients will take
       81mg aspirin as prescribed.'
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 15
   sample_index: 115
@@ -393,7 +395,7 @@ rows:
   - label: Treatment B
     type: ACTIVE_COMPARATOR
     description: Reference Product Glucophage® XR 1000 mg Prolonged Release Tablets (Merck Serono Ltd, UK)
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 16
   sample_index: 121
@@ -420,7 +422,7 @@ rows:
   - label: 'C: Interventional arm'
     type: ACTIVE_COMPARATOR
     description: Radiotherapy as per standard of care with metformin, with additional biomarkers/imaging
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 17
   sample_index: 123
@@ -452,7 +454,7 @@ rows:
     type: PLACEBO_COMPARATOR
     description: Participants will receive once weekly s.c. dose of placebo matched to cagrilintide/semaglutide
       for up to 52 weeks.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 18
   sample_index: 124
@@ -471,7 +473,7 @@ rows:
   - label: Lithium
     type: EXPERIMENTAL
     description: Lithium capsules titrated to 30-45mg/day based on individual patient subjective benefits and tolerability.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 19
   sample_index: 128
@@ -504,7 +506,7 @@ rows:
       once weekly for 26 weeks, followed by 26 weeks of post-treatment observation. Standard care comprises usual
       adjuvant endocrine therapy, routine oncology follow-up and standardized written guidance on diet and physical
       activity. Total follow-up is 78 weeks from randomization.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 20
   sample_index: 131
@@ -529,7 +531,7 @@ rows:
   - label: Metformin
     type: ACTIVE_COMPARATOR
     description: Metformin tablets 500-2250 mg a day (twice or three times per day)
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 21
   sample_index: 140
@@ -550,7 +552,7 @@ rows:
     type: EXPERIMENTAL
     description: Oral solution of sirolimus, 2mg, once a day. The trial will be terminated when a serious adverse
       reaction occurred, or the tumor progressed rapidly twice in a row, or when the patient did not want to continue.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 22
   sample_index: 143
@@ -580,7 +582,7 @@ rows:
     type: ACTIVE_COMPARATOR
     description: the initial dosage of gliclazide was 30 mg before breakfast, which was gradually titrated to a
       maximum of 120 mg/day to achieve a fasting capillary plasma glucose of \<7.0 mmol/L
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 23
   sample_index: 145
@@ -608,7 +610,7 @@ rows:
   - label: Resveratrol supplementation
     type: EXPERIMENTAL
     description: null
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 24
   sample_index: 148
@@ -644,7 +646,7 @@ rows:
     description: In Phase A, participants sitagliptin 100 mg plus atorvastatin 80 mg daily for 16 weeks. Participants
       continuing to Phase B received sitagliptin 100 mg plus atorvastatin 80 mg plus matching placebo to glimepiride
       daily for an additional 38 weeks.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 25
   sample_index: 153
@@ -667,7 +669,7 @@ rows:
   - label: Comparator group
     type: PLACEBO_COMPARATOR
     description: null
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 26
   sample_index: 159
@@ -701,7 +703,7 @@ rows:
   - label: Glimepiride group
     type: EXPERIMENTAL
     description: null
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 27
   sample_index: 167
@@ -729,7 +731,7 @@ rows:
   - label: Placebo
     type: PLACEBO_COMPARATOR
     description: Placebo once daily
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 28
   sample_index: 169
@@ -766,7 +768,7 @@ rows:
 
       Prednisone 30 mg/day in the first month. Induction therapy consisted of basiliximab or thymoglobulin if panel
       reactivity class I greater than 50 %'
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 29
   sample_index: 178
@@ -788,7 +790,7 @@ rows:
   - label: Lithium Carbonate
     type: EXPERIMENTAL
     description: null
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 30
   sample_index: 181
@@ -811,5 +813,5 @@ rows:
   - label: Glimepirid plus Metformin
     type: ACTIVE_COMPARATOR
     description: Metformin (1000 mg BID) + Glimepiride (individual dosage)
-  verdict: null
+  verdict: correct
   note: ''

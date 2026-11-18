@@ -26,6 +26,9 @@ Agreement on all 30: the number stands. Disagreement on two or more: the whole s
 re-adjudicated by someone other than the resolver's author. One disagreement is reported
 and resolved by discussion.
 
+**Outcome (2026-11-18): 30 of 30 agree; the number stands.** Details and limits are in
+`docs/step4b_precision_result.md`, "Blind checks".
+
 ## The four errors
 
 | # | Trial | Compound | Registered as | What it actually is | Error class |

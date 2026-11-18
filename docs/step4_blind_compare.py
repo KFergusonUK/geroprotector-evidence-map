@@ -14,13 +14,13 @@ tag = "step4" if ROUND == "4" else f"step{ROUND}"
 blind = yaml.safe_load(open(root / "docs" / f"{tag}_blind_check.yaml", encoding="utf-8"))["rows"]
 orig = {r["i"]: r for r in yaml.safe_load(open(root / "data" / "reviews" / f"{tag}_precision_sample.yaml",
                                                 encoding="utf-8"))["rows"]}
-missing = [b["blind_id"] for b in blind if b["verdict"] not in ("correct", "incorrect")]
+missing = [b["blind_id"] for b in blind if str(b["verdict"]).lower() not in ("correct", "incorrect")]
 if missing:
     sys.exit(f"verdict missing or not 'correct'/'incorrect' for blind_id {missing}")
 dis = []
 for b in blind:
     o = orig[b["sample_index"]]
-    if (b["verdict"] == "correct") != o["identity_correct"]:
+    if (str(b["verdict"]).lower() == "correct") != o["identity_correct"]:
         dis.append((b["blind_id"], b["nct_id"], b["verdict"], "correct" if o["identity_correct"] else "incorrect",
                     b.get("note", ""), o.get("note", "")))
 print(f"{len(blind)} rows; {len(blind) - len(dis)} agree; {len(dis)} disagree")

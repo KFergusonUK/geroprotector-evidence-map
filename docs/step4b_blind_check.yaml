@@ -13,6 +13,8 @@
 # original verdicts (data/reviews/step4*_precision_sample.yaml) until you have finished.
 # Then run: python3 docs/step4_blind_compare.py ROUND
 # Round 4b: 30 of 200, random.Random(2026111930); original verdicts committed before this packet was generated.
+# VERDICTS (Kevin Ferguson, 2026-11-18): 0 entered directly in this file; the other 30
+# transcribed by Claude from Kevin's message "Both blind checks all correct".
 rows:
 - blind_id: 1
   sample_index: 0
@@ -40,7 +42,7 @@ rows:
   - label: Placebo Semaglutide
     type: PLACEBO_COMPARATOR
     description: Semaglutide matched placebo pen injector
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 2
   sample_index: 4
@@ -66,7 +68,7 @@ rows:
     type: ACTIVE_COMPARATOR
     description: Metformin (1500 mg daily) (n = 10 in total) Older subjects with moderate frailty will be assigned
       for 16 weeks to this arm. A subgroup (n=5) will undergo 3 x 72h periods of CBGM
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 3
   sample_index: 9
@@ -93,7 +95,7 @@ rows:
     type: ACTIVE_COMPARATOR
     description: Participants will receive two treatments - metformin and pioglitazone for eight weeks each, separated
       by a one week washout period.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 4
   sample_index: 12
@@ -150,7 +152,7 @@ rows:
   - label: 'Phase II: RP2D determined in the Phase Ib'
     type: EXPERIMENTAL
     description: 'Phase II: L-NMMA starting dose will be the RP2D determined in the Phase Ib portion of the study.'
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 5
   sample_index: 20
@@ -180,7 +182,7 @@ rows:
     type: EXPERIMENTAL
     description: Each participant will receive a single dose of 2 tablets of CANA/MET XR FDC, formulation 2, under
       fed conditions.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 6
   sample_index: 25
@@ -200,7 +202,7 @@ rows:
   - label: Rapamycin
     type: EXPERIMENTAL
     description: Sirolimus tablets will be administered orally, 7 mg once per week during 26 weeks
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 7
   sample_index: 29
@@ -224,7 +226,7 @@ rows:
   - label: STANDARS CARE
     type: NO_INTERVENTION
     description: According to surviving covid-Campaign guidelines
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 8
   sample_index: 39
@@ -243,7 +245,7 @@ rows:
   - label: aspirin
     type: EXPERIMENTAL
     description: Low dose daily aspirin in healthy volunteers for two weeks
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 9
   sample_index: 42
@@ -265,7 +267,7 @@ rows:
     description: Dabrafenib 150 mg PO BID until progression or unacceptable toxicity. Trametinib 2 mg PO QD until
       progression or unacceptable toxicity. Metformin 500 mg PO BID x 2 weeks, then 850 mg PO BID until progression
       or unacceptable toxicity.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 10
   sample_index: 53
@@ -290,7 +292,7 @@ rows:
   - label: control group
     type: PLACEBO_COMPARATOR
     description: placebo
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 11
   sample_index: 61
@@ -314,7 +316,7 @@ rows:
   - label: Aspirin
     type: ACTIVE_COMPARATOR
     description: 'Intervention: Drug: Aspirin verum + Ticagrelor placebo'
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 12
   sample_index: 67
@@ -338,7 +340,7 @@ rows:
   - label: ARDIANCE®
     type: ACTIVE_COMPARATOR
     description: ARDIANCE® (Empagliflozin 10 mg tablets (reference drug))
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 13
   sample_index: 69
@@ -361,7 +363,7 @@ rows:
   - label: Metformin
     type: ACTIVE_COMPARATOR
     description: Metformin 1000mg bid po
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 14
   sample_index: 74
@@ -417,7 +419,7 @@ rows:
   - label: Placebo (metformin+sulfonylurea)
     type: PLACEBO_COMPARATOR
     description: Placebo tablets matching BI 10773
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 15
   sample_index: 92
@@ -443,7 +445,7 @@ rows:
     type: ACTIVE_COMPARATOR
     description: Placebo for 6 weeks, minimum of a 2 week washout period, followed by Empagliflozin (SGLT2 inhibitor)
       25mg capsules once daily for 6 weeks
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 16
   sample_index: 102
@@ -458,7 +460,7 @@ rows:
     armGroupLabels: null
   study_title: Rapamycin Therapy for Patients With Tuberous Sclerosis Complex and Sporadic LAM
   arm_groups: []
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 17
   sample_index: 109
@@ -495,7 +497,7 @@ rows:
       tablet form for oral administration. Participants who did not have a continuous need to take a PPI, were randomized
       1:1 to receive pantoprazole 40 mg (tablet form for oral administration, od) or matching placebo od. Participants
       who consented to LTOLE part received open label rivaroxaban 2.5 mg bid and aspirin 100 mg od in LTOLE part.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 18
   sample_index: 111
@@ -551,7 +553,7 @@ rows:
   - label: Placebo Obesity
     type: PLACEBO_COMPARATOR
     description: Placebo in Obesity
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 19
   sample_index: 113
@@ -577,7 +579,7 @@ rows:
   - label: Metformin
     type: ACTIVE_COMPARATOR
     description: Metformin monotherapy
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 20
   sample_index: 116
@@ -592,7 +594,7 @@ rows:
     armGroupLabels: null
   study_title: 'Efficacy of Metformin in PCOS: Metabolic and Hormonal Factors'
   arm_groups: []
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 21
   sample_index: 119
@@ -617,7 +619,7 @@ rows:
     type: EXPERIMENTAL
     description: To evaluate the effect of multiple doses of voxelotor on the plasma PK of a single dose of metformin,
       furosemide, and rosuvastatin
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 22
   sample_index: 133
@@ -654,7 +656,7 @@ rows:
       metastatic site, and date of diagnosis. The matched historical controls will be obtained from the same treating
       institution as the corresponding case to account for institutional differences in treatment and supportive
       care. Patients in the historical control cohort received standard therapy.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 23
   sample_index: 135
@@ -682,7 +684,7 @@ rows:
   - label: Placebo plus aspirin
     type: PLACEBO_COMPARATOR
     description: 200 mg Placebo twice daily and 325 mg tablet aspirin once daily (Day 1-7)
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 24
   sample_index: 148
@@ -708,7 +710,7 @@ rows:
   - label: semaglutide Arm
     type: ACTIVE_COMPARATOR
     description: Participants will receive semaglutide once weekly after randomization
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 25
   sample_index: 159
@@ -734,7 +736,7 @@ rows:
   - label: heart failure with preserved ejection fraction
     type: EXPERIMENTAL
     description: Empagliflozin 10mg, tablet, once daily
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 26
   sample_index: 172
@@ -757,7 +759,7 @@ rows:
   - label: No treatment
     type: NO_INTERVENTION
     description: null
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 27
   sample_index: 175
@@ -781,7 +783,7 @@ rows:
   - label: Placebo
     type: PLACEBO_COMPARATOR
     description: Placebo 1 tablet twice a day
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 28
   sample_index: 189
@@ -805,7 +807,7 @@ rows:
   - label: Placebo
     type: PLACEBO_COMPARATOR
     description: A cohort of fifty-one cross matched PCOS women
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 29
   sample_index: 190
@@ -827,7 +829,7 @@ rows:
     type: EXPERIMENTAL
     description: Single arm, open label study of1% sirolimus ointment applied to affected area twice daily for the
       first four weeks followed by once daily for 5 months.
-  verdict: null
+  verdict: correct
   note: ''
 - blind_id: 30
   sample_index: 191
@@ -872,5 +874,5 @@ rows:
     type: EXPERIMENTAL
     description: Patients receive DEC-205/NY-ESO-1 fusion protein CDX-1401 as in the Cohort (1a-1d) that is determined
       to be safe and produces optimal immunological effects and sirolimus PO on days 1-14 as in Cohort 1b dose.
-  verdict: null
+  verdict: correct
   note: ''
