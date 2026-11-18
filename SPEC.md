@@ -1,9 +1,19 @@
 # Geroprotector Human Evidence Map — Specification
 
-**Status:** v0.6 draft spec
+**Status:** v0.7 draft spec
 **Owner:** Kevin Ferguson
 
-**Changes since v0.5** (2026-11-11):
+**Changes since v0.6** (2026-11-18):
+- §5.1: the registry's MeSH search expansion is the stated evidence for forbidding
+  search-membership joins; resolver design for §7 step 3 fixed (§5.1a).
+- §5.9: `trial_intervention.role` (experimental | comparator | background | unclear);
+  primary counts use experimental only. Closes the comparator/background question.
+- §4.2a: query rules file (ASA and NR dropped as search strings; decoys for identity
+  traps); masoprocol and Y-27632 added to the fetch; staging no longer copies records.
+- §5.2: results sections fetched only for trials that survive §7 step 4.
+- Recall check of the registry fetch against a literature sample (§4.2a).
+
+**Changes in v0.6** (2026-11-11):
 - ITP **strong** tier now requires positive cohorts in ≥2 independent experiments; the two
   sexes of one experiment read mixed (§5.4).
 - **Replication** requires two (mammal) lab groups or a **strong** ITP tier; one positive
@@ -355,20 +365,50 @@ fetch phases, both stored verbatim in `raw_response` with request parameters and
 version:
 
 1. **Hits** — one search per query string (`query.intr`, NCT ID and last-update date
-   only). Query strings for the seed compounds are the canonical name plus every
-   `must_match` synonym in the fixture; strings carrying a dose are resolver test inputs,
-   not names, and are skipped; case and dash variants collapse. `ctgov_query_plan` records
-   which fixture compound supplied each string, and `ctgov_query_hit` which string found
-   each study — the evidence for the precision check (§7 step 4).
+   only). Query strings for the fixture compounds (seeds, class test cases, the linked
+   compound masoprocol, and the identity trap Y-27632) are the canonical name plus every
+   `must_match` synonym; strings carrying a dose are resolver test inputs, not names, and
+   are skipped; case and dash variants collapse. `data/rules/ctgov_query.yaml` (versioned)
+   removes strings too noisy to search on (ASA, NR — see §10) and adds **decoys** for
+   identity traps: ximelagatran and Exanta are searched so the resolver meets them in live
+   registry text and must not map them to Y-27632. `ctgov_query_plan` records which
+   fixture compound supplied each string, and `ctgov_query_hit` which string found each
+   study — the evidence for the precision check (§7 step 4).
 2. **Full records** — each study once, batched by NCT ID, with `protocolSection`,
    `derivedSection` (MeSH browse modules) and `hasResults`. The posted-results section is
-   not fetched: it is large, and results reporting is derived from status and dates (§5.2).
+   not fetched in bulk; see §5.2 for which trials get it.
 
-Staging tables, rebuilt from the raw layer at any time and never edited by hand:
-`ctgov_study` (the whole record plus convenience columns; conditions, outcomes and MeSH
-arrays verbatim), `ctgov_intervention` (one row per intervention object: name, type,
-description, `otherNames`, `armGroupLabels`, and the full object as returned). Nothing in
-staging links a study to a `compound_id`; that is the resolver's job (§7 step 3).
+Staging tables, rebuilt from the raw layer at any time and never edited by hand (a test
+proves the rebuild is identical): `ctgov_study` (convenience columns; conditions,
+outcomes and MeSH arrays verbatim; the full record is read from the raw response it points
+to, not copied), `ctgov_intervention` (one row per intervention object: name, type,
+description, `otherNames`, `armGroupLabels`, and the full object as returned). Staging
+holds only the current plan's hits; a dropped query string keeps its raw history. Nothing
+in staging links a study to a `compound_id`; that is the resolver's job (§7 step 3).
+
+**Seed fetch, 2026-11-11/18:** 112 query strings, 10,360 studies, 25,567 intervention
+objects. In 3,232 interventions the compound appears only outside the name (592 in
+`otherNames`, 2,640 in descriptions); thousands more trials mention it only in arm
+descriptions, titles or summaries (background therapy, §5.9) or not at all (registry
+search expansion, §5.1).
+
+**Recall check** (`agesdk/recall.py`, sample in `data/fixtures/ctgov_recall_sample.yaml`):
+precision problems are visible inside the fetched data; a systematic miss is not. For each
+compound, the most-cited PubMed randomised-trial papers (OpenAlex citation counts) whose
+record carries a ClinicalTrials.gov registration are verified in the registry, and the
+fetch is checked for each. The sample comes from the literature, not from our query
+strings, so it can expose misses.
+
+*Result, 2026-11-18* (32 trials sampled across 17 compounds; 17-α-estradiol, NDGA and
+meclizine have no registered RCT publications in PubMed): of the **27 trials whose registry
+record names the compound, 26 were caught (96%)**; all 24 naming it in an intervention
+name were caught. The one miss, THALES (NCT03354429), gives aspirin only as "ASA" in the
+title, with aspirin as background in both arms: the measured cost of dropping "ASA" (§10),
+landing on a background trial. Five sampled trials do not name the compound at all and are
+not counted: two metformin-background trials (tirzepatide; oral semaglutide), a
+histidine-tryptophan-ketoglutarate cardioplegia trial (not alpha-ketoglutarate), and the
+two most-cited **spermidine** trials, including SmartAge (NCT03094546), which register the
+intervention only as "Polyamine supplementation" / wheat germ extract — see §10.
 
 The raw layer is the cache: a re-run makes no network calls for anything stored. The
 §11 incremental refresh uses the same two phases, re-fetching full records only for
@@ -472,6 +512,35 @@ Current overrides:
 **Rule: no fuzzy match enters `trial_intervention.compound_id` without human review.**
 Precision over recall. A false join poisons every downstream count.
 
+**Registry search membership is never identity.** ClinicalTrials.gov's intervention search
+expands queries through MeSH, including a heading's descendants. Measured in the seed fetch
+(2026-11-11):
+
+- about **a third of "sirolimus" hits are other rapalogs** — 795 trials whose interventions
+  are everolimus, temsirolimus and relatives, filed under Sirolimus in MeSH — exactly the
+  everolimus join this section forbids;
+- **all six "17-α-estradiol" hits are other hormone trials** (cetrorelix, Nuvaring and
+  similar, under the Estradiol heading) — the stereo trap firing inside the registry's own
+  search;
+- 45 "taurine" hits are acamprosate; the masoprocol queries return terameprocol (M4N,
+  EM-1421), a methylated derivative.
+
+A trial's presence in a search result is therefore a *candidate*, never evidence that it
+involves the compound.
+
+### 5.1a Resolver design (§7 step 3)
+
+- **Primary evidence:** the intervention object's `name` and `otherNames` (a brand name
+  often sits in `otherNames` while `name` reads "Study Drug").
+- **Weak evidence:** the intervention description, arm group labels and descriptions,
+  title and summary. Alone, these support at most `background` or review (§5.9).
+- **Never evidence:** membership of a registry search result (above).
+- **Class-level names** ("SGLT2 inhibitor", "ACE inhibitor") are flagged for review,
+  never auto-matched, even when `otherNames` lists several drugs.
+- Each match also gets a **role** (§5.9) and a **systemic-exposure** classification (§5.6).
+- The fixture's `must_match`, `must_not_match`, `needs_review` and `route_excluded` lists,
+  the decoys, and the recall sample are the tests it must pass (§7 step 4).
+
 ### 5.2 `results_state` is not a boolean
 
 Model as an enum from the start:
@@ -488,6 +557,12 @@ Model as an enum from the start:
 
 The publication-bias finding lives in the distinction between `NOT_POSTED_DUE`
 and `TERMINATED_NO_RESULTS`. Collapsing these to a boolean destroys the result.
+
+**What each state needs.** `NOT_POSTED_DUE`, `NOT_POSTED_NOT_DUE`,
+`TERMINATED_NO_RESULTS`, `WITHDRAWN`, `ONGOING` and `UNKNOWN` derive from overall status,
+dates and `hasResults`, all already fetched. `PARTIAL` cannot: it needs the per-outcome
+results section. Results sections are therefore fetched **only for trials that survive
+the resolver in §7 step 4**, not for all fetched studies.
 
 ### 5.3 Ageing-adjacent endpoint classification
 
@@ -767,6 +842,24 @@ path, not this one.
 
 ---
 
+### 5.9 Role of the compound in a trial
+
+`trial_intervention.role` records what the compound is doing in the trial:
+
+- `experimental` — under test;
+- `comparator` — the active control;
+- `background` — co-administered, not tested (e.g. placebo or a new drug on top of
+  metformin; a P2Y12 inhibitor alongside aspirin);
+- `unclear` — not yet assigned (default).
+
+**Primary counts use `experimental` only** (`v_compound_trials`, the gold and null cells,
+`v_unreported`, the mechanistic dossier). Background and comparator trials are retained
+and labelled, with their own counts: they carry exposure and safety information, which
+matters for the harm path. Evidence for the large background share: most of metformin's
+and aspirin's trials that do not name the compound in an intervention object mention it
+only in arm descriptions, titles or summaries (§4.2a). `role_basis` records what set the
+role (arm group type, or a reviewed rule).
+
 ## 6. Seed list (n=18 + 2 class test cases + 1 linked compound)
 
 Chosen to stress the matching logic, not for fame. Resolve all by hand first;
@@ -819,10 +912,11 @@ A10BF01; NMN — take the β-anomer. **Unresolvable:** aluminium acetylsalicylat
 
 1. **Resolve the seed compounds by hand.** Build the fixture first.
 2. ClinicalTrials.gov client → raw layer, for the seed compounds only (§4.2a). *Done.*
-3. Intervention string resolver → measure precision/recall against the fixture.
+3. Intervention string resolver → measure precision/recall against the fixture (§5.1a).
 4. **Decision point:** if matching is too noisy at seed scale, stop and rethink
    before scaling. Cheap failure is the point of this step.
-5. `results_state` derivation; systemic exposure classification (§5.6).
+5. `results_state` derivation; systemic exposure classification (§5.6); results
+   sections fetched for the trials surviving step 4 (§5.2).
 6. Endpoint classifier + rule set.
 7. Scale to full DrugAge compound list (all species and directions loaded).
 8. ChEMBL ATC load, class entry, `lab_group` derivation.
@@ -866,8 +960,23 @@ collaborate. That is the realistic route to the data behind governance walls
 - **The fourth output cell — shortens animal lifespan + widely used in humans — is
   now in scope via the harm path, not deferred.**
 - Is the EU Clinical Trials Register (or WHO ICTRP) worth adding in v2 for non-US coverage?
-- How to handle trials where the compound is a comparator or background therapy
-  rather than the intervention? (ClinicalTrials.gov arm groups carry arm type.)
+- ~~How to handle trials where the compound is a comparator or background therapy?~~
+  **Resolved:** `trial_intervention.role`; primary counts use experimental only (§5.9).
+- **Deliberate precision-over-recall trade-off:** "ASA" and "NR" are not used as registry
+  search strings (`data/rules/ctgov_query.yaml`). In the seed fetch "ASA" found 614
+  studies "aspirin" did not — mesalamine/mesalazine (5-ASA), anaesthesia trials citing ASA
+  physical status, laser dermatology — and "NR" found 142 that "nicotinamide riboside" did
+  not — venetoclax, secukinumab, an infant formula named "NR Pepti", ATC "nr."
+  abbreviations. Trials naming the compound only by these abbreviations may be missed; the
+  recall check is how that cost is measured. Both stay in the fixture as resolver inputs.
+- Spermidine's human evidence base is extract trials registered as "polyamine
+  supplementation" (wheat germ extract), never naming spermidine; the fetch misses them and
+  the fixture already routes extracts to review. Search "polyamine" too (feeding review
+  only), or accept that spermidine's registry dossier is near-empty by design?
+- Genetic reprogramming (Yamanaka factors, OSK/OSKM) is out of scope: the factors are
+  transcription factors delivered as genes, not compounds, with no InChIKey, and the
+  mechanistic path (§5.8) is limited to *chemical* cocktails. Bringing them in would need a
+  separate path with its own identity model (construct and delivery, not molecule).
 - Should observational studies (not just RCTs) be in scope? Probably v2.
 - What evidence establishes "substantial human exposure" for the harm path beyond
   reviewer judgement (e.g. ChEMBL approval status, prescription volume)?

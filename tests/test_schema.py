@@ -272,7 +272,8 @@ class ReprogrammingEvidenceStandard(unittest.TestCase):
         self.conn.execute("INSERT INTO trial (nct_id, results_state) VALUES ('NCT2', 'ONGOING')")
         for nct, exposure in (("NCT1", "systemic"), ("NCT2", "local")):
             self.conn.execute("INSERT INTO trial_intervention (nct_id, raw_name, compound_id, systemic_exposure, "
-                              "route_rule_version) VALUES (?, 'x', ?, ?, 'r1')", (nct, self.cid, exposure))
+                              "route_rule_version, role) VALUES (?, 'x', ?, ?, 'r1', 'experimental')",
+                              (nct, self.cid, exposure))
         r = dict(self.conn.execute("SELECT * FROM v_mechanistic_human_dossier").fetchone())
         self.assertEqual((r["n_systemic_trials"], r["n_trials_with_results"]), (1, 1))
 
@@ -701,3 +702,32 @@ class HarmReviewContext(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TrialRole(unittest.TestCase):
+    """SPEC §5.9: primary counts use experimental only; background is kept and labelled."""
+
+    def setUp(self):
+        c = self.conn = fresh()
+        self.met = add_compound(c, "metformin")
+        for nct, role, state in (("NCT1", "experimental", "NOT_POSTED_DUE"), ("NCT2", "background", "NOT_POSTED_DUE"),
+                                 ("NCT3", "comparator", "POSTED"), ("NCT4", "unclear", "POSTED")):
+            c.execute("INSERT INTO trial (nct_id, results_state) VALUES (?, ?)", (nct, state))
+            c.execute("INSERT INTO trial_intervention (nct_id, raw_name, compound_id, systemic_exposure, "
+                      "route_rule_version, role) VALUES (?, 'metformin', ?, 'systemic', 'r1', ?)", (nct, self.met, role))
+
+    def test_role_enum_and_default(self):
+        self.conn.execute("INSERT INTO trial (nct_id, results_state) VALUES ('NCT9', 'ONGOING')")
+        with self.assertRaises(sqlite3.IntegrityError):
+            self.conn.execute("INSERT INTO trial_intervention (nct_id, raw_name, role) VALUES ('NCT9', 'x', 'add-on')")
+        self.conn.execute("INSERT INTO trial_intervention (nct_id, raw_name) VALUES ('NCT9', 'y')")
+        self.assertEqual(self.conn.execute("SELECT role FROM trial_intervention WHERE nct_id = 'NCT9'").fetchone()[0],
+                         "unclear")
+
+    def test_primary_counts_experimental_only(self):
+        r = dict(self.conn.execute("SELECT * FROM v_compound_trials WHERE compound_id = ?", (self.met,)).fetchone())
+        self.assertEqual((r["n_systemic_trials"], r["n_overdue_trials"]), (1, 1))
+        self.assertEqual((r["n_comparator_trials"], r["n_background_trials"], r["n_role_unclear_trials"]), (1, 1, 1))
+
+    def test_background_overdue_trial_is_not_unreported_for_the_compound(self):
+        self.assertEqual([r["nct_id"] for r in self.conn.execute("SELECT nct_id FROM v_unreported")], ["NCT1"])

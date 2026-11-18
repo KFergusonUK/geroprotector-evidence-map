@@ -127,6 +127,14 @@ def cmd_ctgov_report(conn, args):
     print(json.dumps(ctgov_report.build(conn), indent=2, ensure_ascii=False))
 
 
+def cmd_recall_check(conn, args):
+    from agesdk import recall
+    res = recall.run(conn, fixture.load(), progress=lambda m: print(m, flush=True))
+    recall.save(res)
+    print(json.dumps(res["summary"], indent=2))
+    print(f"sample written to {recall.SAMPLE_PATH}")
+
+
 def cmd_fixture_chembl(conn, args):
     print(json.dumps(fixture.chembl_report(fixture.load(), conn), indent=2))
 
@@ -147,6 +155,7 @@ def main(argv=None):
     p.add_argument("--no-litscan", action="store_true")
     sub.add_parser("ctgov-seed", help="fetch ClinicalTrials.gov hits + full records for the seed compounds")
     sub.add_parser("ctgov-report", help="hit volume and intervention-string quality for the seed fetch")
+    sub.add_parser("recall-check", help="literature-sampled recall check of the ClinicalTrials.gov fetch")
     p = sub.add_parser("state-backups", help="dated pipeline-state release names and pruning (reads gh JSON)")
     p.add_argument("action", choices=["tag", "latest", "prune"])
     p.add_argument("--run-id", type=int, default=0)
@@ -159,7 +168,7 @@ def main(argv=None):
     {"init-db": cmd_init_db, "fetch-drugage": cmd_fetch_drugage,
      "fixture-check": cmd_fixture_check, "fixture-chembl": cmd_fixture_chembl,
      "reprogramming-check": cmd_reprogramming_check, "refresh": cmd_refresh,
-     "ctgov-seed": cmd_ctgov_seed, "ctgov-report": cmd_ctgov_report}[args.cmd](conn, args)
+     "ctgov-seed": cmd_ctgov_seed, "ctgov-report": cmd_ctgov_report, "recall-check": cmd_recall_check}[args.cmd](conn, args)
 
 
 if __name__ == "__main__":

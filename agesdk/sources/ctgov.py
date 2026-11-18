@@ -28,6 +28,9 @@ import sqlite3
 import unicodedata
 from datetime import date, timedelta
 
+import yaml
+
+from agesdk.db import PROJECT_ROOT
 from agesdk.raw import CachedFetcher, HttpClient, StoredResponse, last_watermark, log_fetch
 
 SOURCE = "ctgov"
@@ -38,6 +41,13 @@ HIT_PAGE_SIZE = 1000
 ID_BATCH = 100
 OVERLAP_DAYS = 1
 MIN_INTERVAL_S = 1.2          # well under the API's published rate limit
+RULES_PATH = PROJECT_ROOT / "data" / "rules" / "ctgov_query.yaml"
+PLAN_ROLES = ("seed", "class_test_case", "linked_compound", "identity_trap")
+
+
+def load_rules(path=RULES_PATH) -> dict:
+    with open(path, encoding="utf-8") as fh:
+        return yaml.safe_load(fh)
 
 
 def version(client: HttpClient) -> dict:
@@ -89,18 +99,23 @@ def normalise_term(s: str) -> str:
     return " ".join(unicodedata.normalize("NFKC", s).translate(DASHES).split())
 
 
-def seed_query_plan(fx: dict, roles=("seed", "class_test_case")) -> list[dict]:
-    """Query strings for the seed compounds: canonical name plus the fixture's must_match
+def seed_query_plan(fx: dict, roles=PLAN_ROLES, rules: dict | None = None) -> list[dict]:
+    """Query strings for the fixture compounds: canonical name plus the fixture's must_match
     synonyms. Strings carrying a dose ("aspirin 81 mg") are resolver test inputs, not names,
-    and are skipped. Case and dash variants collapse to one query."""
+    and are skipped; so are the rules file's excluded_terms (too noisy to search on). Case
+    and dash variants collapse to one query. Identity-trap entries also get their decoys."""
+    rules = rules if rules is not None else {"excluded_terms": [], "trap_decoys": {}}
+    excluded = {normalise_term(e["term"]).lower() for e in rules.get("excluded_terms", [])}
+    decoys = rules.get("trap_decoys", {}) or {}
     plan, seen = [], {}
     for c in fx["compounds"]:
         if c["role"] not in roles:
             continue
-        candidates = [(c["canonical_name"], "canonical_name")] + [(m, "must_match") for m in c["must_match"]]
+        candidates = ([(c["canonical_name"], "canonical_name")] + [(m, "must_match") for m in c["must_match"]]
+                      + [(d, "trap_decoy") for d in decoys.get(c["key"], [])])
         for raw, source in candidates:
             term = normalise_term(str(raw))
-            if not term or DOSE_RE.search(term):
+            if not term or DOSE_RE.search(term) or term.lower() in excluded:
                 continue
             k = term.lower()
             if k in seen:
@@ -113,6 +128,8 @@ def seed_query_plan(fx: dict, roles=("seed", "class_test_case")) -> list[dict]:
 
 
 def save_plan(conn: sqlite3.Connection, plan: list[dict], plan_version: str) -> None:
+    """Replace the whole plan: a term dropped from the plan leaves staging (its raw history stays)."""
+    conn.execute("DELETE FROM ctgov_query_plan")
     conn.executemany("INSERT OR REPLACE INTO ctgov_query_plan (query_term, compound_key, term_source, plan_version) "
                      "VALUES (:query_term, :compound_key, :term_source, :pv)",
                      [dict(p, pv=plan_version) for p in plan])
@@ -176,28 +193,36 @@ def _date(struct):
 
 def stage(conn: sqlite3.Connection) -> dict:
     """Rebuild ctgov_query_hit, ctgov_study and ctgov_intervention from the raw layer.
-    Raw responses are applied in id order, so a later record of a study supersedes an
-    earlier one."""
+
+    Only the current query plan's terms are staged (dropped terms keep their raw history),
+    and only studies those terms hit. Raw responses are applied in id order, so a later
+    record of a study supersedes an earlier one. Nothing here is a source of truth: the
+    whole staging layer can be dropped and rebuilt from raw_response.
+    """
     conn.execute("DELETE FROM ctgov_intervention")
     conn.execute("DELETE FROM ctgov_study")
     conn.execute("DELETE FROM ctgov_query_hit")
+    plan_terms = {r[0] for r in conn.execute("SELECT query_term FROM ctgov_query_plan")}
     n_hits = n_studies = 0
     reader = conn.cursor()   # stream: the raw layer can be large
     for row in reader.execute("SELECT id, request_params, response_body FROM raw_response "
-                              "WHERE source = ? AND endpoint = 'studies' AND http_status = 200 ORDER BY id",
-                              (SOURCE,)):
+                              "WHERE source = ? AND endpoint = 'studies' AND http_status = 200 "
+                              "AND request_params LIKE '%query.intr%' ORDER BY id", (SOURCE,)):
         params = json.loads(row["request_params"])
-        data = json.loads(row["response_body"])
-        if "query.intr" in params:
-            for s in data.get("studies", []):
+        if "query.intr" in params and params["query.intr"] in plan_terms:
+            for s in json.loads(row["response_body"]).get("studies", []):
                 ps = s.get("protocolSection", {})
                 conn.execute("INSERT OR REPLACE INTO ctgov_query_hit (query_term, nct_id, last_update_post_date, "
                              "raw_response_id) VALUES (?, ?, ?, ?)",
                              (params["query.intr"], ps["identificationModule"]["nctId"],
                               _date(ps.get("statusModule", {}).get("lastUpdatePostDateStruct")), row["id"]))
                 n_hits += 1
-        elif "filter.ids" in params:
-            for s in data.get("studies", []):
+    wanted = {r[0] for r in conn.execute("SELECT DISTINCT nct_id FROM ctgov_query_hit")}
+    for row in reader.execute("SELECT id, request_params, response_body FROM raw_response "
+                              "WHERE source = ? AND endpoint = 'studies' AND http_status = 200 "
+                              "AND request_params LIKE '%filter.ids%' ORDER BY id", (SOURCE,)):
+        for s in json.loads(row["response_body"]).get("studies", []):
+            if s["protocolSection"]["identificationModule"]["nctId"] in wanted:
                 _stage_study(conn, row["id"], s)
                 n_studies += 1
     conn.commit()
@@ -220,8 +245,8 @@ def _stage_study(conn: sqlite3.Connection, raw_id: int, s: dict) -> None:
              nct_id, raw_response_id, last_update_post_date, brief_title, overall_status, study_type, phases,
              enrollment, start_date, primary_completion_date, completion_date, results_first_post_date,
              has_results, lead_sponsor, lead_sponsor_class, interventions, arm_groups, conditions_module,
-             condition_browse, intervention_browse, outcomes_module, study_json)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+             condition_browse, intervention_browse, outcomes_module)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (nct, raw_id, _date(status.get("lastUpdatePostDateStruct")), ident.get("briefTitle"),
          status.get("overallStatus"), design.get("studyType"), dumps(design.get("phases")),
          (design.get("enrollmentInfo") or {}).get("count"), _date(status.get("startDateStruct")),
@@ -230,7 +255,7 @@ def _stage_study(conn: sqlite3.Connection, raw_id: int, s: dict) -> None:
          (sponsor.get("leadSponsor") or {}).get("name"), (sponsor.get("leadSponsor") or {}).get("class"),
          dumps(arms.get("interventions", [])), dumps(arms.get("armGroups")), dumps(ps.get("conditionsModule")),
          dumps(ds.get("conditionBrowseModule")), dumps(ds.get("interventionBrowseModule")),
-         dumps(ps.get("outcomesModule")), dumps(s)))
+         dumps(ps.get("outcomesModule"))))
     for i, iv in enumerate(arms.get("interventions", [])):
         conn.execute(
             """INSERT INTO ctgov_intervention (nct_id, idx, intervention_type, name, description, other_names,
@@ -239,14 +264,25 @@ def _stage_study(conn: sqlite3.Connection, raw_id: int, s: dict) -> None:
              dumps(iv.get("armGroupLabels")), dumps(iv)))
 
 
+def study_record(conn: sqlite3.Connection, nct_id: str) -> dict | None:
+    """The full study record as returned, read from the raw response staging points at."""
+    row = conn.execute("SELECT raw_response_id FROM ctgov_study WHERE nct_id = ?", (nct_id,)).fetchone()
+    if row is None:
+        return None
+    body = conn.execute("SELECT response_body FROM raw_response WHERE id = ?", (row[0],)).fetchone()[0]
+    return next((s for s in json.loads(body).get("studies", [])
+                 if s["protocolSection"]["identificationModule"]["nctId"] == nct_id), None)
+
+
 # ---------------------------------------------------------------- orchestration
 
 def fetch_seed(conn: sqlite3.Connection, fx: dict, *, client: HttpClient | None = None,
                run_id: int | None = None) -> dict:
     """§7 step 2: hits for every seed query string, then full records for every study not
     already stored. Idempotent: a re-run with everything cached makes no network calls."""
-    plan = seed_query_plan(fx)
-    save_plan(conn, plan, f"fixture-{fx.get('fixture_version')}")
+    rules = load_rules()
+    plan = seed_query_plan(fx, rules=rules)
+    save_plan(conn, plan, f"fixture-{fx.get('fixture_version')}+{rules['version']}")
     f = Fetcher(conn, client or HttpClient(min_interval_s=MIN_INTERVAL_S))
     per_term = []
     for p in plan:

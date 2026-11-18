@@ -1,0 +1,25 @@
+# ClinicalTrials.gov query-plan rules (SPEC §4.2a, §10). Versioned: bump on any change.
+version: ctgov-query-v2
+created: "2026-11-11"
+
+# Fixture synonyms NOT used as standalone search strings. They stay in the fixture as
+# resolver test inputs; they are only too noisy to search on. Precision over recall.
+excluded_terms:
+  - term: ASA
+    compound: aspirin
+    rationale: >-
+      614 studies found by "ASA" and not by "aspirin" in the 2026-11-11 seed fetch:
+      mesalamine/mesalazine (5-ASA), anaesthesia trials citing ASA physical status,
+      dermatology laser studies. Aspirin trials are reached via "aspirin",
+      "acetylsalicylic acid" and brand names.
+  - term: NR
+    compound: nr
+    rationale: >-
+      142 studies found by "NR" and not by "nicotinamide riboside": venetoclax, secukinumab,
+      ribavirin, an infant formula named "NR Pepti", ATC "nr." abbreviations. NR trials are
+      reached via "nicotinamide riboside", "Niagen" and "NR chloride" forms.
+
+# Strings searched as decoys for identity-trap fixture entries: the resolver must meet
+# them in live registry text and NOT map them to the trap compound.
+trap_decoys:
+  y27632: [ximelagatran, Exanta]

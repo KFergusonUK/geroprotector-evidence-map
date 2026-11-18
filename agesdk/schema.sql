@@ -337,6 +337,12 @@ CREATE TABLE IF NOT EXISTS trial_intervention (
   route             TEXT,                 -- as derived from the registry record
   systemic_exposure TEXT CHECK (systemic_exposure IN ('systemic', 'local', 'unclear')),
   route_rule_version TEXT,
+  -- What the compound is doing in the trial (SPEC §5.9). Primary counts use 'experimental'
+  -- only; 'background' (co-administered, not tested) is kept and labelled: it carries
+  -- exposure and safety information. 'unclear' until assigned.
+  role              TEXT NOT NULL DEFAULT 'unclear'
+                      CHECK (role IN ('experimental', 'comparator', 'background', 'unclear')),
+  role_basis        TEXT,                 -- e.g. arm group type, or the reviewed rule that set it
   PRIMARY KEY (nct_id, raw_name),
   CHECK (systemic_exposure IS NULL OR route_rule_version IS NOT NULL)
 );
@@ -739,10 +745,13 @@ WITH rp AS (
   FROM reprogramming_evidence GROUP BY compound_id),
 tr AS (
   SELECT ti.compound_id,
-         count(DISTINCT ti.nct_id)                                    AS n_systemic_trials,
-         count(DISTINCT CASE WHEN t.results_state IN ('POSTED', 'PARTIAL', 'PUBLISHED_ONLY')
+         count(DISTINCT CASE WHEN ti.role = 'experimental' THEN ti.nct_id END) AS n_systemic_trials,
+         count(DISTINCT CASE WHEN ti.role = 'experimental'
+                              AND t.results_state IN ('POSTED', 'PARTIAL', 'PUBLISHED_ONLY')
                              THEN ti.nct_id END)                      AS n_trials_with_results,
-         count(DISTINCT CASE WHEN o.ageing_adjacent = 1 THEN ti.nct_id END) AS n_trials_ageing_adjacent
+         count(DISTINCT CASE WHEN ti.role = 'experimental' AND o.ageing_adjacent = 1
+                             THEN ti.nct_id END)                      AS n_trials_ageing_adjacent,
+         count(DISTINCT CASE WHEN ti.role = 'background' THEN ti.nct_id END) AS n_background_trials
   FROM trial_intervention ti
   JOIN trial t ON t.nct_id = ti.nct_id
   LEFT JOIN trial_outcome o ON o.nct_id = ti.nct_id
@@ -755,7 +764,8 @@ SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
        rp.any_in_vivo, rp.all_rows_reviewed,
        coalesce(tr.n_systemic_trials, 0)        AS n_systemic_trials,
        coalesce(tr.n_trials_with_results, 0)    AS n_trials_with_results,
-       coalesce(tr.n_trials_ageing_adjacent, 0) AS n_trials_ageing_adjacent
+       coalesce(tr.n_trials_ageing_adjacent, 0) AS n_trials_ageing_adjacent,
+       coalesce(tr.n_background_trials, 0)      AS n_background_trials
 FROM compound c
 JOIN rp USING (compound_id)
 LEFT JOIN tr USING (compound_id)
@@ -771,7 +781,9 @@ WHERE c.evidence_tier = 'mechanistic_only';
 CREATE TABLE IF NOT EXISTS ctgov_query_plan (
   query_term    TEXT PRIMARY KEY,
   compound_key  TEXT NOT NULL,            -- fixture key that supplied the term
-  term_source   TEXT NOT NULL CHECK (term_source IN ('canonical_name', 'must_match')),
+  -- trap_decoy: a string the compound must NOT match, searched so the resolver's
+  -- precision check meets it in live registry text (e.g. ximelagatran for Y-27632).
+  term_source   TEXT NOT NULL CHECK (term_source IN ('canonical_name', 'must_match', 'trap_decoy')),
   plan_version  TEXT NOT NULL
 );
 
@@ -785,8 +797,9 @@ CREATE TABLE IF NOT EXISTS ctgov_query_hit (
 );
 CREATE INDEX IF NOT EXISTS ix_ctgov_query_hit_nct ON ctgov_query_hit (nct_id);
 
--- One row per study: the full record as returned (protocolSection, derivedSection,
--- hasResults) plus convenience columns. Later raw responses for a study supersede earlier.
+-- One row per study hit by the current query plan, with convenience columns. The full
+-- record is NOT copied: it lives in raw_response (raw_response_id), read on demand by
+-- agesdk.sources.ctgov.study_record. Later raw responses for a study supersede earlier.
 CREATE TABLE IF NOT EXISTS ctgov_study (
   nct_id                   TEXT PRIMARY KEY,
   raw_response_id          INTEGER NOT NULL REFERENCES raw_response (id),
@@ -808,8 +821,7 @@ CREATE TABLE IF NOT EXISTS ctgov_study (
   conditions_module        TEXT CHECK (conditions_module IS NULL OR json_valid(conditions_module)),
   condition_browse         TEXT CHECK (condition_browse IS NULL OR json_valid(condition_browse)),      -- MeSH
   intervention_browse      TEXT CHECK (intervention_browse IS NULL OR json_valid(intervention_browse)),-- MeSH
-  outcomes_module          TEXT CHECK (outcomes_module IS NULL OR json_valid(outcomes_module)),       -- raw measures
-  study_json               TEXT NOT NULL CHECK (json_valid(study_json))      -- the whole record
+  outcomes_module          TEXT CHECK (outcomes_module IS NULL OR json_valid(outcomes_module))        -- raw measures
 );
 
 -- One row per intervention object, every field kept (name, type, description, otherNames,
@@ -925,9 +937,16 @@ CREATE TABLE IF NOT EXISTS literature_candidate (
 DROP VIEW IF EXISTS v_compound_trials;
 CREATE VIEW v_compound_trials AS
 SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
-       count(DISTINCT ti.nct_id)                                                   AS n_systemic_trials,
-       count(DISTINCT CASE WHEN o.ageing_adjacent = 1 THEN ti.nct_id END)           AS n_ageing_adjacent_trials,
-       count(DISTINCT CASE WHEN t.results_state = 'NOT_POSTED_DUE' THEN ti.nct_id END) AS n_overdue_trials
+       -- Primary counts: the compound is under test (role 'experimental').
+       count(DISTINCT CASE WHEN ti.role = 'experimental' THEN ti.nct_id END)       AS n_systemic_trials,
+       count(DISTINCT CASE WHEN ti.role = 'experimental' AND o.ageing_adjacent = 1
+                           THEN ti.nct_id END)                                     AS n_ageing_adjacent_trials,
+       count(DISTINCT CASE WHEN ti.role = 'experimental' AND t.results_state = 'NOT_POSTED_DUE'
+                           THEN ti.nct_id END)                                     AS n_overdue_trials,
+       -- Labelled, not counted above.
+       count(DISTINCT CASE WHEN ti.role = 'comparator' THEN ti.nct_id END)         AS n_comparator_trials,
+       count(DISTINCT CASE WHEN ti.role = 'background' THEN ti.nct_id END)         AS n_background_trials,
+       count(DISTINCT CASE WHEN ti.role = 'unclear' THEN ti.nct_id END)            AS n_role_unclear_trials
 FROM compound c
 LEFT JOIN trial_intervention ti ON ti.compound_id = c.compound_id AND ti.systemic_exposure = 'systemic'
 LEFT JOIN trial t               ON t.nct_id = ti.nct_id
@@ -981,6 +1000,7 @@ SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
        t.nct_id, t.status, t.completion_date, t.primary_completion_date, t.results_state
 FROM trial t
 JOIN trial_intervention ti ON ti.nct_id = t.nct_id AND ti.systemic_exposure = 'systemic'
+                          AND ti.role = 'experimental'
 JOIN compound c            ON c.compound_id = ti.compound_id
 WHERE t.results_state = 'NOT_POSTED_DUE';
 
@@ -1066,7 +1086,7 @@ SELECT 'orphaned_review', 'derived_cell', review_table || ':' || review_key, NUL
 FROM v_orphaned_reviews
 UNION ALL
 SELECT 'compound_trial', 'churn', ti.compound_id || ':' || ti.nct_id, ti.compound_id, c.canonical_name,
-       c.entry_route, c.evidence_tier, ti.nct_id, NULL, NULL
+       c.entry_route, c.evidence_tier, ti.nct_id, group_concat(DISTINCT ti.role), NULL
 FROM trial_intervention ti JOIN compound c ON c.compound_id = ti.compound_id
 WHERE ti.systemic_exposure = 'systemic'
 GROUP BY ti.compound_id, ti.nct_id
@@ -1122,4 +1142,4 @@ SELECT * FROM (
   FROM v_membership_changes WHERE cell_class = 'derived_cell')
 WHERE transition IS NOT NULL;
 
-PRAGMA user_version = 7;
+PRAGMA user_version = 8;

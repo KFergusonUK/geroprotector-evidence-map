@@ -87,10 +87,23 @@ class QueryPlan(unittest.TestCase):
                                  ("Glucophage", "metformin", "must_match"),
                                  ("metformin HCl", "metformin", "must_match"),
                                  ("17-alpha-estradiol", "17a", "canonical_name"),
-                                 ("alfatradiol", "17a", "must_match")])   # dose dropped; dashes and case collapsed
+                                 ("alfatradiol", "17a", "must_match"),
+                                 ("masoprocol", "maso", "canonical_name"),
+                                 ("Actinex", "maso", "must_match")])   # dose dropped; dashes and case collapsed
 
-    def test_linked_and_trap_entries_excluded_by_default(self):
-        self.assertNotIn("masoprocol", {p["query_term"] for p in ctgov.seed_query_plan(FX)})
+    def test_rules_exclude_terms_and_add_decoys(self):
+        fx = {"compounds": FX["compounds"] + [
+            {"key": "y27632", "role": "identity_trap", "canonical_name": "Y-27632", "must_match": ["Y27632"]}]}
+        rules = {"excluded_terms": [{"term": "glucophage"}], "trap_decoys": {"y27632": ["ximelagatran"]}}
+        plan = {p["query_term"]: p for p in ctgov.seed_query_plan(fx, rules=rules)}
+        self.assertNotIn("Glucophage", plan)
+        self.assertEqual((plan["ximelagatran"]["compound_key"], plan["ximelagatran"]["term_source"]),
+                         ("y27632", "trap_decoy"))
+
+    def test_real_rules_file(self):
+        rules = ctgov.load_rules()
+        self.assertEqual({e["term"] for e in rules["excluded_terms"]}, {"ASA", "NR"})
+        self.assertIn("ximelagatran", rules["trap_decoys"]["y27632"])
 
     def test_term_claimed_twice_is_an_error(self):
         fx = {"compounds": FX["compounds"] + [{"key": "x", "role": "seed", "canonical_name": "Glucophage",
@@ -128,7 +141,32 @@ class SeedFetch(unittest.TestCase):
         self.assertEqual(json.loads(s["outcomes_module"])["primaryOutcomes"][0]["measure"], "All-cause mortality")
         self.assertEqual(json.loads(s["condition_browse"])["meshes"][0]["id"], "D003924")
         self.assertEqual(json.loads(s["intervention_browse"])["meshes"][0]["term"], "Metformin")
-        self.assertIn("protocolSection", json.loads(s["study_json"]))
+
+    def test_full_record_read_from_raw_not_copied(self):
+        cols = {r[1] for r in self.conn.execute("PRAGMA table_info(ctgov_study)")}
+        self.assertNotIn("study_json", cols)
+        for nct in ("NCT1", "NCT2", "NCT3", "NCT4"):
+            self.assertEqual(ctgov.study_record(self.conn, nct), self.reg.studies[nct])
+
+    def test_staging_rebuilds_identically_from_raw(self):
+        def snapshot():
+            return {t: sorted(tuple(r) for r in self.conn.execute(f"SELECT * FROM {t}"))
+                    for t in ("ctgov_query_hit", "ctgov_study", "ctgov_intervention")}
+        before = snapshot()
+        for t in ("ctgov_intervention", "ctgov_study", "ctgov_query_hit"):
+            self.conn.execute(f"DELETE FROM {t}")
+        self.conn.commit()
+        self.assertEqual(sum(len(v) for v in snapshot().values()), 0)
+        ctgov.stage(self.conn)
+        self.assertEqual(snapshot(), before)
+
+    def test_dropped_term_leaves_staging_but_not_raw(self):
+        raw = self.conn.execute("SELECT count(*) FROM raw_response").fetchone()[0]
+        self.conn.execute("DELETE FROM ctgov_query_plan WHERE query_term = 'alfatradiol'")
+        ctgov.stage(self.conn)
+        self.assertEqual(self.conn.execute("SELECT count(*) FROM ctgov_query_hit WHERE query_term = 'alfatradiol'").fetchone()[0], 0)
+        self.assertIsNone(self.conn.execute("SELECT 1 FROM ctgov_study WHERE nct_id = 'NCT4'").fetchone())
+        self.assertEqual(self.conn.execute("SELECT count(*) FROM raw_response").fetchone()[0], raw)
 
     def test_api_version_and_params_on_every_response(self):
         rows = self.conn.execute("SELECT api_version, request_params FROM raw_response WHERE source = 'ctgov'").fetchall()

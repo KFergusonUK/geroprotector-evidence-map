@@ -129,7 +129,7 @@ class Transitions(unittest.TestCase):
     def add_trial(self, nct, compound, state="ONGOING", ageing=False):
         self.conn.execute("INSERT INTO trial (nct_id, results_state) VALUES (?, ?)", (nct, state))
         self.conn.execute("INSERT INTO trial_intervention (nct_id, raw_name, compound_id, systemic_exposure, "
-                          "route_rule_version) VALUES (?, 'x', ?, 'systemic', 'r1')", (nct, compound))
+                          "route_rule_version, role) VALUES (?, 'x', ?, 'systemic', 'r1', 'experimental')", (nct, compound))
         if ageing:
             self.conn.execute("INSERT INTO trial_outcome (nct_id, outcome_type, measure, ageing_adjacent) "
                               "VALUES (?, 'primary', 'all-cause mortality', 1)", (nct,))
