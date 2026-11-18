@@ -107,12 +107,14 @@ def seed_query_plan(fx: dict, roles=PLAN_ROLES, rules: dict | None = None) -> li
     rules = rules if rules is not None else {"excluded_terms": [], "trap_decoys": {}}
     excluded = {normalise_term(e["term"]).lower() for e in rules.get("excluded_terms", [])}
     decoys = rules.get("trap_decoys", {}) or {}
+    review_q = rules.get("review_queries", {}) or {}
     plan, seen = [], {}
     for c in fx["compounds"]:
         if c["role"] not in roles:
             continue
         candidates = ([(c["canonical_name"], "canonical_name")] + [(m, "must_match") for m in c["must_match"]]
-                      + [(d, "trap_decoy") for d in decoys.get(c["key"], [])])
+                      + [(d, "trap_decoy") for d in decoys.get(c["key"], [])]
+                      + [(q, "review_query") for q in review_q.get(c["key"], [])])
         for raw, source in candidates:
             term = normalise_term(str(raw))
             if not term or DOSE_RE.search(term) or term.lower() in excluded:

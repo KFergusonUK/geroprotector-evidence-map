@@ -8,7 +8,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DB_PATH = PROJECT_ROOT / "data" / "agesdk.sqlite"
-SCHEMA_VERSION = 8
+SCHEMA_VERSION = 9
 
 
 def db_path() -> Path:
@@ -33,7 +33,8 @@ PRESERVED_TABLES = {"raw_response", "fetch_log", "snapshot_run", "snapshot_membe
 # Rebuilt from version-controlled files in data/ (direction_review: data/reviews/),
 # or from the raw layer (ctgov_* staging, via agesdk.sources.ctgov.stage).
 RELOADABLE_TABLES = {"species_taxon", "analysis_threshold", "direction_review",
-                     "ctgov_query_plan", "ctgov_query_hit", "ctgov_study", "ctgov_intervention"}
+                     "ctgov_query_plan", "ctgov_query_hit", "ctgov_study", "ctgov_intervention",
+                     "resolver_match"}
 
 
 class MigrationError(RuntimeError):

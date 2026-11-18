@@ -1,0 +1,64 @@
+# Intervention-string resolver rules (SPEC §5.1a, §5.6, §5.9). Versioned: bump on any change;
+# every resolver_match row records the version that produced it.
+version: resolver-v1
+created: "2026-11-18"
+
+# Stripped before comparing a registry string with a fixture synonym, so "Metformin
+# hydrochloride 500 mg extended-release tablets" compares as "metformin". Whole words only.
+formulation_words: [tablet, tablets, tab, tabs, capsule, capsules, cap, caps, oral, orally, solution,
+  suspension, injection, injectable, infusion, iv, intravenous, subcutaneous, sc, im, powder, granules,
+  sachet, syrup, drops, extended-release, extended, release, delayed-release, delayed, immediate-release,
+  immediate, modified-release, sustained-release, sustained, prolonged-release, xr, er, sr, ir, xl, mr, cr, dr,
+  enteric-coated, enteric, coated, film-coated, chewable, effervescent, low-dose, low, high-dose, high,
+  dose, doses, dosing, daily, once, twice, weekly, per, day, days, week, weeks, bid, tid, qd, qid,
+  mg, g, mcg, ug, ml, iu, kg, generic, brand, tm, supplement, supplements, supplementation, dietary]
+salt_words: [hydrochloride, hcl, sodium, potassium, calcium, magnesium, chloride, sulfate, sulphate,
+  phosphate, acetate, citrate, tartrate, maleate, mesylate, besylate, fumarate, succinate, carbonate,
+  dihydrate, monohydrate, hydrate, anhydrous, salt, free, base]
+# A dose needs a unit: bare numbers are kept, because sponsor codes are numbers
+# ("BI 10773", "AY-22989", "JNJ-28431754").
+dose_pattern: '\b\d+([.,]\d+)?\s*(%|mg/kg|mg/m2|mg/day|mg/d|mg|g|mcg|µg|ug|ml|iu|ppm|mmol|units?)(?=\s|$|/|\))'
+
+# A placebo matching the compound is not the compound (but tells us it is tested elsewhere).
+placebo_pattern: '\b(placebo|matching|dummy|sham|vehicle)\b'
+
+# Class-level or regimen names: never auto-matched, even if otherNames list a fixture drug.
+class_patterns:
+  - '\binhibitors?\b'
+  - '\bagonists?\b'
+  - '\bantagonists?\b'
+  - '\bblockers?\b'
+  - '\banalogu?es?\b'
+  - '\bstatins?\b'
+  - '\bsglt-?2i?\b'
+  - '\bglp-?1(ra)?\b'
+  - '\bdpp-?4i?\b'
+  - '\bace-?i?\b'
+  - '\barbs?\b'
+  - '\banti-?(diabetic|hypertensive|platelet|coagulant|inflammatory|oxidant)s?\b'
+  - '\b(standard|usual|routine|conventional)\s+(of\s+)?(care|treatment|therapy|medication)s?\b'
+  - '\bregimens?\b'
+  - '\bclass\b'
+  - '\bmedications?\b'
+
+# Names that carry no identity themselves: an otherNames match may be accepted behind them.
+generic_name_patterns:
+  - '^(the\s+)?(study|investigational|trial|active|experimental|test)\s+(drug|product|medication|treatment|agent|compound|intervention|arm)s?$'
+  - '^(drug|treatment|intervention|arm|group)\s*[a-z0-9]?$'
+  - '^[a-z]{1,6}[\s-]?\d{2,}([\s-]\d+)?$'      # sponsor code, e.g. "BI 10773", "BIA 6-512"
+
+# Systemic exposure (§5.6). Local wins over default-systemic; unclear routes go to review.
+local_route_patterns: ['\bstents?\b', '\beluting\b', '\bballoons?\b', '\btopical(ly)?\b', '\bcreams?\b',
+  '\bointments?\b', '\bgels?\b', '\blotions?\b', '\beye\s*drops?\b', '\bophthalmic\b', '\bintravitreal\b',
+  '\bintracameral\b', '\bintraocular\b', '\bsubconjunctival\b', '\bcorneal\b', '\bintra-?articular\b',
+  '\bintralesional\b', '\bmouth\s*(wash|rinse)\b', '\btoothpaste\b', '\bdressings?\b', '\birrigation\b',
+  '\bcardioplegi[ac]\b', '\bdermal\b', '\bshampoo\b', '\bvaginal\b', '\bintravesical\b']
+unclear_route_patterns: ['\binhal(ed|ation|er)\b', '\bnebuli[sz]ed\b', '\bintrathecal\b', '\brectal\b',
+  '\bsuppositor(y|ies)\b', '\benema\b', '\bimplants?\b', '\bnasal\b', '\bintranasal\b']
+systemic_route_patterns: ['\btransdermal\b']
+local_intervention_types: [DEVICE, PROCEDURE, RADIATION]
+
+# Abbreviations this short are never auto-accepted, even as an exact whole field.
+short_code_max_len: 4
+# Single-token typo tolerance: edit distance 1 for tokens at least this long -> review only.
+fuzzy_min_len: 6

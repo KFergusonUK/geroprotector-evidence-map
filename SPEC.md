@@ -1,9 +1,17 @@
 # Geroprotector Human Evidence Map — Specification
 
-**Status:** v0.7 draft spec
+**Status:** v0.8 draft spec
 **Owner:** Kevin Ferguson
 
-**Changes since v0.6** (2026-11-18):
+**Changes since v0.7** (2026-11-18):
+- §7 step 3 done: the resolver (`agesdk/resolver.py`, rules `data/rules/resolver.yaml`,
+  `resolver-v1`) per §5.1a, with results in §5.1a.
+- Review queries (§4.2a): "polyamine", "wheat germ extract" and related strings searched for
+  spermidine; every hit goes to review. Resolves the §10 spermidine question.
+- Cardioplegia-solution strings (HTK, Custodiol, histidine-tryptophan-ketoglutarate) added to
+  alpha-ketoglutarate's must_not_match and searched as decoys.
+
+**Changes in v0.7** (2026-11-18):
 - §5.1: the registry's MeSH search expansion is the stated evidence for forbidding
   search-membership joins; resolver design for §7 step 3 fixed (§5.1a).
 - §5.9: `trial_intervention.role` (experimental | comparator | background | unclear);
@@ -369,9 +377,13 @@ version:
    compound masoprocol, and the identity trap Y-27632) are the canonical name plus every
    `must_match` synonym; strings carrying a dose are resolver test inputs, not names, and
    are skipped; case and dash variants collapse. `data/rules/ctgov_query.yaml` (versioned)
-   removes strings too noisy to search on (ASA, NR — see §10) and adds **decoys** for
-   identity traps: ximelagatran and Exanta are searched so the resolver meets them in live
-   registry text and must not map them to Y-27632. `ctgov_query_plan` records which
+   removes strings too noisy to search on (ASA, NR — see §10), adds **decoys** for identity
+   traps (ximelagatran and Exanta for Y-27632; HTK/Custodiol cardioplegia solution for
+   alpha-ketoglutarate), and adds **review queries** — strings searched to catch sensible
+   targets whose registry entries never name the compound. Spermidine's most-cited trials,
+   including SmartAge, register only "Polyamine supplementation" / wheat germ extract;
+   "polyamine", "wheat germ extract" and related strings now find them. Every review-query
+   hit goes to human review; nothing is auto-matched on one. `ctgov_query_plan` records which
    fixture compound supplied each string, and `ctgov_query_hit` which string found each
    study — the evidence for the precision check (§7 step 4).
 2. **Full records** — each study once, batched by NCT ID, with `protocolSection`,
@@ -540,6 +552,37 @@ involves the compound.
 - Each match also gets a **role** (§5.9) and a **systemic-exposure** classification (§5.6).
 - The fixture's `must_match`, `must_not_match`, `needs_review` and `route_excluded` lists,
   the decoys, and the recall sample are the tests it must pass (§7 step 4).
+
+**Implemented** (`agesdk/resolver.py`; rules versioned in `data/rules/resolver.yaml`;
+output in `resolver_match`, one row per intervention × compound, rebuilt on each run).
+Only a *clean* primary match auto-accepts: after stripping doses (a number with a unit;
+bare numbers are kept, since sponsor codes are numbers), formulation and salt words, the
+string equals a fixture synonym, or its residue is only that compound's own synonyms
+("Canagliflozin (JNJ-28431754) 100 mg"). Name and `otherNames` agreeing on one compound
+also auto-accepts. Everything else that mentions a compound goes to review: combinations
+and qualified strings, near-misses (edit distance 1), abbreviations of ≤4 characters,
+class-level names, multi-drug `otherNames` lists, a specific name with the compound only in
+`otherNames`, and "X and placebo". A placebo *for* the compound ("X-matching placebo",
+"placebo of X") is rejected; so is any `must_not_match` string. Role comes from arm groups
+(in every arm including a comparator → background; all arms experimental → experimental);
+route from the intervention's text, falling back to its arms and the study title, labelled.
+
+*Fixture score:* 143 of 152 `must_match` strings auto-accept, the other 9 being the short
+abbreviations (RAPA, NDGA, AKG, ASA, NMN, NR, NRCl), by design; **zero violations** (no
+negative or review-list string auto-accepted, no synonym accepted for a different compound,
+no route-excluded string classed systemic).
+
+*Live, 2026-11-18* (10,796 studies, 120 query strings): 4,864 trials auto-accepted for at
+least one compound (2,772 as experimental and systemic); 3,957 trials with a review item;
+1,863 background candidates; 571 search hits with no string evidence (no row, by design). No
+decoy (ximelagatran, Exanta, HTK) and no 17-α-estradiol hit was auto-accepted. Of the 26
+recall-sample trials the fetch caught, **23 are auto-accepted**; two name the compound only
+in arm text (background candidates, correctly) and one carries manufacturer details in the
+name ("Nicotinamide riboside (NIAGEN TM, ChromaDex, CA, USA )", review).
+
+*For step 4:* the review queue is dominated by combinations and qualified strings (about
+4,650 rows), too many for row-by-row human review. Step 4 has to decide how to handle it
+before scaling.
 
 ### 5.2 `results_state` is not a boolean
 
@@ -912,7 +955,7 @@ A10BF01; NMN — take the β-anomer. **Unresolvable:** aluminium acetylsalicylat
 
 1. **Resolve the seed compounds by hand.** Build the fixture first.
 2. ClinicalTrials.gov client → raw layer, for the seed compounds only (§4.2a). *Done.*
-3. Intervention string resolver → measure precision/recall against the fixture (§5.1a).
+3. Intervention string resolver → measure precision/recall against the fixture (§5.1a). *Done.*
 4. **Decision point:** if matching is too noisy at seed scale, stop and rethink
    before scaling. Cheap failure is the point of this step.
 5. `results_state` derivation; systemic exposure classification (§5.6); results
@@ -969,10 +1012,8 @@ collaborate. That is the realistic route to the data behind governance walls
   not — venetoclax, secukinumab, an infant formula named "NR Pepti", ATC "nr."
   abbreviations. Trials naming the compound only by these abbreviations may be missed; the
   recall check is how that cost is measured. Both stay in the fixture as resolver inputs.
-- Spermidine's human evidence base is extract trials registered as "polyamine
-  supplementation" (wheat germ extract), never naming spermidine; the fetch misses them and
-  the fixture already routes extracts to review. Search "polyamine" too (feeding review
-  only), or accept that spermidine's registry dossier is near-empty by design?
+- ~~Spermidine trials registered only as "polyamine supplementation"?~~ **Resolved:**
+  searched as review queries; hits go to review (§4.2a).
 - Genetic reprogramming (Yamanaka factors, OSK/OSKM) is out of scope: the factors are
   transcription factors delivered as genes, not compounds, with no InChIKey, and the
   mechanistic path (§5.8) is limited to *chemical* cocktails. Bringing them in would need a

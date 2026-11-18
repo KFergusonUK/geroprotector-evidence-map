@@ -135,6 +135,24 @@ def cmd_recall_check(conn, args):
     print(f"sample written to {recall.SAMPLE_PATH}")
 
 
+def cmd_resolve(conn, args):
+    from agesdk import resolver
+    ev = resolver.evaluate_fixture(fixture.load())
+    print(f"fixture: must_match {ev['must_match']}; violations {len(ev['violations'])}")
+    for v in ev["violations"]:
+        print("  -", v)
+    if ev["violations"]:
+        sys.exit(1)
+    print(json.dumps(resolver.run(conn, fixture.load())))
+
+
+def cmd_resolve_report(conn, args):
+    import yaml
+    from agesdk import recall, resolver
+    sample = yaml.safe_load(open(recall.SAMPLE_PATH, encoding="utf-8")) if recall.SAMPLE_PATH.exists() else None
+    print(json.dumps(resolver.report(conn, sample), indent=2))
+
+
 def cmd_fixture_chembl(conn, args):
     print(json.dumps(fixture.chembl_report(fixture.load(), conn), indent=2))
 
@@ -156,6 +174,8 @@ def main(argv=None):
     sub.add_parser("ctgov-seed", help="fetch ClinicalTrials.gov hits + full records for the seed compounds")
     sub.add_parser("ctgov-report", help="hit volume and intervention-string quality for the seed fetch")
     sub.add_parser("recall-check", help="literature-sampled recall check of the ClinicalTrials.gov fetch")
+    sub.add_parser("resolve", help="run the intervention-string resolver over staging (after a fixture check)")
+    sub.add_parser("resolve-report", help="per-compound resolver outcomes and recall-sample check")
     p = sub.add_parser("state-backups", help="dated pipeline-state release names and pruning (reads gh JSON)")
     p.add_argument("action", choices=["tag", "latest", "prune"])
     p.add_argument("--run-id", type=int, default=0)
@@ -168,7 +188,8 @@ def main(argv=None):
     {"init-db": cmd_init_db, "fetch-drugage": cmd_fetch_drugage,
      "fixture-check": cmd_fixture_check, "fixture-chembl": cmd_fixture_chembl,
      "reprogramming-check": cmd_reprogramming_check, "refresh": cmd_refresh,
-     "ctgov-seed": cmd_ctgov_seed, "ctgov-report": cmd_ctgov_report, "recall-check": cmd_recall_check}[args.cmd](conn, args)
+     "ctgov-seed": cmd_ctgov_seed, "ctgov-report": cmd_ctgov_report, "recall-check": cmd_recall_check,
+     "resolve": cmd_resolve, "resolve-report": cmd_resolve_report}[args.cmd](conn, args)
 
 
 if __name__ == "__main__":

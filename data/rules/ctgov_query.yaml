@@ -1,5 +1,5 @@
 # ClinicalTrials.gov query-plan rules (SPEC §4.2a, §10). Versioned: bump on any change.
-version: ctgov-query-v2
+version: ctgov-query-v3
 created: "2026-11-11"
 
 # Fixture synonyms NOT used as standalone search strings. They stay in the fixture as
@@ -23,3 +23,13 @@ excluded_terms:
 # them in live registry text and NOT map them to the trap compound.
 trap_decoys:
   y27632: [ximelagatran, Exanta]
+  # Histidine-tryptophan-ketoglutarate cardioplegia solution: a recall-sample paper titled
+  # "...ketoglutarate" was this, not alpha-ketoglutarate.
+  akg: [Custodiol, HTK solution, histidine-tryptophan-ketoglutarate]
+
+# Review queries: strings searched to CATCH sensible targets whose registry entries never
+# name the compound. Every hit goes to human review; the resolver never auto-matches on
+# them. Spermidine's most-cited trials (SmartAge NCT03094546; NCT02755246) register the
+# intervention only as "Polyamine supplementation" / wheat germ extract.
+review_queries:
+  spermidine: [polyamine, polyamine supplementation, polyamine-rich, spermidine-rich, wheat germ extract]

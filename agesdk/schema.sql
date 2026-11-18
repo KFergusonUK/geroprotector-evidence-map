@@ -783,7 +783,9 @@ CREATE TABLE IF NOT EXISTS ctgov_query_plan (
   compound_key  TEXT NOT NULL,            -- fixture key that supplied the term
   -- trap_decoy: a string the compound must NOT match, searched so the resolver's
   -- precision check meets it in live registry text (e.g. ximelagatran for Y-27632).
-  term_source   TEXT NOT NULL CHECK (term_source IN ('canonical_name', 'must_match', 'trap_decoy')),
+  -- review_query: searched to catch targets whose registry entries never name the compound
+  -- (e.g. 'polyamine' for spermidine); every hit goes to human review, never auto-matched.
+  term_source   TEXT NOT NULL CHECK (term_source IN ('canonical_name', 'must_match', 'trap_decoy', 'review_query')),
   plan_version  TEXT NOT NULL
 );
 
@@ -837,6 +839,35 @@ CREATE TABLE IF NOT EXISTS ctgov_intervention (
   object_json       TEXT NOT NULL CHECK (json_valid(object_json)),
   PRIMARY KEY (nct_id, idx)
 );
+
+-- Resolver output (SPEC §5.1a, §7 step 3). One row per (intervention, compound) with any
+-- string evidence, or per (study, compound) for study-level text only (idx = -1). Rebuilt
+-- by agesdk.resolver from staging + data/rules/resolver.yaml + the fixture; never edited.
+-- Registry search membership is not evidence: a hit with no string evidence gets no row.
+CREATE TABLE IF NOT EXISTS resolver_match (
+  nct_id            TEXT NOT NULL,
+  idx               INTEGER NOT NULL,       -- intervention index; -1 = study-level text
+  compound_key      TEXT NOT NULL,          -- fixture key (compound_id once compounds load)
+  evidence_field    TEXT NOT NULL CHECK (evidence_field IN
+                      ('name', 'other_names', 'description', 'arm_group', 'title_summary')),
+  evidence_strength TEXT NOT NULL CHECK (evidence_strength IN ('primary', 'weak')),
+  matched_text      TEXT NOT NULL,          -- registry string, verbatim
+  matched_term      TEXT,                   -- fixture string it matched
+  method            TEXT NOT NULL CHECK (method IN
+                      ('exact', 'normalised', 'contains', 'fuzzy', 'short_code', 'review_list', 'negative')),
+  decision          TEXT NOT NULL CHECK (decision IN
+                      ('auto_accept', 'review', 'background_candidate', 'rejected')),
+  reasons           TEXT NOT NULL CHECK (json_valid(reasons)),
+  role              TEXT CHECK (role IN ('experimental', 'comparator', 'background', 'unclear')),
+  role_basis        TEXT,
+  systemic_exposure TEXT CHECK (systemic_exposure IN ('systemic', 'local', 'unclear')),
+  route_basis       TEXT,
+  resolver_version  TEXT NOT NULL,
+  PRIMARY KEY (nct_id, idx, compound_key),
+  -- auto_accept only on primary evidence, never on weak text
+  CHECK (decision <> 'auto_accept' OR evidence_strength = 'primary')
+);
+CREATE INDEX IF NOT EXISTS ix_resolver_match_compound ON resolver_match (compound_key, decision);
 
 -- ===========================================================================
 -- §11 REFRESH AND CHANGE DETECTION — a diff, not a monitor.
@@ -1142,4 +1173,4 @@ SELECT * FROM (
   FROM v_membership_changes WHERE cell_class = 'derived_cell')
 WHERE transition IS NOT NULL;
 
-PRAGMA user_version = 8;
+PRAGMA user_version = 9;
