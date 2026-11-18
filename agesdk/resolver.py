@@ -265,7 +265,7 @@ class Resolver:
             reasons = list(m.reasons)
             if m.method == "negative":
                 decision = "rejected"
-            elif placebo_for:
+            elif placebo_for or (m_name and self.is_x_placebo(key, n_name)):
                 decision, reasons = "rejected", reasons + ["placebo_matching"]
             elif placebo:
                 decision, reasons = "review", reasons + ["placebo_with_compound"]
@@ -308,6 +308,20 @@ class Resolver:
                          "systemic_exposure": route, "route_basis": route_basis})
         return rows
 
+    def is_x_placebo(self, key: str, n_name: str) -> bool:
+        """resolver-v4: the name is "<this compound> placebo" and nothing else ("ASA placebo",
+        "Empagliflozin high placebo", "Metformin DR Placebo"): a placebo FOR the compound.
+        Anything left over ("then", "vs", "followed by", another drug) keeps it out, so
+        sequences and "X and placebo" stay in review. Downgrade only: review -> rejected."""
+        stripped = self.strip(n_name)
+        if not re.search(r"\bplacebos?$", stripped) or self._combo_name.search(stripped):
+            return False                                   # "X + placebo", "X/placebo": review
+        residue = stripped
+        for a, b, _ in sorted(self._spans(stripped, self.compounds[key]["syn"]), reverse=True):
+            residue = residue[:a] + " " + residue[b:]
+        residue = re.sub(r"\b(placebos?|matched|matching)\b|[-()]", " ", residue)
+        return residue != stripped.replace("-", " ") and not self.strip(" ".join(residue.split()))
+
     def is_combination(self, key: str, text: str, n_desc: str) -> bool:
         """The compound given as part of a combination: a name joining it with another drug
         ("Metformin + Sitagliptin", "Saxagliptin/Metformin"), or a description stating a
@@ -322,7 +336,7 @@ class Resolver:
         residue = n
         for a, b, _ in sorted(self._spans(n, self.compounds[key]["syn"]), reverse=True):
             residue = residue[:a] + " " + residue[b:]
-        residue = re.sub(r"[/+&,]|\band\b|\bwith\b|\bplacebo\b|\bmatching\b", " ", residue)
+        residue = re.sub(r"[/+&,]|\band\b|\bwith\b|\bplus\b|\bplacebo\b|\bmatching\b", " ", residue)
         return bool(self.strip(" ".join(residue.split())))
 
     def _disqualify(self, key: str, iv: dict, n_desc: str) -> list[str]:

@@ -1,6 +1,6 @@
 # Intervention-string resolver rules (SPEC §5.1a, §5.6, §5.9). Versioned: bump on any change;
 # every resolver_match row records the version that produced it.
-version: resolver-v3
+version: resolver-v4
 created: "2026-11-18"
 
 # Stripped before comparing a registry string with a fixture synonym, so "Metformin
@@ -83,4 +83,11 @@ other_drug_stems: ['gliptin', 'gliflozin', 'glutide', 'gli(clazide|pizide|mepiri
   'platin\b', 'taxel\b', 'insulin', 'warfarin', 'folfox', 'mycin\b', 'cillin\b', 'glitazone']
 
 # The name-and-otherNames-agree rule never applies to a name that joins drugs.
-combination_name_pattern: '/|\+|&|\band\b|\bwith\b|,'
+# v4: 'plus' joins drugs too ("aspirin plus clopidogrel").
+combination_name_pattern: '/|\+|&|\band\b|\bwith\b|\bplus\b|,'
+
+# ---- resolver-v4 (review-queue characterisation, docs/review_queue_composition.md) ------
+# All downgrade-only (docs/measurement_policy.md §3): none can add an auto-accept.
+#  - "X placebo" names are placebos for X: rejected (resolver.py, placebo_for).
+#  - "plus" is a combination separator (combination_name_pattern above; is_combination).
+#  - "lithium disilicate" (dental ceramic) is a lithium must_not_match (fixture v0.8.0).

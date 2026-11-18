@@ -39,7 +39,7 @@
 #   decisions        Decisions made by a named person, with date. Distinct from the
 #                    entry-level review sign-off.
 
-fixture_version: 0.7.0
+fixture_version: 0.8.0
 pubchem_checked_at: "2026-11-11"
 drugage_version: "Build 5 (2024-11-29); archive sha256 d12f59717de60a207748f53bdbcdb484ed07e30d8608eb8e4a101e2a08d7fa80"
 
@@ -347,7 +347,9 @@ compounds:
     drugage_names: [Lithium Chloride]
     must_match: [lithium, lithium carbonate, Lithium Chloride, lithium chloride, lithium citrate,
                  Lithobid, Priadel, Camcolit, Eskalith, "lithium carbonate 300 mg"]
-    must_not_match: [lithium heparin, "lithium dilution", LiDCO, lithium-ion, "lithium battery"]
+    must_not_match: [lithium heparin, "lithium dilution", LiDCO, lithium-ion, "lithium battery",
+                     lithium disilicate, "Lithium Disilicate", "lithium disilicate crown",
+                     lithium-disilicate, "Lithium-Disilicate", "lithium di-silicate"]
     needs_review: [lithium orotate, lithium aspartate, "microdose lithium", "lithium in drinking water"]
     notes: >
       MANUAL IDENTITY DECISION. The active moiety is the Li+ ion (CID 28486). PubChem's

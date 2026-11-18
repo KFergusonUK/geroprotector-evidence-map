@@ -40,15 +40,41 @@ words): stent 155, eluting 107, plus 104, -eluting 68, clopidogrel 63, coronary 
 - **Device context in "qualified_other"**: stent, eluting, balloon, scaffold, catheter,
   Cypher, bioresorbable (≈ 400 word hits) — drug-eluting devices, local route, cannot move
   a count.
-- **Defects found (all downgrade-only to fix):**
-  - "X placebo" names ("ASA placebo", "Acarbose Placebo") are placebos *for* the compound
-    and should be rejected; the placebo rule only recognises "placebo of X" / "X-matching
-    placebo".
-  - "plus" is not a combination separator ("aspirin plus clopidogrel" lands in
-    qualified_other, not combination).
-  - "lithium disilicate" (dental ceramic, 33 hits) should be a lithium must_not_match.
+- **Defects found (all downgrade-only to fix): applied in resolver-v4**, see below.
 - **Small, genuinely human categories**: class-level (58), short codes (36), near-misses
   (60), fixture review lists including the polyamine review queries (312).
+
+## resolver-v4 (applied 2026-11-18, decided by Kevin Ferguson)
+
+The three defects above, fixed. All three are downgrade-only, so none triggers
+re-measurement (`docs/measurement_policy.md` §3). Checked empirically against a v3 snapshot:
+**0 new auto-accepts.**
+
+| Fix | Effect |
+|---|---|
+| "X placebo" (name is the compound + "placebo" and nothing else: "ASA placebo", "Empagliflozin high placebo") → rejected as `placebo_matching`, for that compound only. "X + placebo", "X/placebo", "X then placebo", "X vs placebo" and "X followed by placebo" stay in review, because the drug is given | 67 review → rejected |
+| "plus" is a combination separator | 152 rows newly `is_combination`; 5 auto-accepts → review (e.g. "Oral contraceptive plus metformin", "omega-3 plus aspirin") |
+| "lithium disilicate" (dental ceramic), with hyphen variants → lithium `must_not_match` | 66 review → rejected; 22 title-level lithium background candidates gone |
+
+Auto-accepts 4,943 → 4,938. **Review queue 5,708 → 5,580 rows (3,816 trials); could
+change a headline count 1,892 → 1,804 rows (1,438 trials).**
+
+A first draft of the placebo rule was too broad. It rejected sequences ("Empagliflozin 10 MG
+then Placebo") and "X + placebo", and rejected other compounds on the same object. The
+v3/v4 diff caught both before commit, and both are now tests.
+
+### Found while doing this, not fixed (needs a decision)
+
+- **The v1 rule `^placebo` over-rejects.** Any name starting with "placebo" is rejected for
+  every compound in it. That includes 70 rows such as "Placebo + Metformin", "Placebo plus
+  metformin IR" and "Placebo + (lithium or divalproex)". There the compound *is* given,
+  usually as background, and the placebo is for the drug under test. They should be
+  `review` (placebo_with), not `rejected`. Fixing this moves rejected → review, so it cannot
+  add an auto-accept and needs no re-measurement. It does put about 70 rows back in the
+  queue.
+- **The comma in `combination_name_pattern` never fires**, because normalisation removes
+  commas first. The 30 comma names this affects are dose qualifiers ("Canagliflozin, 300
+  mg"), correctly single compounds, so nothing is wrong today.
 
 ## Triage (standing)
 

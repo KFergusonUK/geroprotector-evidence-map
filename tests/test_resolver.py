@@ -260,3 +260,47 @@ class Combination(unittest.TestCase):
         self.assertFalse(decide("Canagliflozin (JNJ-28431754) 100 mg")["canagliflozin"]["is_combination"])
         self.assertFalse(decide("Metformin and placebo")["metformin"]["is_combination"])
         self.assertFalse(decide("aspirin 100 mg/d")["aspirin"]["is_combination"])     # dose unit, not a separator
+
+
+class ResolverV4(unittest.TestCase):
+    """Review-queue defects (docs/review_queue_composition.md). All downgrade-only."""
+
+    def test_x_placebo_is_a_placebo_for_x(self):
+        for name, key in [("ASA placebo", "aspirin"), ("Acarbose Placebo", "acarbose"),
+                          ("Aspirin placebo tablets", "aspirin"), ("Metformin placebos", "metformin")]:
+            r = decide(name)[key]
+            self.assertEqual(r["decision"], "rejected", name)
+            self.assertIn("placebo_matching", r["reasons"], name)
+
+    def test_x_and_placebo_still_review(self):
+        for name in ["Metformin and placebo", "Metformin + placebo", "Metformin plus placebo"]:
+            self.assertEqual(decide(name)["metformin"]["decision"], "review", name)
+
+    def test_plus_is_a_combination_separator(self):
+        r = decide("aspirin plus clopidogrel")["aspirin"]
+        self.assertTrue(r["is_combination"])
+        self.assertNotEqual(r["decision"], "auto_accept")
+        # 'plus' blocks the name-and-otherNames-agree rule, like '+'
+        r = decide("Glucophage plus sitagliptin", ["Metformin"])["metformin"]
+        self.assertNotEqual(r["decision"], "auto_accept")
+
+    def test_plus_alone_is_not_a_combination(self):
+        self.assertFalse(decide("Aspirin Plus")["aspirin"]["is_combination"])
+
+    def test_lithium_disilicate_rejected(self):
+        for name in ["lithium disilicate", "Lithium Disilicate crown", "IPS e.max lithium disilicate"]:
+            self.assertEqual(decide(name)["lithium"]["decision"], "rejected", name)
+        self.assertEqual(decide("Lithium carbonate")["lithium"]["decision"], "auto_accept")
+
+    def test_sequences_ending_in_placebo_stay_review(self):
+        # the drug IS given; "then / vs / followed by" are not "placebo for X"
+        for name, key in [("Empagliflozin 10 MG then Placebo", "empagliflozin"),
+                          ("Empagliflozin 25 mg vs Placebo", "empagliflozin"),
+                          ("Fisetin followed by Placebo", "fisetin"),
+                          ("Aspirin placebo, Vitamin D placebo", "aspirin")]:
+            self.assertEqual(decide(name)[key]["decision"], "review", name)
+
+    def test_x_placebo_rejects_only_x(self):
+        # metformin named only in the description of a sitagliptin placebo: not rejected by v4
+        r = decide("Sitagliptin placebo", description="on stable background metformin")["metformin"]
+        self.assertEqual(r["decision"], "review")
