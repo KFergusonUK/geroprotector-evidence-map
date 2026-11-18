@@ -58,3 +58,14 @@ stays labelled in the queue and is not reviewed. On this basis the queue to revi
 1,892 rows, before any rule-based reduction. Role suggestions
 are themselves only 78.6% accurate (step 4), so this triage inherits that error until role
 is measured (`docs/role1_protocol.md`).
+
+## Known limitation, noted and deliberately not fixed now
+
+The other-drug rule (`other_drug_stems` in `data/rules/resolver.yaml`, added in v2 for the
+step-4 regimen error) recognises "another drug" in `otherNames` only as another fixture
+compound or an entry carrying one of a short list of INN stems. Any other drug (an
+antibiotic, a statin, a brand with no stem) is not recognised, so a single-compound name
+whose `otherNames` lists it is not sent to review. Doing this properly needs a drug-name
+dictionary (e.g. ChEMBL or RxNorm names), not a longer stem list. Decided 2026-11-18: note
+it, do not fix it now. The miss is in the accepting direction, so it is within what the
+step-4b precision measurement (99.5%, a floor under resolver-v3) already counts.
