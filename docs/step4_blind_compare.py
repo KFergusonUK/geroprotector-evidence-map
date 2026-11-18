@@ -9,8 +9,10 @@ from pathlib import Path
 import yaml
 
 root = Path(__file__).resolve().parent.parent
-blind = yaml.safe_load(open(root / "docs" / "step4_blind_check.yaml", encoding="utf-8"))["rows"]
-orig = {r["i"]: r for r in yaml.safe_load(open(root / "data" / "reviews" / "step4_precision_sample.yaml",
+ROUND = sys.argv[1] if len(sys.argv) > 1 else "4"
+tag = "step4" if ROUND == "4" else f"step{ROUND}"
+blind = yaml.safe_load(open(root / "docs" / f"{tag}_blind_check.yaml", encoding="utf-8"))["rows"]
+orig = {r["i"]: r for r in yaml.safe_load(open(root / "data" / "reviews" / f"{tag}_precision_sample.yaml",
                                                 encoding="utf-8"))["rows"]}
 missing = [b["blind_id"] for b in blind if b["verdict"] not in ("correct", "incorrect")]
 if missing:
