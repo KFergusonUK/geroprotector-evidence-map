@@ -70,6 +70,15 @@ equals any string in the seed fixture (synonym, negative or review), is **remove
 automatic matching for every compound involved** and put on their review lists. It never
 auto-accepts. The count is reported (step-7 secondary question).
 
+"Equal" means equal **under the resolver's own normalisation**: both its `normalise()`
+form and its `strip()` form, the latter with dose, formulation and salt words removed.
+Two strings that differ only by a salt or formulation word ("X hydrochloride" and "X")
+therefore collide. Matching would treat them as the same string, so collision detection
+must too. This was proposed by Codex on 2026-11-26.
+
+A test must show that a colliding generated term is withheld from auto-accept for **every**
+compound it was generated for, and is routed to review for each.
+
 ## Stage 3 — matching and querying
 
 **[decide] D1. Which synonyms become registry *query* strings.**
@@ -81,12 +90,20 @@ auto-accepts. The count is reported (step-7 secondary question).
 - *Cost:* a trial that names a compound only by a PubChem-only synonym is found only if
   another query brings it in. That is a recall cost, already declared as an unmeasured gap
   (§10).
+- **Deduplication:** query strings are deduplicated across sources and compounds before
+  fetching. Each unique string keeps every source and compound tag. The plan reports the
+  unique query count, the overlap between sources, and the expected fetch volume before any
+  fetch runs, so the cost of D1 sits next to its recall gap. This was proposed by Codex.
 
 **[decide] D2. No fuzzy (edit-distance-1) matching for scaled compounds.**
 - *Proposed:* off.
 - *Why:* with tens of thousands of unreviewed synonyms, near-misses would flood review.
   Fuzzy matching can never auto-accept anyway, so precision is unaffected; the cost is
   recall only.
+- *Scope of "no fuzzy":* this removes only the edit-distance-1 near-match step. Exact
+  matching keeps the resolver's normal handling of case, Unicode, hyphens, whitespace and
+  punctuation, and still strips dose, formulation and salt words. This was proposed by
+  Codex.
 
 **[decide] D3. Scaled compounds get no `must_not_match` lists.**
 - *Proposed:* the generated set has no negatives beyond the collision rule.
@@ -102,7 +119,18 @@ patterns run:
 - so the index is exact, not approximate.
 
 It is proven, not argued: before any scaled compound is added, a seed-only run with the
-index must produce a resolver diff of **0 changes**.
+index must produce a resolver diff of **0 changes**. "0 changes" covers every row's
+decision, every route and role, and every `is_combination` flag. It is not limited to the
+auto-accept count. That check is run as a script, not eyeballed.
+
+**Invariant:** every compound that the unindexed matcher would consider for a string is
+still among the index's candidates for it. Targeted tests cover the following:
+- terms starting or ending with punctuation, such as "(+)-…" and "17α-…";
+- multi-word terms;
+- terms containing "/", "+" or "-";
+- Unicode hyphens.
+
+This was proposed by Codex.
 
 ## Freeze
 
