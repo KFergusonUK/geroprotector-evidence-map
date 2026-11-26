@@ -35,6 +35,22 @@ def load(path: Path = FIXTURE_PATH) -> dict:
         return yaml.safe_load(fh)
 
 
+SCALED_PATH = FIXTURE_PATH.parent.parent / "scale" / "scaled_compounds.yaml"
+
+
+def load_with_scaled(path: Path = FIXTURE_PATH, scaled_path: Path = SCALED_PATH) -> dict:
+    """The seed fixture plus the generated scaled compounds (role 'scaled'). The seed fixture
+    is validated and authoritative; scaled entries are generated, never hand-edited."""
+    fx = load(path)
+    with open(scaled_path, encoding="utf-8") as fh:
+        scaled = yaml.safe_load(fh)["compounds"]
+    seed_keys = {c["key"] for c in fx["compounds"]}
+    clash = seed_keys & {c["key"] for c in scaled}
+    if clash:
+        raise ValueError(f"scaled keys clash with seed keys: {sorted(clash)}")
+    return {**fx, "compounds": fx["compounds"] + scaled, "scaled_rules_version": None}
+
+
 TIERS = {"none", "weak", "mixed", "strong"}
 ITP_KEYS = {"experiments", "arms", "cohorts", "male", "female", "tier"}
 

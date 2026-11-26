@@ -63,8 +63,11 @@ class Match:
     reasons: list = field(default_factory=list)
 
 
+_WORD = re.compile(r"\w+")
+
+
 class Resolver:
-    def __init__(self, fx: dict, rules: dict | None = None):
+    def __init__(self, fx: dict, rules: dict | None = None, use_index: bool = True):
         self.rules = rules or load_rules()
         self.version = self.rules["version"]
         r = self.rules
@@ -90,8 +93,25 @@ class Resolver:
                 "neg": {self.normalise(s) for s in c.get("must_not_match", [])} - {""},
                 "review": {self.normalise(s) for s in c.get("needs_review", [])} - {""},
                 "route_local": {self.normalise(s) for s in c.get("route_excluded", [])} - {""},
+                # D2 (docs/synonym_pipeline.md): no edit-distance near-misses for scaled compounds
+                "fuzzy": c.get("role") != "scaled",
             }
         self._rx: dict[str, re.Pattern] = {}
+        # Word index (D4, exact, no behaviour change). A term can only match where its first
+        # \w+ run occurs as a whole \w+ run of the text: the pattern is (?<!\w)term(?!\w), so the
+        # characters around that run are either the term's own non-word characters or the
+        # pattern's boundaries. So a compound none of whose terms' first runs occur in the text
+        # cannot produce a syn / neg / review span there, and the full evaluation is skipped.
+        self.use_index = use_index
+        self._index: dict[str, set] = defaultdict(set)
+        self._always: set = set()                 # compounds with a term containing no \w at all
+        for key, d in self.compounds.items():
+            for term in d["syn"] | d["neg"] | d["review"]:
+                m = _WORD.search(term)
+                if m:
+                    self._index[m.group(0)].add(key)
+                else:
+                    self._always.add(key)
 
     # ---------------------------------------------------------------- text
     @staticmethod
@@ -133,7 +153,18 @@ class Resolver:
             return []
         st = self.strip(n)
         out = []
+        if self.use_index:
+            cand = set(self._always)
+            for w in _WORD.findall(n):
+                cand |= self._index.get(w, set())
         for key, d in self.compounds.items():
+            if self.use_index and key not in cand:
+                # No term of this compound can occur in n: only the near-miss step can apply.
+                if d["fuzzy"]:
+                    hit = self._near_miss(st, d)
+                    if hit:
+                        out.append(Match(key, "fuzzy", hit[1], [f"near_miss:{hit[0]}"]))
+                continue
             syn = self._spans(n, d["syn"])
             neg = self._spans(n, d["neg"])
             rev = self._spans(n, d["review"])
@@ -158,13 +189,16 @@ class Resolver:
                                          [] if st in d["syn_stripped"] else ["only_own_synonyms"]))
                 else:
                     out.append(Match(key, "contains", term, ["qualified_or_combination"]))
-            else:
-                singles = [s for s in d["syn_stripped"] if " " not in s and len(s) >= self.fuzzy_min]
-                hit = next(((tok, s) for tok in st.split() if len(tok) >= self.fuzzy_min
-                            for s in singles if _lev1(tok, s)), None)
+            elif d["fuzzy"]:
+                hit = self._near_miss(st, d)
                 if hit:
                     out.append(Match(key, "fuzzy", hit[1], [f"near_miss:{hit[0]}"]))
         return out
+
+    def _near_miss(self, st: str, d: dict):
+        singles = [s for s in d["syn_stripped"] if " " not in s and len(s) >= self.fuzzy_min]
+        return next(((tok, s) for tok in st.split() if len(tok) >= self.fuzzy_min
+                     for s in singles if _lev1(tok, s)), None)
 
     def is_class_level(self, n: str) -> bool:
         return any(p.search(n) for p in self._class)

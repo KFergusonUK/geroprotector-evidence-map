@@ -385,5 +385,45 @@ class ResolverV6Routes(unittest.TestCase):
                          "systemic")
 
 
+
+class WordIndexIsExact(unittest.TestCase):
+    """D4 (docs/synonym_pipeline.md): the word index changes speed, never a result."""
+
+    def assertSameMatches(self, strings, fx=FX):
+        indexed, brute = resolver.Resolver(fx), resolver.Resolver(fx, use_index=False)
+        for s in strings:
+            a = sorted((m.compound, m.method, m.term, tuple(m.reasons)) for m in indexed.match(s))
+            b = sorted((m.compound, m.method, m.term, tuple(m.reasons)) for m in brute.match(s))
+            self.assertEqual(a, b, s)
+
+    def test_every_fixture_string(self):
+        strings = []
+        for c in FX["compounds"]:
+            for f in ("must_match", "must_not_match", "needs_review", "route_excluded"):
+                strings += list(c.get(f) or [])
+        self.assertSameMatches(strings)
+
+    def test_awkward_strings(self):
+        self.assertSameMatches([
+            "17‐alpha‐estradiol cream", "(+)-alpha-lipoic acid", "Saxagliptin/Metformin XR", "aspirin+clopidogrel",
+            "Metformin-ER 500mg", "16α-hydroxyestradiol", "NR-chloride", "nicotinamide riboside (NIAGEN TM)",
+            "metfromin", "rapamicin 1 mg", "Glucophage® XR", "low-dose ASA", "everolimus-eluting stent",
+            "", "   ", "!!!", "estriol/estradiol", "Placebo + Metformin", "lithium disilicate crown"])
+
+    def test_multiword_and_punctuated_scaled_terms(self):
+        fx = {"compounds": [
+            {"key": "a", "role": "scaled", "canonical_name": "alpha lipoic acid", "must_match": ["(+)-alpha-lipoic acid", "ALA-600"]},
+            {"key": "b", "role": "scaled", "canonical_name": "nicotinamide", "must_match": ["vitamin b3", "3-pyridinecarboxamide"],
+             "needs_review": ["b3"]}]}
+        self.assertSameMatches(["(+)-alpha-lipoic acid 600 mg", "ALA-600", "Vitamin B3 + zinc", "3-pyridinecarboxamide",
+                                "b3", "vitamin b 3", "alpha lipoic", "lipoic acid"], fx)
+
+    def test_no_fuzzy_for_scaled(self):
+        fx = {"compounds": [{"key": "s", "role": "scaled", "canonical_name": "pterostilbene", "must_match": []}]}
+        self.assertEqual(resolver.Resolver(fx).match("pterostilbine"), [])
+        fx["compounds"][0]["role"] = "seed"
+        self.assertEqual([m.method for m in resolver.Resolver(fx).match("pterostilbine")], ["fuzzy"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -112,9 +112,15 @@ def seed_query_plan(fx: dict, roles=PLAN_ROLES, rules: dict | None = None) -> li
     for c in fx["compounds"]:
         if c["role"] not in roles:
             continue
-        candidates = ([(c["canonical_name"], "canonical_name")] + [(m, "must_match") for m in c["must_match"]]
-                      + [(d, "trap_decoy") for d in decoys.get(c["key"], [])]
-                      + [(q, "review_query") for q in review_q.get(c["key"], [])])
+        if c["role"] == "scaled":
+            # D1 (docs/synonym_pipeline.md, decided by Kevin Ferguson): scaled compounds are
+            # searched only on their official names (DrugAge, ChEMBL preferred/INN/USAN/BAN/JAN/
+            # trade), never on PubChem-only synonyms, which are used for matching only.
+            candidates = [(q, "scaled_query_term") for q in c.get("query_terms", [])]
+        else:
+            candidates = ([(c["canonical_name"], "canonical_name")] + [(m, "must_match") for m in c["must_match"]]
+                          + [(d, "trap_decoy") for d in decoys.get(c["key"], [])]
+                          + [(q, "review_query") for q in review_q.get(c["key"], [])])
         for raw, source in candidates:
             term = normalise_term(str(raw))
             if not term or DOSE_RE.search(term) or term.lower() in excluded:
@@ -350,3 +356,15 @@ def refresh(conn: sqlite3.Connection, terms: list[str] | None = None, *, run_id:
         stage(conn)
     return {"api_version": v.get("apiVersion"), "data_timestamp": v.get("dataTimestamp"),
             "terms": len(terms), "studies": sum(r["studies"] for r in results)}
+
+
+def count_terms(conn: sqlite3.Connection, terms: list[str], *, client: HttpClient | None = None) -> list[dict]:
+    """How many studies each query term would return, one tiny cached request per term
+    (pageSize 1). For estimating a fetch before running it (docs/synonym_pipeline.md, D1)."""
+    f = Fetcher(conn, client or HttpClient(min_interval_s=MIN_INTERVAL_S))
+    out = []
+    for term in terms:
+        resp = f.get("studies", {"query.intr": term, "fields": "NCTId", "pageSize": 1, "countTotal": "true",
+                                 "format": "json"})
+        out.append({"query_term": term, "total": json.loads(resp.body).get("totalCount", 0)})
+    return out

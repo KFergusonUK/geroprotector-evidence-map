@@ -145,3 +145,13 @@ output. The amendment requires the blind-check file to be committed before compa
 Correction to my previous status: Kevin asked me to commit the packet. Commit `ce495a9`
 contains only `docs/estriol_blind_check.yaml`. The prescribed comparison then found 18/18
 agreement and 0 disagreements; outcome: **number stands**. No resolver output was used.
+
+## 2026-11-26 19:15 · Claude Code (Opus 5.5) · LOCK db
+
+LOCK db: Claude Code, seed-only `resolve` with the word index (D4 exactness run), started 19:15.
+
+UNLOCK db: Claude Code. D4 exactness run: 17,419 rows, 0 rows with any column changed,
+0 added or gone; 41 s.
+
+LOCK db: Claude Code, count-only registry pass for the 3,191 scaled query terms (one
+cached request per term, about an hour; writes raw_response only), started 19:25.
