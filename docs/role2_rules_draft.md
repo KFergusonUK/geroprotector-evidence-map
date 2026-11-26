@@ -11,6 +11,32 @@ compound play in answering that question?** Read the trial purpose, intervention
 descriptions, and arm descriptions together. A sponsor's arm-type label is evidence, not
 the answer.
 
+## Decision path
+
+Answer these questions in order, using words in the registry rather than assumptions about
+usual medical practice:
+
+1. **Is the same dose and form of the compound given in every arm, without the record
+   comparing its use?** If yes, label **background**. *Look at each arm's description and
+   intervention list.*
+2. **Does the record say it is a probe or challenge, or describe it as supporting care for
+   a different treatment, device, or study question?** If yes, label **background**. *Look
+   at the purpose, intervention description, and arm descriptions.*
+3. **Does the record call it the control, reference, standard, or usual treatment, or does
+   the title frame a new treatment versus it as standard care?** If yes, label
+   **comparator**. *Look at the title and arm descriptions; an `ACTIVE_COMPARATOR` label
+   alone is not enough.*
+4. **Does the record say it evaluates this compound's effect, compares its presence with
+   its absence, or compares its dose, schedule, or form?** If yes, label **experimental**.
+   *Look at the purpose/title and the differences between arms.*
+5. **Do the record's words still leave its role uncertain or contradictory?** If yes, label
+   **unclear** and note what is missing. *Point to the conflicting or absent purpose, arm,
+   or intervention detail.*
+
+For a head-to-head trial, each treatment being tested is **experimental** unless the record
+identifies one as the control, reference, standard, or usual treatment under question 3.
+*Reason: the registry's stated comparison tells us which compounds the trial tests.*
+
 - **Experimental:** label the compound experimental when the trial is designed to evaluate
   its effect on participants, including a comparison of its doses, schedules, formulations,
   or an explicitly tested treatment that contains it; merely measuring the compound in the
@@ -26,11 +52,10 @@ the answer.
 - **Same compound, different dose or form:** if arms differ in the dose, schedule, or
   formulation of the named compound, it is experimental even when one arm is called
   “ACTIVE_COMPARATOR.”
-- **Head-to-head active treatments:** when a trial compares two or more active treatments
-  to learn which works better, label each compared treatment experimental for its own
-  compound; reserve comparator for a reference/control treatment that is not itself part
-  of the active head-to-head question. *Reason: this map asks what the trial tests about
-  each compound, and a head-to-head trial tests each treatment's outcome.*
+- **Head-to-head active treatments:** label each treatment experimental unless the record
+  calls one the control, reference, standard, or usual treatment, or frames the title as a
+  new treatment versus standard care; arm-type labels alone do not decide this. *Reason:
+  the registry's stated comparison tells us which compounds the trial tests.*
 - **Bioequivalence:** label the test product experimental and its reference product
   comparator.
 - **Compound in every arm:** if the same dose and form are given in every arm, it is usually
@@ -72,13 +97,12 @@ The record says aspirin is taken “as a part of dual anti-platelet therapy”; 
 registry of an everolimus-eluting stent. **Role: background.** Aspirin is supporting care
 around the device procedure, not the device being evaluated.
 
-### Open-label add-on around the main treatment — empagliflozin, NCT04702490
+### Open-label add-on compared as part of treatment — empagliflozin, NCT04702490
 
-The record says empagliflozin “will be incorporated into two of the treatment arms in an
-open-label manner”; its arm labels pair it with both active and placebo MET409. **Role:
-background in this role-1 example.** It is an open-label co-treatment in the MET409
-comparison; being named in intervention lists or given without blinding does not, on its
-own, make it the compound whose effect this record is testing.
+The title says “MET409 Alone or in Combination With Empagliflozin,” and the summary says
+empagliflozin “will be incorporated into two of the treatment arms in an open-label manner.”
+**Empagliflozin: experimental.** Its addition is part of the treatment comparison; “open-
+label” says it is unmasked, not that it is background.
 
 ## When `unclear` is the right label
 
@@ -98,15 +122,6 @@ clinical practice.
 - **NCT01598337, aspirin:** the named aspirin-only arm suggests a comparator, but the
   record also says patients continue maintenance aspirin and links other antiplatelets to
   that arm; it does not say whether aspirin continues in the other arms. **Unclear.**
-
-## Quick decision path
-
-1. Is the compound itself being evaluated, or is it part of the assigned treatment under
-   test? **Experimental.**
-2. Is it the active reference against a different treatment? **Comparator.**
-3. Is it a stable co-treatment, probe, challenge, or standard care for a different study
-   question? **Background.**
-4. Does the record leave those possibilities unresolved? **Unclear.**
 
 When in doubt, add a short note pointing to the registry wording that decided the label, or
 say exactly what the record leaves unknown.

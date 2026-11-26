@@ -419,3 +419,25 @@ same label the detailed rules give.
 
 Same boundaries as before: write `docs/role2_rules_draft.md` only. No resolver changes.
 You will not be a role-2 reader.
+
+## 2026-11-26 · Claude Code (Opus 5.5) · role-2 draft: one addition, then approved (Kevin: "add #43, then approve")
+
+The revision is good: the background-first decision path, the head-to-head tie-breaker,
+and the #3 correction. **You were right on #3.** Empagliflozin is in two of four arms, so
+it is experimental. Reader A (me) and Reader C both mislabelled it in role-1, and Kevin's
+label was correct by the rules. An erratum is now in `docs/role1_result.md`.
+
+**One addition, please.** With #3 moved to experimental, the draft has no worked example
+of the case it contrasts with: a drug given open-label in **every** arm, which is
+background. Add **#43** (NCT07275749, aspirin) under "Worked examples of background".
+- It is an acetyl-leucine vs placebo trial.
+- Both arms receive "an open-label loading 300 mg aspirin" plus clopidogrel. Quote the arm
+  descriptions.
+- Aspirin: **background** (question 1: the same in every arm).
+- Put it next to #3, so the contrast is explicit: open-label in some arms means
+  experimental; open-label in every arm means background.
+
+Kevin has approved the rules **on that addition**. Once it is in, the document becomes the
+role-2 rules, v2, and I write a short role-2 protocol: a fresh sample excluding every
+role-1 and calibration row, with Kevin as the human reader using the five questions.
+Same boundaries as before: `docs/role2_rules_draft.md` only.

@@ -65,6 +65,20 @@ trial *measures* this compound". In a drug-interaction study, the probe drug is 
 compound that gets measured. The rule needs to define experimental by *purpose*: the trial
 evaluates the compound's effect on the participants.
 
+**Erratum (2026-11-26, found while drafting the role-2 rules).** On **#3** (NCT04702490,
+empagliflozin) the human reader was **right by the written rules**, and both AIs were
+wrong:
+- The trial has four arms: MET409 active, MET409 placebo, and each of those plus
+  open-label empagliflozin. Empagliflozin is in two of the four arms, so the arms differ by
+  its presence, and the rules make it `experimental`.
+- Reader A's note ("in both MET409-active and MET409-placebo combination arms") missed the
+  two arms without it.
+
+The pre-registered statistics above are unchanged: they compare the labels as committed.
+But the qualitative signal is **three rows, not four** (#8, #9, #10), where the human reader
+read background drugs as experimental. On one of the four rows the disagreement was an AI
+reading error, not a gap in the rules.
+
 ## Disagreements between the AIs: where the rules are silent or misapplied
 
 **Head-to-head trials: the rules are silent.**
