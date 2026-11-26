@@ -1,0 +1,185 @@
+protocol: docs/estriol_census_protocol.md
+protocol_commit: 65a5449
+population_commit: 8a3f776
+adjudicated_by: Claude (single reviewer; wrote the resolver and the estriol fixture entry)
+adjudicated_at: '2026-11-26'
+summary:
+  n: 18
+  identity_correct: 18
+  identity_errors: 0
+  wilson95:
+  - 0.8241
+  - 1.0
+  route_correct: 16
+  route_errors:
+  - 4
+  - 11
+  truly_systemic: 2
+  decision: '0 errors: meets the census bar'
+  status: provisional until Kevin Ferguson's blind check of all 18 rows (protocol step 5)
+rows:
+- i: 1
+  nct_id: NCT00451204
+  idx: 0
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: systemic
+  role_claude: experimental
+  note: Oral estriol 8 mg + Copaxone vs placebo + Copaxone (arm typed ACTIVE_COMPARATOR).
+- i: 2
+  nct_id: NCT00816556
+  idx: 0
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: local
+  role_claude: experimental
+  note: Vaginal estriol 10 ug vs estradiol valerate vs base cream.
+- i: 3
+  nct_id: NCT00908570
+  idx: 0
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: local
+  role_claude: experimental
+  note: Vaginal estriol cream vs placebo.
+- i: 4
+  nct_id: NCT01408030
+  idx: 2
+  compound: estriol
+  identity_correct: true
+  route_correct: false
+  correct_route: local
+  role_claude: experimental
+  note: 'Estriol 0.1% NASAL SPRAY for epistaxis (HHT): intranasal, local. Resolver defaulted to systemic (no route
+    word matched). One of three active sprays vs saline.'
+- i: 5
+  nct_id: NCT01466114
+  idx: 0
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: systemic
+  role_claude: experimental
+  note: Oral estriol 8 mg (Synapause) vs placebo in MS.
+- i: 6
+  nct_id: NCT02413008
+  idx: 0
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: local
+  role_claude: experimental
+  note: 0.005% estriol vaginal gel vs placebo.
+- i: 7
+  nct_id: NCT02733731
+  idx: 1
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: local
+  role_claude: comparator
+  note: Estriol is the active control for a Chinese herbal ointment.
+- i: 8
+  nct_id: NCT02906111
+  idx: 0
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: local
+  role_claude: experimental
+  note: Vaginal estriol gel before prolapse surgery vs no estriol (arm typed ACTIVE_COMPARATOR).
+- i: 9
+  nct_id: NCT02967510
+  idx: 0
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: local
+  role_claude: experimental
+  note: Three vaginal gel strengths vs placebo.
+- i: 10
+  nct_id: NCT03032848
+  idx: 2
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: local
+  role_claude: experimental
+  note: Estriol cream (Stelle), one of three vaginal estrogens compared; registry arm links are scrambled (each
+    arm lists the OTHER drugs), but the object is estriol.
+- i: 11
+  nct_id: NCT03116022
+  idx: 0
+  compound: estriol
+  identity_correct: true
+  route_correct: false
+  correct_route: local
+  role_claude: experimental
+  note: 'Estriol 1 mg/g applied in the proximal third of the VAGINA: local. Resolver said systemic: route pattern
+    matches ''vaginal'' but not ''vagina''. Arms differ by site of application.'
+- i: 12
+  nct_id: NCT03363997
+  idx: 0
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: local
+  role_claude: experimental
+  note: Estriol vaginal ring 0.125 mg/day (PK of three ring strengths).
+- i: 13
+  nct_id: NCT03363997
+  idx: 1
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: local
+  role_claude: experimental
+  note: Estriol vaginal ring 0.250 mg/day.
+- i: 14
+  nct_id: NCT03363997
+  idx: 2
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: local
+  role_claude: experimental
+  note: Estriol vaginal ring 0.500 mg/day.
+- i: 15
+  nct_id: NCT04045379
+  idx: 2
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: local
+  role_claude: comparator
+  note: Vaginal estriol vs CO2 laser vs microablative radiofrequency; estriol is the standard-treatment arm.
+- i: 16
+  nct_id: NCT04159493
+  idx: 0
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: local
+  role_claude: experimental
+  note: Ovestin (estriol) vaginal, dose-finding vs placebo (arm typed ACTIVE_COMPARATOR).
+- i: 17
+  nct_id: NCT04574999
+  idx: 0
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: local
+  role_claude: experimental
+  note: 0.005% estriol vaginal gel vs placebo; otherNames give the IUPAC name (16alpha-hydroxyestradiol).
+- i: 18
+  nct_id: NCT07854873
+  idx: 1
+  compound: estriol
+  identity_correct: true
+  route_correct: true
+  correct_route: local
+  role_claude: comparator
+  note: Vaginal estriol (Oekolp forte) is the active control for vaginal prasterone.
