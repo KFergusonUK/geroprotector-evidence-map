@@ -88,3 +88,63 @@ see the fixture's `decisions`). Its auto-accepts are measured by census before u
 
 **A structural point for the harm review:** one source paper can produce several harm
 candidates. The review should see when candidates share a PMID.
+
+## Additional DrugAge Build 5 candidates checked 2026-11-26
+
+The verdict concerns whether the cited paper supports the row as transcribed. It does not
+mean that a mouse or rat result establishes harm in people. For older papers whose full
+tables were unavailable, I have not inferred the exact result from DrugAge.
+
+### Metformin — Martin-Montalvo et al. 2013 (PMID 23900241)
+
+The full paper is available in [PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC3736576/).
+Its abstract says the 0.1% dietary dose extended lifespan in male mice, while the higher
+1% dose was toxic. The Results report mean lifespan **+5.83%** at 0.1% in C57BL/6 mice
+(*p* = 0.02), **+4.15%** in B6C3F1 mice (*p* = 0.064), and **−14.4%** at 1% in C57BL/6
+mice (*p* < 0.001), likely due to renal failure. Thus the DrugAge row at 10,000 ppm
+(1%) is **confirmed** in direction, magnitude and significance; 1,000 ppm is the same
+paper's 0.1% dose. The authors explicitly call 1% toxic. This is a dose-specific toxic
+harm signal, not evidence that ordinary human metformin exposure shortens life. The
+opposite results at 0.1% and 1% also mean the shortening does not follow a simple
+monotonic dose-response.
+
+### Aspirin and chloroquine — Hochschild 1973 (PMID 4788962)
+
+The publisher exposes the [abstract](https://karger.com/ggi/article-abstract/19/5-6/271/148550/Effects-of-Various-Drugs-on-Longevity-in-Female?redirectedFrom=PDF),
+but the article's tables and full text are subscriber-only in the copy available for this
+check. The abstract says that, aside from two cases of apparently toxic effects, lifespan
+differences were not significant at *p* < 0.05; it does not identify the two cases or give
+the dose-specific survival statistics. I therefore cannot verify DrugAge's aspirin
+−10% (*S*) at 242 ppm, its 0% arms at 113 and 495 ppm, or chloroquine −8% (*S*) at
+13.2 ppm and 0% at 39.5 ppm against the paper's table. **Verdict: not independently
+verified (full table unavailable); no direction/significance correction proposed.** If
+the supplied rows are accurate, their pattern is non-monotonic for both compounds, and
+the reported shortenings could be the paper's two toxic cases; that remains a hypothesis,
+not a verified reading. Aspirin and chloroquine are two rows from one study, not
+independent replications.
+
+### Phenobarbital and nicotine — Schmähl & Habs 1976 (PMID 132031)
+
+The [publisher summary](https://link.springer.com/article/10.1007/BF00304936) and PubMed
+abstract are accessible; the full article/table is not. The abstract reports 858
+Sprague-Dawley rats across 12 substances and says nicotine and phenobarbital “diminish
+the mean survival times.” This supports the **qualitative shortening direction** for
+both, but does not expose the sex-specific means, dose, *p*-values, or control-group
+construction. The DrugAge magnitudes (phenobarbital −9.6% female / −16.7% male;
+nicotine −8.5% female / −11.5% male) and the stated 2 mg/kg/week dose therefore remain
+**unverified against the paper's table**. The compounds are certainly from the same
+paper; whether they shared a single concurrent control cannot be checked from the
+accessible abstract. No numeric or significance correction is proposed without the
+table.
+
+### Quercetin — Jones & Hughes 1982 (PMID 7140862)
+
+The [PubMed abstract](https://pubmed.ncbi.nlm.nih.gov/7140862/) is accessible, but the
+full table is not. It says a dietary supplement of 0.1% quercetin “significantly reduced
+the life span of mice” and that the effect was predominantly in shorter-lived males.
+This confirms the **qualitative direction and reported significance** of the male harm
+signal, and supports a sex difference. It does not give the male −14% or female −6%
+(*NS*) values; those magnitudes and female statistics remain unverified. **Verdict:
+direction/significance confirmed from the abstract; magnitude not independently
+verified.** This is one old mouse study, not evidence that normal quercetin-containing
+foods shorten human lifespan.
