@@ -37,8 +37,8 @@ rows:
     type: PLACEBO_COMPARATOR
     description: 'Route: Vaginal. Administration by an applicator inserted deep inside the vagina Dose: 1 g of gel.
       Dosage schedule: Weeks 1-3: single daily application Weeks 4-12: twice weekly administration'
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The linked registry record names estriol and specifies estriol in the administered 0.005% vaginal gel.'
 - blind_id: 2
   census_i: 12
   nct_id: NCT03363997
@@ -66,8 +66,8 @@ rows:
     type: EXPERIMENTAL
     description: Single vaginal application of 1 vaginal ring containing 600 mg estriol, with delivery rate of 0.500
       mg/day over 21 days
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The registry identifies estriol in the vaginal ring; the three active arms differ by estriol delivery dose.'
 - blind_id: 3
   census_i: 17
   nct_id: NCT04574999
@@ -94,8 +94,8 @@ rows:
     description: 'Placebo gel for vaginal administration. Route: Vaginal by a cannula inserted deep inside the vagina
       Single dose: 1 g of gel Dosage schedule: Weeks 1-3: single daily application Weeks 4-12: single application
       2 times per week.'
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The linked record explicitly describes 0.005% estriol gel and its estriol dose.'
 - blind_id: 4
   census_i: 13
   nct_id: NCT03363997
@@ -123,8 +123,8 @@ rows:
     type: EXPERIMENTAL
     description: Single vaginal application of 1 vaginal ring containing 600 mg estriol, with delivery rate of 0.500
       mg/day over 21 days
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The registry names estriol as the ring ingredient; the arm description confirms estriol administration.'
 - blind_id: 5
   census_i: 14
   nct_id: NCT03363997
@@ -152,8 +152,8 @@ rows:
     type: EXPERIMENTAL
     description: Single vaginal application of 1 vaginal ring containing 600 mg estriol, with delivery rate of 0.500
       mg/day over 21 days
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The registry names estriol as the ring ingredient; the arm description confirms estriol administration.'
 - blind_id: 6
   census_i: 5
   nct_id: NCT01466114
@@ -175,8 +175,8 @@ rows:
   - label: 'Group B: Placebo'
     type: PLACEBO_COMPARATOR
     description: Standard MS Treatment + Placebo
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The intervention is oral estriol capsules (Synapause); norethindrone is a separately listed later co-treatment.'
 - blind_id: 7
   census_i: 10
   nct_id: NCT03032848
@@ -206,8 +206,8 @@ rows:
   - label: Vaginal Moisturizer Cream
     type: PLACEBO_COMPARATOR
     description: use of 1 gram per day
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The registry has a separate Estriol Group and an intervention object named Estriol; no other molecule is indicated.'
 - blind_id: 8
   census_i: 2
   nct_id: NCT00816556
@@ -235,8 +235,8 @@ rows:
     type: PLACEBO_COMPARATOR
     description: Vanicream Lite 0.5 grams applied to vaginal introitus daily for two weeks and then twice weekly
       for 10 weeks
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The active-comparator arm specifies 10 micrograms of estriol in cream; estradiol is a separate arm.'
 - blind_id: 9
   census_i: 8
   nct_id: NCT02906111
@@ -264,8 +264,8 @@ rows:
   - label: Control group, no estriol treatment
     type: ACTIVE_COMPARATOR
     description: 'Procedure: vaginal surgery'
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The registry arm describes vaginal gel containing 50 micrograms of estriol.'
 - blind_id: 10
   census_i: 3
   nct_id: NCT00908570
@@ -286,8 +286,8 @@ rows:
   - label: 2Placebo cream
     type: PLACEBO_COMPARATOR
     description: null
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The intervention and experimental arm specify topical estriol cream at 1 mg/mL.'
 - blind_id: 11
   census_i: 7
   nct_id: NCT02733731
@@ -310,8 +310,8 @@ rows:
     type: ACTIVE_COMPARATOR
     description: The dosage of medicine for single treatment once a day in two group is 0.5g,The total time for
       therapy is 3 weeks in two groups.
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The registry lists Estriol as a separate active-comparator intervention and arm; it is not the herbal ointment.'
 - blind_id: 12
   census_i: 16
   nct_id: NCT04159493
@@ -343,8 +343,8 @@ rows:
 
       Active, Vaginal Application 0.5 to 2 g administered daily for the 1st 14 days, then twice weekly for following
       10 weeks'
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'Ovestin is the named estriol intervention; the listed doses are dose levels of that treatment.'
 - blind_id: 13
   census_i: 18
   nct_id: NCT07854873
@@ -369,8 +369,8 @@ rows:
     type: ACTIVE_COMPARATOR
     description: Participants received vaginal estriol according to the preoperative treatment regimen before urogynecological
       surgery.
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The linked registry record describes vaginal estriol (Oekolp forte) administered before surgery.'
 - blind_id: 14
   census_i: 4
   nct_id: NCT01408030
@@ -398,8 +398,8 @@ rows:
   - label: Tranexamic acid spray
     type: ACTIVE_COMPARATOR
     description: tranexamic acid 10%
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The intervention and active-comparator arm specify estriol spray; route does not change identity.'
 - blind_id: 15
   census_i: 9
   nct_id: NCT02967510
@@ -434,8 +434,8 @@ rows:
     type: PLACEBO_COMPARATOR
     description: 'Vaginal. Administration by an applicator inserted deep inside the vagina Dose: 1 g of gel, containing
       50 Mcg of estriol Dosage schedule: Weeks 1-3: single daily application Weeks 4-12: twice weekly administration'
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The study compares active estriol gel formulations; the registry identifies estriol as the intervention.'
 - blind_id: 16
   census_i: 15
   nct_id: NCT04045379
@@ -467,8 +467,8 @@ rows:
     description: The patient will use intravaginal estriol, daily for 2 weeks and them twice a week for 3 months
       . Each 30 days, the patients will have an appointment when will be checked the weight of the estriol tube
       to verify the correct use.
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'The intervention and arm describe intravaginal estriol; the other arms are procedures.'
 - blind_id: 17
   census_i: 11
   nct_id: NCT03116022
@@ -495,8 +495,8 @@ rows:
   - label: Control group (CG)
     type: PLACEBO_COMPARATOR
     description: This arm is composed of women using vaginal gel lubricant base water during intercourse
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'Both groups receive estriol; the location of application differs, not the administered molecule.'
 - blind_id: 18
   census_i: 1
   nct_id: NCT00451204
@@ -521,5 +521,5 @@ rows:
     type: PLACEBO_COMPARATOR
     description: Placebo Capsules (daily) plus Copaxone injections (daily). A second placebo capsule given for 2
       weeks every 3 months.
-  verdict: null
-  note: ''
+  verdict: correct
+  note: 'Estriol is a separately named capsule intervention; Copaxone and cyclic progestin are co-administered regimen components, not a fixed-dose estriol product.'
