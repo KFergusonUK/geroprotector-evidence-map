@@ -1,0 +1,216 @@
+# Role-1 CALIBRATION rows: practice, NOT part of the measured 100 (docs/role1_protocol.md).
+# Five trials from the step-4/4b samples (excluded from the role-1 population), chosen by
+# Claude to exercise one written rule each. Head-to-head multi-arm trials are deliberately
+# NOT included (that case is where the written rules are silent; it is being measured).
+# Label these exactly as you label the packet, THEN open docs/role1_calibration_answers.yaml.
+# Added 2026-11-26 at Kevin Ferguson's request, after he had labelled 14 of 100 rows; the
+# role-1 result reports this as a protocol deviation (training mid-measurement).
+rows:
+- id: C1
+  nct_id: NCT07172867
+  registry_url: https://clinicaltrials.gov/study/NCT07172867
+  question: Role of semaglutide in this trial (the intervention object below names it)
+  compound: semaglutide
+  intervention_index: 2
+  intervention:
+    type: DRUG
+    name: Semaglutide 1 mg
+    otherNames: null
+    description: Semaglutide 1 mg, every week
+    armGroupLabels:
+    - HT-6184 2mg Matching Placebo
+    - HT-6184 2mg Treatment
+  all_interventions:
+  - HT-6184
+  - HT-6184 Matching Placebo
+  - Semaglutide 1 mg
+  arm_groups:
+  - label: HT-6184 2mg Treatment
+    type: EXPERIMENTAL
+    description: 'Ofirnoflast (2 mg): dosed once a day, orally (PO QD) + semaglutide (1 mg): dosed weekly (q1wk),
+      via subcutaneous (SC) injection for 12 weeks.'
+    interventionNames:
+    - 'Drug: HT-6184'
+    - 'Drug: Semaglutide 1 mg'
+  - label: HT-6184 2mg Matching Placebo
+    type: PLACEBO_COMPARATOR
+    description: 'Placebo: dosed once a day, orally (PO QD) + semaglutide (1 mg): dosed weekly (q1wk), via SC injection
+      for 12 weeks.'
+    interventionNames:
+    - 'Drug: HT-6184 Matching Placebo'
+    - 'Drug: Semaglutide 1 mg'
+  study_type: INTERVENTIONAL
+  title: A Randomized, Double-Blind, Placebo-Controlled Multicenter Phase 2 Study to Evaluate the Safety, Efficacy
+    and Tolerability of Ofirnoflast (HT-6184) and Semaglutide in Obese or Overweight Participants With Type 2 Diabetes
+    Mellitus (T2DM)
+  summary: The purpose of this study is to evaluate the efficacy and safety of ofirnoflast in combination with semaglutide
+    in comparison to semaglutide alone in obese participants with T2DM.
+  label: null
+  note: ''
+- id: C2
+  nct_id: NCT05123781
+  registry_url: https://clinicaltrials.gov/study/NCT05123781
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Glucophage® XR 1000 mg Prolonged Release Tablets (Merck Serono Ltd, UK)
+    otherNames:
+    - Glucophage® XR 1000 mg
+    description: One tablet of the Reference product was administered orally with 240 ml of water
+    armGroupLabels:
+    - Treatment B
+  all_interventions:
+  - Metformin 1000 mg Prolonged Release Tablets (JSC Farmak, Ukraine)
+  - Glucophage® XR 1000 mg Prolonged Release Tablets (Merck Serono Ltd, UK)
+  arm_groups:
+  - label: Treatment A
+    type: EXPERIMENTAL
+    description: Test Product Metformin 1000 mg Prolonged Release Tablets (JSC Farmak, Ukraine)
+    interventionNames:
+    - 'Drug: Metformin 1000 mg Prolonged Release Tablets (JSC Farmak, Ukraine)'
+  - label: Treatment B
+    type: ACTIVE_COMPARATOR
+    description: Reference Product Glucophage® XR 1000 mg Prolonged Release Tablets (Merck Serono Ltd, UK)
+    interventionNames:
+    - 'Drug: Glucophage® XR 1000 mg Prolonged Release Tablets (Merck Serono Ltd, UK)'
+  study_type: INTERVENTIONAL
+  title: An Open, Comparative, Randomized, Crossover, Bioequivalence Study of Metformin, Prolonged-release Tablets
+    500 mg (JSC Farmak, Ukraine) vs Glucophage® XR in Healthy, Adult Male and Female Subjects Under Fasting Conditions
+  summary: 'The primary objective was to compare the rate and extent of absorption of Metformin XR after administration
+    of a Test Product Metformin 1000 mg Prolonged Release Tablets (JSC Farmak, Ukraine) and Reference Product Glucophage®
+    XR 1000 mg Prolonged Release Tablets (Merck Serono Ltd, UK), administered as a single dose in healthy subjects
+    under fasting conditions.
+
+
+    The adverse events, physical examinations and vital signs were reported for the evaluation of safety.'
+  label: null
+  note: ''
+- id: C3
+  nct_id: NCT04352439
+  registry_url: https://clinicaltrials.gov/study/NCT04352439
+  question: Role of aspirin in this trial (the intervention object below names it)
+  compound: aspirin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Aspirin
+    otherNames: null
+    description: 81 mg aspirin daily
+    armGroupLabels:
+    - Aspirin
+  all_interventions:
+  - Aspirin
+  arm_groups:
+  - label: Aspirin
+    type: EXPERIMENTAL
+    description: Patients with a Khorana risk score of 1 receive 81 mg aspirin daily while receiving neoadjuvant
+      chemotherapy for ovarian cancer.
+    interventionNames:
+    - 'Drug: Aspirin'
+  study_type: INTERVENTIONAL
+  title: Aspirin for Prevention of Venous Thromboembolism Among Ovarian Cancer Patients Receiving Neoadjuvant Chemotherapy
+  summary: This is a pilot study to determine the safety and efficacy of low dose aspirin for the prevention of
+    venous thromboembolism among women with advanced ovarian cancer receiving neoadjuvant chemotherapy.
+  label: null
+  note: ''
+- id: C4
+  nct_id: NCT07785934
+  registry_url: https://clinicaltrials.gov/study/NCT07785934
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Metformin hydrochloride
+    otherNames: null
+    description: Oral administration. Metformin hydrochloride will be given as twice-daily doses for 7 consecutive
+      administrations.
+    armGroupLabels:
+    - UBT251
+  all_interventions:
+  - UBT251
+  - Metformin hydrochloride
+  - Warfarin Sodium
+  - Atorvastatin calcium
+  - Digoxin
+  arm_groups:
+  - label: UBT251
+    type: EXPERIMENTAL
+    description: 'This study contains two cohorts. Cohort 1: Participants will first receive multiple-dose metformin,
+      then a single-dose warfarin after a 7-day washout period, with PK/PD sampling for both treatments. Following
+      a 20-week weekly dose-escalation phase of UBT251, metformin will be administered 24 hours after the 5th consecutive
+      fixed-dose UBT251 injection, and warfarin will be given 24 hours after the 6th injection. Dosing and PK/PD
+      sampling procedures will match those of the single-drug phase.
+
+
+      Cohort 2: Participants will receive single-dose atorvastatin and digoxin separated by a 7-day washout period,
+      with PK sampling for each drug. After the 20-week UBT251 weekly dose-escalation phase, atorvastatin will be
+      given 24 hours after the 5th consecutive fixed-dose UBT251 injection, and digoxin will be administered 24
+      hours after the 6th injection. PK sampling procedures will be consistent with those of the single-drug treatment
+      phase.'
+    interventionNames:
+    - 'Drug: UBT251'
+    - 'Drug: Metformin hydrochloride'
+    - 'Drug: Warfarin Sodium'
+    - 'Drug: Atorvastatin calcium'
+    - 'Drug: Digoxin'
+  study_type: INTERVENTIONAL
+  title: A Phase 1, Open-Label, Drug-Drug Interaction Study to Evaluate the Effect of UBT251 on the Pharmacokinetics
+    of Single Oral Doses of Metformin, Warfarin, Atorvastatin, and Digoxin in Overweight or Obese Participants.
+  summary: 'This is a Phase I, open-label, two-cohort study designed to evaluate the drug-drug interaction potential
+    of multiple-dose UBT251 Injection in adult participants with overweight or obesity.
+
+
+    The primary objective of Cohort 1 is to evaluate the effect of UBT251 Injection on the pharmacokinetic (PK)
+    profiles of metformin and warfarin. The secondary objectives of Cohort 1 are to assess the influence of UBT251
+    Injection on the pharmacodynamic (PD) characteristics of warfarin, to evaluate the safety of UBT251 Injection
+    administered alone, as well as metformin and warfarin administered alone or in combination with UBT251 Injection,
+    and to characterize the PK, PD, and immunogenicity profiles following repeated UBT251 Injection dosing.
+
+
+    The primary objective of Cohort 2 is to evaluate the effect of UBT251 Injection on the PK profiles of atorvastatin
+    and digoxin. The secondary objectives of Cohort 2 are to evaluate the safety of UBT251 Injection alone, atorvastatin
+    and digoxin alone, and their combination with UBT251 Injection, as well as to assess the PK, PD, and immunogenicity
+    characteristics after multiple administrations of UBT251 Injection.'
+  label: null
+  note: ''
+- id: C5
+  nct_id: NCT00470561
+  registry_url: https://clinicaltrials.gov/study/NCT00470561
+  question: Role of aspirin in this trial (the intervention object below names it)
+  compound: aspirin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Aspirin
+    otherNames:
+    - Acetylsalicylic acid
+    description: Two 325 mg doses of aspirin per day for 6 months
+    armGroupLabels:
+    - Aspirin
+  all_interventions:
+  - Aspirin
+  - Placebo
+  arm_groups:
+  - label: Aspirin
+    type: ACTIVE_COMPARATOR
+    description: null
+    interventionNames:
+    - 'Drug: Aspirin'
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: null
+    interventionNames:
+    - 'Drug: Placebo'
+  study_type: INTERVENTIONAL
+  title: The Effect of Aspirin on Mammogram Density (TEAM)
+  summary: 'RATIONALE: Aspirin may be effective in reducing breast density in healthy postmenopausal women with
+    a moderate or high level of breast density.
+
+
+    PURPOSE: This randomized clinical trial is studying the effect of aspirin on mammogram density compared with
+    a placebo in healthy postmenopausal women with a moderate or high level of breast density.'
+  label: null
+  note: ''

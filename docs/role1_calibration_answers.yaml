@@ -1,0 +1,40 @@
+# Claude's labels and reasoning for docs/role1_calibration.yaml. Open AFTER labelling those 5.
+answers:
+- id: C1
+  nct_id: NCT07172867
+  compound: semaglutide
+  rule_tested: compound in every arm
+  claude_label: background
+  reasoning: 'Semaglutide 1 mg weekly is in BOTH arms at the same dose; the arms differ only by HT-6184 vs its placebo.
+    In every arm, not varied by dose/regimen/formulation -> background (rule: ''X + drug'' vs ''placebo + drug''
+    -> judge the compound''s own role).'
+- id: C2
+  nct_id: NCT05123781
+  compound: metformin
+  rule_tested: bioequivalence reference product
+  claude_label: comparator
+  reasoning: 'Bioequivalence study; this object is Glucophage XR, described as the Reference Product (Treatment
+    B). The test product is Farmak''s metformin (Treatment A). Rule: the reference product in a BE study is comparator.'
+- id: C3
+  nct_id: NCT04352439
+  compound: aspirin
+  rule_tested: single-arm study of the compound
+  claude_label: experimental
+  reasoning: 'Single arm: aspirin 81 mg is the object of study (VTE prevention during chemotherapy). Rule: object
+    of study in a single-arm study -> experimental.'
+- id: C4
+  nct_id: NCT07785934
+  compound: metformin
+  rule_tested: probe substrate in a drug-interaction study
+  claude_label: background
+  reasoning: 'Phase I DDI study of UBT251: metformin, warfarin, atorvastatin and digoxin are given to measure UBT251''s
+    effect on them. Metformin is a probe substrate, not what is being tested -> background (even though the only
+    arm is typed EXPERIMENTAL).'
+- id: C5
+  nct_id: NCT00470561
+  compound: aspirin
+  rule_tested: '''Active Comparator'' arm against placebo'
+  claude_label: experimental
+  reasoning: 'Aspirin vs placebo. The aspirin arm is typed ACTIVE_COMPARATOR by the sponsor, but there is nothing
+    else being tested: aspirin is what differs between the arms. Rule: arm types are evidence, not the answer ->
+    experimental.'
