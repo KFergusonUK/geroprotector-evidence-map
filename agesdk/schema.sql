@@ -793,7 +793,9 @@ CREATE TABLE IF NOT EXISTS ctgov_query_plan (
   -- precision check meets it in live registry text (e.g. ximelagatran for Y-27632).
   -- review_query: searched to catch targets whose registry entries never name the compound
   -- (e.g. 'polyamine' for spermidine); every hit goes to human review, never auto-matched.
-  term_source   TEXT NOT NULL CHECK (term_source IN ('canonical_name', 'must_match', 'trap_decoy', 'review_query')),
+  -- scaled_query_term: an official name of a scaled compound (§7 step 7; docs/synonym_pipeline.md D1).
+  term_source   TEXT NOT NULL CHECK (term_source IN ('canonical_name', 'must_match', 'trap_decoy', 'review_query',
+                                                    'scaled_query_term')),
   plan_version  TEXT NOT NULL
 );
 
@@ -1194,4 +1196,4 @@ SELECT * FROM (
   FROM v_membership_changes WHERE cell_class = 'derived_cell')
 WHERE transition IS NOT NULL;
 
-PRAGMA user_version = 10;
+PRAGMA user_version = 11;

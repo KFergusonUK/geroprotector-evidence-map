@@ -219,7 +219,9 @@ class Resolver:
         return kind, basis
 
     def _route_text(self, iv: dict, compound: str, text: str) -> tuple[str, str]:
-        for t in self.compounds[compound]["route_local"]:
+        # Longest phrase first, then alphabetical: deterministic. Iterating the set directly made
+        # route_basis depend on Python's hash seed (found 2026-11-26: 3 rows differed between runs).
+        for t in sorted(self.compounds[compound]["route_local"], key=lambda s: (-len(s), s)):
             if self._phrase(t).search(text):
                 return "local", f"fixture route_excluded: {t}"
         for kind, pats in (("local", self._local), ("unclear", self._unclear), ("systemic", self._systemic)):

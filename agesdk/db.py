@@ -8,7 +8,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DB_PATH = PROJECT_ROOT / "data" / "agesdk.sqlite"
-SCHEMA_VERSION = 10
+SCHEMA_VERSION = 11
 
 
 def db_path() -> Path:
