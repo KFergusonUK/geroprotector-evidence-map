@@ -177,11 +177,13 @@ estimates alone would have to allow 1.5 errors, which cannot happen.
 
 | Item | Value |
 |---|---|
-| Code | git `…` |
-| Resolver rules | `data/rules/resolver.yaml`, version `…`, sha256 `…` |
-| Synonym pipeline | rules/version `…`; synonym table sha256 `…`; sources and their dates `…` |
-| Seed fixture (excluded compounds) | `data/fixtures/seed_compounds.yaml` v`…`, sha256 `…` |
-| Registry data | ClinicalTrials.gov API `…`, data date `…`; query strings `…`; studies `…` |
-| Scaled compounds | `…` resolved to a single identity; `…` without one (review only) |
-| Population | `data/measurements/step7_population.csv`, sha256 `…`; **N = …** rows over `…` compounds |
-| Scaled-down bar | only if R < 200 rows or C < 100 compounds; otherwise "not needed" |
+| Code | git: the commit that adds this table (the frozen-inputs commit, 2026-11-26) |
+| Scope | `docs/step7_amendment_1.md`: scaled compounds with mammal evidence (106 of 686) |
+| Resolver rules | `data/rules/resolver.yaml`, version `resolver-v6`, sha256 `81635ebaf6ebc5d7…` |
+| Synonym pipeline | `data/rules/synonyms.yaml` `synonyms-v4` (sha256 `95414368a355b473…`); synonym table `data/scale/synonyms.csv` sha256 `fc36eee34aa0fe42…`; generated entries `data/scale/scaled_compounds.yaml` sha256 `0454d0985f7daf31…`; sources: DrugAge Build 5, PubChem PUG-REST (retrieved 2026-11-26), ChEMBL_37 |
+| Seed fixture (excluded compounds) | `data/fixtures/seed_compounds.yaml` v0.9.0, sha256 `6b9c4d6db29b0ecc…` |
+| Registry data | ClinicalTrials.gov API 2.0.5, data 2026-11-25; 806 query terms (678 scaled); 41,168 studies |
+| Scaled compounds | 729 DrugAge names resolved to a single identity, giving 686 compounds; 106 in scope; 72 of those have at least one auto-accept. Not resolved: 258 not found, 27 mixture, 11 ambiguous, 1 rejected (stage 1, `data/scale/identity.csv`) |
+| Population | `data/measurements/step7_population.csv`, sha256 `96786b48c723e5ec…`; **N = 10,649** auto-accept rows over **72** compounds |
+| Scaled-down bar | **R:** not needed (N ≥ 200). **C:** only 72 compounds have auto-accepts, so C is all 72, one row each. The bar scales by 72/100: **GO 0 errors; CONDITIONAL 1–2; NO-GO ≥ 3** (100-row thresholds 1, 3 and 4, multiplied by 0.72, give 0.72, 2.16 and 2.88) |
+| Sampler | `docs/step7_sample.py`: R `random.Random(20261121)`, 200 rows; C `random.Random(20261122)`, all 72 compounds in random order, then one row each from the same generator; blind `random.Random(20261123)` |

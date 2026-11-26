@@ -158,7 +158,8 @@ def cmd_resolve(conn, args):
     if ev["violations"]:
         sys.exit(1)
     try:
-        out = resolver.run(conn, fixture.load(), downgrade_only=args.downgrade_only)
+        fx = fixture.load_with_scaled() if args.scaled else fixture.load()
+        out = resolver.run(conn, fx, downgrade_only=args.downgrade_only)
     except resolver.NotDowngradeOnly as e:
         print(json.dumps(e.report, indent=2))
         sys.exit(f"NOT downgrade-only, rolled back: {e}")
@@ -199,6 +200,8 @@ def main(argv=None):
     sub.add_parser("recall-check", help="literature-sampled recall check of the ClinicalTrials.gov fetch")
     p = sub.add_parser("resolve", help="run the intervention-string resolver over staging (after a fixture check); "
                                        "prints the diff against the previous decisions")
+    p.add_argument("--scaled", action="store_true",
+                   help="include the scaled compounds in scope (docs/step7_amendment_1.md)")
     p.add_argument("--downgrade-only", action="store_true",
                    help="roll back if the change adds any auto-accept (measurement_policy.md §3)")
     sub.add_parser("resolve-report", help="per-compound resolver outcomes and recall-sample check")
