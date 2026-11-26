@@ -16,7 +16,7 @@ summary:
   - 11
   truly_systemic: 2
   decision: '0 errors: meets the census bar'
-  status: provisional until Kevin Ferguson's blind check of all 18 rows (protocol step 5)
+  status: "FINAL (2026-11-26): blind check by Codex (GPT-6) per amendment 1 (ce495a9), 18/18 agree, number stands"
 rows:
 - i: 1
   nct_id: NCT00451204
