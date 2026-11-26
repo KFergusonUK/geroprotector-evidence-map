@@ -95,7 +95,8 @@ class CombinationProducts(unittest.TestCase):
         import csv
         from pathlib import Path
         path = Path(__file__).resolve().parent.parent / "data" / "scale" / "synonyms.csv"
-        rows = [r for r in csv.DictReader(open(path, encoding="utf-8")) if "component of" in r["synonym"].lower()]
+        with open(path, encoding="utf-8") as fh:
+            rows = [r for r in csv.DictReader(fh) if "component of" in r["synonym"].lower()]
         self.assertTrue(rows)
         self.assertEqual({r["fate"] for r in rows if not r["fate"].startswith("dropped")}, {"review_combination_product"})
 
@@ -124,7 +125,8 @@ class CodexReviewFixes(unittest.TestCase):
         import yaml
         from agesdk import fixture
         fx = fixture.load_with_scaled()
-        self.assertEqual(fx["scaled_rules_version"], yaml.safe_load(open(fixture.SCALED_PATH))["rules_version"])
+        with open(fixture.SCALED_PATH, encoding="utf-8") as fh:
+            self.assertEqual(fx["scaled_rules_version"], yaml.safe_load(fh)["rules_version"])
         with tempfile.TemporaryDirectory() as d:
             stale = Path(d) / "scaled.yaml"
             stale.write_text(yaml.safe_dump({"rules_version": "synonyms-v0", "compounds": []}))

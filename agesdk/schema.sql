@@ -749,13 +749,15 @@ WITH rp AS (
   FROM reprogramming_evidence GROUP BY compound_id),
 tr AS (
   SELECT ti.compound_id,
-         count(DISTINCT CASE WHEN ti.role = 'experimental' AND NOT ti.is_combination
-                             THEN ti.nct_id END)                      AS n_systemic_trials,
-         count(DISTINCT CASE WHEN ti.role = 'experimental' AND NOT ti.is_combination
+         -- Headline counts do not depend on role (SPEC §5.9); n_tested_trials is the breakdown.
+         count(DISTINCT CASE WHEN NOT ti.is_combination THEN ti.nct_id END) AS n_systemic_trials,
+         count(DISTINCT CASE WHEN NOT ti.is_combination
                               AND t.results_state IN ('POSTED', 'PARTIAL', 'PUBLISHED_ONLY')
                              THEN ti.nct_id END)                      AS n_trials_with_results,
-         count(DISTINCT CASE WHEN ti.role = 'experimental' AND NOT ti.is_combination AND o.ageing_adjacent = 1
+         count(DISTINCT CASE WHEN NOT ti.is_combination AND o.ageing_adjacent = 1
                              THEN ti.nct_id END)                      AS n_trials_ageing_adjacent,
+         count(DISTINCT CASE WHEN ti.role = 'experimental' AND NOT ti.is_combination
+                             THEN ti.nct_id END)                      AS n_tested_trials,
          count(DISTINCT CASE WHEN ti.role = 'background' THEN ti.nct_id END) AS n_background_trials
   FROM trial_intervention ti
   JOIN trial t ON t.nct_id = ti.nct_id
@@ -770,6 +772,7 @@ SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
        coalesce(tr.n_systemic_trials, 0)        AS n_systemic_trials,
        coalesce(tr.n_trials_with_results, 0)    AS n_trials_with_results,
        coalesce(tr.n_trials_ageing_adjacent, 0) AS n_trials_ageing_adjacent,
+       coalesce(tr.n_tested_trials, 0)          AS n_tested_trials,
        coalesce(tr.n_background_trials, 0)      AS n_background_trials
 FROM compound c
 JOIN rp USING (compound_id)
@@ -971,22 +974,30 @@ CREATE TABLE IF NOT EXISTS literature_candidate (
 -- ---------------------------------------------------------------------------
 
 -- Systemic trials per compound (only systemic interventions count, §5.6).
+-- HEADLINE counts do not depend on role (SPEC §5.9, Kevin Ferguson 2026-11-26): a trial counts
+-- if it clearly gives the compound (identity-confirmed, systemic, not a combination), in any
+-- role. Role could not be assigned reliably from registry text (docs/role1_result.md), so the
+-- 'tested' columns are a BREAKDOWN, to be printed with the measured role accuracy.
 DROP VIEW IF EXISTS v_compound_trials;
 CREATE VIEW v_compound_trials AS
 SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
-       -- Primary counts: the compound itself is under test (role 'experimental', not a combination).
-       count(DISTINCT CASE WHEN ti.role = 'experimental' AND NOT ti.is_combination
-                           THEN ti.nct_id END)                                     AS n_systemic_trials,
-       count(DISTINCT CASE WHEN ti.role = 'experimental' AND NOT ti.is_combination AND o.ageing_adjacent = 1
+       count(DISTINCT CASE WHEN NOT ti.is_combination THEN ti.nct_id END)          AS n_systemic_trials,
+       count(DISTINCT CASE WHEN NOT ti.is_combination AND o.ageing_adjacent = 1
                            THEN ti.nct_id END)                                     AS n_ageing_adjacent_trials,
-       count(DISTINCT CASE WHEN ti.role = 'experimental' AND NOT ti.is_combination
-                                AND t.results_state = 'NOT_POSTED_DUE'
+       count(DISTINCT CASE WHEN NOT ti.is_combination AND t.results_state = 'NOT_POSTED_DUE'
                            THEN ti.nct_id END)                                     AS n_overdue_trials,
        count(DISTINCT CASE WHEN ti.is_combination THEN ti.nct_id END)              AS n_combination_trials,
-       -- Labelled, not counted above.
-       count(DISTINCT CASE WHEN ti.role = 'comparator' THEN ti.nct_id END)         AS n_comparator_trials,
-       count(DISTINCT CASE WHEN ti.role = 'background' THEN ti.nct_id END)         AS n_background_trials,
-       count(DISTINCT CASE WHEN ti.role = 'unclear' THEN ti.nct_id END)            AS n_role_unclear_trials
+       -- Breakdown by role (indicative: carries the measured role accuracy).
+       count(DISTINCT CASE WHEN ti.role = 'experimental' AND NOT ti.is_combination
+                           THEN ti.nct_id END)                                     AS n_tested_trials,
+       count(DISTINCT CASE WHEN ti.role = 'experimental' AND NOT ti.is_combination AND o.ageing_adjacent = 1
+                           THEN ti.nct_id END)                                     AS n_tested_ageing_adjacent_trials,
+       count(DISTINCT CASE WHEN ti.role = 'experimental' AND NOT ti.is_combination
+                                AND t.results_state = 'NOT_POSTED_DUE'
+                           THEN ti.nct_id END)                                     AS n_tested_overdue_trials,
+       count(DISTINCT CASE WHEN ti.role = 'comparator' AND NOT ti.is_combination THEN ti.nct_id END) AS n_comparator_trials,
+       count(DISTINCT CASE WHEN ti.role = 'background' AND NOT ti.is_combination THEN ti.nct_id END) AS n_background_trials,
+       count(DISTINCT CASE WHEN ti.role = 'unclear' AND NOT ti.is_combination THEN ti.nct_id END)    AS n_role_unclear_trials
 FROM compound c
 LEFT JOIN trial_intervention ti ON ti.compound_id = c.compound_id AND ti.systemic_exposure = 'systemic'
 LEFT JOIN trial t               ON t.nct_id = ti.nct_id
@@ -1037,10 +1048,11 @@ WHERE t.n_systemic_trials > 0;
 DROP VIEW IF EXISTS v_unreported;
 CREATE VIEW v_unreported AS
 SELECT c.compound_id, c.canonical_name, c.entry_route, c.evidence_tier,
-       t.nct_id, t.status, t.completion_date, t.primary_completion_date, t.results_state
+       t.nct_id, t.status, t.completion_date, t.primary_completion_date, t.results_state,
+       ti.role                     -- breakdown only (indicative; SPEC §5.9)
 FROM trial t
 JOIN trial_intervention ti ON ti.nct_id = t.nct_id AND ti.systemic_exposure = 'systemic'
-                          AND ti.role = 'experimental' AND NOT ti.is_combination
+                          AND NOT ti.is_combination
 JOIN compound c            ON c.compound_id = ti.compound_id
 WHERE t.results_state = 'NOT_POSTED_DUE';
 

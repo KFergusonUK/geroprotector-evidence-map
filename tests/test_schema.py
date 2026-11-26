@@ -705,7 +705,8 @@ if __name__ == "__main__":
 
 
 class TrialRole(unittest.TestCase):
-    """SPEC §5.9: primary counts use experimental only; background is kept and labelled."""
+    """SPEC §5.9 (revised 2026-11-26): headline counts do not depend on role; role is a
+    breakdown (indicative, with its measured accuracy)."""
 
     def setUp(self):
         c = self.conn = fresh()
@@ -724,17 +725,19 @@ class TrialRole(unittest.TestCase):
         self.assertEqual(self.conn.execute("SELECT role FROM trial_intervention WHERE nct_id = 'NCT9'").fetchone()[0],
                          "unclear")
 
-    def test_primary_counts_experimental_only(self):
+    def test_headline_counts_any_role_breakdown_by_role(self):
         r = dict(self.conn.execute("SELECT * FROM v_compound_trials WHERE compound_id = ?", (self.met,)).fetchone())
-        self.assertEqual((r["n_systemic_trials"], r["n_overdue_trials"]), (1, 1))
+        self.assertEqual((r["n_systemic_trials"], r["n_overdue_trials"]), (4, 2))         # headline: every role
+        self.assertEqual((r["n_tested_trials"], r["n_tested_overdue_trials"]), (1, 1))    # breakdown: experimental
         self.assertEqual((r["n_comparator_trials"], r["n_background_trials"], r["n_role_unclear_trials"]), (1, 1, 1))
 
-    def test_background_overdue_trial_is_not_unreported_for_the_compound(self):
-        self.assertEqual([r["nct_id"] for r in self.conn.execute("SELECT nct_id FROM v_unreported")], ["NCT1"])
+    def test_unreported_lists_every_role_with_the_role_shown(self):
+        got = {(r["nct_id"], r["role"]) for r in self.conn.execute("SELECT nct_id, role FROM v_unreported")}
+        self.assertEqual(got, {("NCT1", "experimental"), ("NCT2", "background")})
 
 
 class CombinationCounts(unittest.TestCase):
-    def test_combinations_retained_but_not_in_primary_counts(self):
+    def test_combinations_retained_but_not_in_headline_counts(self):
         c = fresh()
         met = add_compound(c, "metformin")
         for nct, combo in (("NCT1", 0), ("NCT2", 1)):
