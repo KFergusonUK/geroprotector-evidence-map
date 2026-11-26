@@ -1,8 +1,7 @@
-# Role-2 rules draft
+# Role-2 rules v2
 
-**Status: draft for Kevin's review.** This is a proposed explanation of how to label the
-role of one named compound in one trial. It is not a role-2 protocol, sample, or result.
-Approve or revise these rules before a new sample is drawn.
+**Status: approved by Kevin.** These rules explain how to label the role of one named
+compound in one trial. They are not a role-2 protocol, sample, or result.
 
 ## The role question
 
@@ -97,12 +96,16 @@ The record says aspirin is taken “as a part of dual anti-platelet therapy”; 
 registry of an everolimus-eluting stent. **Role: background.** Aspirin is supporting care
 around the device procedure, not the device being evaluated.
 
-### Open-label add-on compared as part of treatment — empagliflozin, NCT04702490
+### Open-label does not decide the role: #3 and #43
 
-The title says “MET409 Alone or in Combination With Empagliflozin,” and the summary says
-empagliflozin “will be incorporated into two of the treatment arms in an open-label manner.”
-**Empagliflozin: experimental.** Its addition is part of the treatment comparison; “open-
-label” says it is unmasked, not that it is background.
+**#3, empagliflozin (NCT04702490): experimental.** The title says “MET409 Alone or in
+Combination With Empagliflozin”; empagliflozin is added in two arms, so its addition is
+part of the comparison. “Open-label” means unmasked, not background.
+
+**#43, aspirin (NCT07275749): background.** Acetyl-leucine arm: “... an open-label loading
+300 mg aspirin ... a maintenance dose of 100 mg aspirin ...”; placebo arm: “... an open-label
+loading 300 mg aspirin ... a maintenance dose of 100 mg aspirin ...”. Aspirin is the same;
+the trial compares acetyl-leucine with placebo.
 
 ## When `unclear` is the right label
 
