@@ -14,44 +14,68 @@
 
 needs_check:   # resolved only after dropping a trailing bracketed description
   - {drugage_name: "78c (CD38 inhibitor)", pubchem: "CID 71447315 Cyclopentyl 2-oxo-4-phenylazetidine-1-carboxylate",
-     recommend: reject, why: "Wrong molecule: the CD38 inhibitor 78c is a thiazoloquin(az)olinone. The bare code hit an unrelated record.", decided_by: null}
+     recommend: reject, why: "Wrong molecule: the CD38 inhibitor 78c is a thiazoloquin(az)olinone. The bare code hit an unrelated record.", decided_by: null,
+     codex_review: accept, codex_why: "Agree with rejection: PubChem CID 71447315 is an azetidine carboxylate, while its separate CID 118736856 record identifies CD38 inhibitor 78c as a thiazolyl quinolinone (PubChem; PMID 29686447)."}
   - {drugage_name: "NSC 11926 (Aristolochic acid I)", pubchem: "CID 2236 Aristolochic Acid",
-     recommend: accept, why: "Bracket names the same molecule.", decided_by: null}
+     recommend: accept, why: "Bracket names the same molecule.", decided_by: null,
+     codex_review: accept, codex_why: "Agree: FDA SRS lists NSC-11926 among Aristolochic Acid I synonyms; PubChem CID 2236 lists both names."}
   - {drugage_name: "NSC 45923 (8-Methyoxypsoralen)", pubchem: "CID 4114 8-Methoxypsoralen",
-     recommend: accept, why: "Bracket names the same molecule (DrugAge typo 'Methyoxy').", decided_by: null}
+     recommend: accept, why: "Bracket names the same molecule (DrugAge typo 'Methyoxy').", decided_by: null,
+     codex_review: accept, codex_why: "Agree: NCI SEER*Rx maps NSC 45923 to 8-methoxypsoralen; the DrugAge bracket contains a spelling transposition only."}
   - {drugage_name: "NSC170984 (Pimozide)", pubchem: "CID 16362 Pimozide",
-     recommend: accept, why: "Bracket names the same molecule.", decided_by: null}
+     recommend: accept, why: "Bracket names the same molecule.", decided_by: null,
+     codex_review: accept, codex_why: "Agree: Cayman product information lists NSC 170984 as an identifier for pimozide."}
   - {drugage_name: "SRT1720 (SIRT1 activator)", pubchem: "CID 24180125",
-     recommend: accept, why: "Imidazothiazole quinoxaline carboxamide: the published SRT1720 structure.", decided_by: null}
+     recommend: accept, why: "Imidazothiazole quinoxaline carboxamide: the published SRT1720 structure.", decided_by: null,
+     codex_review: accept, codex_why: "Agree: PubChem CID 24180125 is the free-base SRT1720 structure; the hydrochloride record points to it as parent. The DrugAge code is not a salt-qualified name."}
   - {drugage_name: "TM5441 (PAI-1 inhibitor)", pubchem: "CID 44250349 TM-5441",
-     recommend: accept, why: "PubChem title is the code itself.", decided_by: null}
+     recommend: accept, why: "PubChem title is the code itself.", decided_by: null,
+     codex_review: accept, codex_why: "Agree: PubChem CID 44250349 is titled TM-5441 and describes it as a PAI-1 inhibitor; primary pharmacology paper PMID 24334617 studies TM5441."}
   - {drugage_name: "LY444711 (GHS-R1a agonist)", pubchem: "CID 91229598 LY-444711",
-     recommend: accept, why: "PubChem title is the code itself.", decided_by: null}
+     recommend: accept, why: "PubChem title is the code itself.", decided_by: null,
+     codex_review: accept, codex_why: "Agree: FDA GSRS maps LY-444711 to PubChem CID 91229598; the primary synthesis paper (PMID 15501059) identifies LY444711 as a GHS-R1a agonist."}
   - {drugage_name: "MIF098 (CD74 antagonist)", pubchem: "CID 44631884 3-(3-hydroxybenzyl)-5-methylbenzoxazol-2-one",
-     recommend: accept, why: "Benzoxazolone MIF/CD74 antagonist; matches the published MIF098 class. Least certain of the seven.", decided_by: null}
+     recommend: accept, why: "Benzoxazolone MIF/CD74 antagonist; matches the published MIF098 class. Least certain of the seven.", decided_by: null,
+     codex_review: accept, codex_why: "Agree: PubChem CID 44631884 lists MIF098 as a synonym of the stated benzoxazolone; primary literature describes MIF098 as an inhibitor of MIF-CD74 binding (PMID 19433998)."}
 
 salt_collapse:  # mammal-universe names that PubChem cannot give a parent for (outcome: mixture)
   organic_parent_unambiguous:   # recommend: collapse to the organic parent
-    - {drugage_name: "Beta-aminopropionitrile fumarate", to: "beta-aminopropionitrile (BAPN)", note: "one of the four open direction conflicts", decided_by: null}
-    - {drugage_name: "Hydroxylamine hydrochloride", to: "hydroxylamine", decided_by: null}
+    - {drugage_name: "Beta-aminopropionitrile fumarate", to: "beta-aminopropionitrile (BAPN)", note: "one of the four open direction conflicts", decided_by: null,
+       codex_review: accept, codex_why: "Agree on salt-to-parent identity; fumarate is the counterion. This is separate from the noted direction conflict."}
+    - {drugage_name: "Hydroxylamine hydrochloride", to: "hydroxylamine", decided_by: null,
+       codex_review: accept, codex_why: "Agree on salt-to-parent identity; chloride is the counterion."}
   inorganic_active_ion:   # recommend: decide per entry; human trials of these are rare
-    - {drugage_name: "Sodium tungstate", to: "tungstate", note: "harm candidate (rat -13%)", decided_by: null}
-    - {drugage_name: "Aluminium chloride", to: "aluminium(3+)", note: "harm candidate (mouse -7%)", decided_by: null}
-    - {drugage_name: "Aluminum potassium sulfate", to: "aluminium(3+)? (alum)", decided_by: null}
-    - {drugage_name: "Mercuric chloride", to: "mercury(2+)", decided_by: null}
-    - {drugage_name: "Beryllium sulfate", to: "beryllium(2+)", decided_by: null}
-    - {drugage_name: "Sodium thiosulfate", to: "thiosulfate", note: "ITP-tested (PMID 38753230); used clinically (cisplatin otoprotection, calciphylaxis)", decided_by: null}
-    - {drugage_name: "Sodium borate", to: "borate", decided_by: null}
-    - {drugage_name: "Sodium metaborate", to: "borate", decided_by: null}
-    - {drugage_name: "Vanadyl sulfate", to: "vanadyl(2+)", decided_by: null}
+    - {drugage_name: "Sodium tungstate", to: "tungstate", note: "harm candidate (rat -13%)", decided_by: null,
+       codex_review: accept, codex_why: "Agree as an explicit active-ion convention: sodium tungstate supplies tungstate; keep the convention documented because compounds and exposures can still differ."}
+    - {drugage_name: "Aluminium chloride", to: "aluminium(3+)", note: "harm candidate (mouse -7%)", decided_by: null,
+       codex_review: accept, codex_why: "Agree as the stated active-ion convention for this simple aluminium salt; this is a mapping convention, not a claim that all aluminium exposures are interchangeable."}
+    - {drugage_name: "Aluminum potassium sulfate", to: "aluminium(3+)? (alum)", decided_by: null,
+       codex_review: unsure, codex_why: "Potassium alum is a double salt containing potassium, aluminium and sulfate (PubChem CID 24856); collapsing it to Al3+ alone needs an explicit exposure convention and may erase materially different chemistry."}
+    - {drugage_name: "Mercuric chloride", to: "mercury(2+)", decided_by: null,
+       codex_review: accept, codex_why: "Agree as an explicit active-ion convention for mercuric chloride; retain the salt-specific source name and document that this does not establish equivalent exposure across mercury compounds."}
+    - {drugage_name: "Beryllium sulfate", to: "beryllium(2+)", decided_by: null,
+       codex_review: accept, codex_why: "Agree as an explicit active-ion convention for this simple beryllium salt; retain the source salt name."}
+    - {drugage_name: "Sodium thiosulfate", to: "thiosulfate", note: "ITP-tested (PMID 38753230); used clinically (cisplatin otoprotection, calciphylaxis)", decided_by: null,
+       codex_review: accept, codex_why: "Agree: sodium is the counterion and thiosulfate is the defined anion; keep the cited human-use context attached."}
+    - {drugage_name: "Sodium borate", to: "borate", decided_by: null,
+       codex_review: unsure, codex_why: "‘Sodium borate’ is underspecified and borate speciation/formula varies; confirm the DrugAge source compound before mapping to one ion."}
+    - {drugage_name: "Sodium metaborate", to: "borate", decided_by: null,
+       codex_review: unsure, codex_why: "Metaborate and generic borate are not unambiguously the same named species; aqueous speciation alone does not establish that human exposures should be merged."}
+    - {drugage_name: "Vanadyl sulfate", to: "vanadyl(2+)", decided_by: null,
+       codex_review: accept, codex_why: "Agree as an explicit active-ion convention for this defined vanadyl salt; retain the salt-specific source name."}
   true_mixture:   # recommend: leave as mixture (review only)
-    - {drugage_name: "Lovaza", why: "omega-3 acid ethyl esters: a mixture", decided_by: null}
+    - {drugage_name: "Lovaza", why: "omega-3 acid ethyl esters: a mixture", decided_by: null,
+       codex_review: accept, codex_why: "Agree: FDA labeling and FDA review describe Lovaza as a mixture of multiple omega-3 fatty-acid ethyl esters, not one defined compound."}
 
 aliases:   # mammal-universe names PubChem does not know, but which are single molecules
-  - {drugage_name: "Butylated hydroxytoluene", to: "2,6-di-tert-butyl-4-methylphenol (CID 31404)", decided_by: null}
-  - {drugage_name: "Sodim cyclamate", to: "sodium cyclamate -> cyclamic acid", why: "DrugAge typo", decided_by: null}
-  - {drugage_name: "Lead acetate", to: "lead(2+)?", why: "inorganic: same question as the salts above", decided_by: null}
-  - {drugage_name: "L-Glu-L-Trp dipeptide", to: "Glu-Trp (thymogen)", why: "a defined dipeptide: single molecule", decided_by: null}
+  - {drugage_name: "Butylated hydroxytoluene", to: "2,6-di-tert-butyl-4-methylphenol (CID 31404)", decided_by: null,
+     codex_review: accept, codex_why: "Agree: PubChem CID 31404 is 2,6-di-tert-butyl-4-methylphenol, the defined single molecule BHT."}
+  - {drugage_name: "Sodim cyclamate", to: "sodium cyclamate -> cyclamic acid", why: "DrugAge typo", decided_by: null,
+     codex_review: accept, codex_why: "Agree: the typo resolves to sodium cyclamate; PubChem records cyclamic acid/cyclamate as its parent. This is the same salt-to-parent convention used elsewhere."}
+  - {drugage_name: "Lead acetate", to: "lead(2+)?", why: "inorganic: same question as the salts above", decided_by: null,
+     codex_review: unsure, codex_why: "Lead acetate usually denotes lead(II) acetate, but the proposed Pb2+ collapse is a convention that could merge distinct lead salts and exposure contexts; Kevin should decide."}
+  - {drugage_name: "L-Glu-L-Trp dipeptide", to: "Glu-Trp (thymogen)", why: "a defined dipeptide: single molecule", decided_by: null,
+     codex_review: accept, codex_why: "Agree if the source's L-Glu-L-Trp notation is literal: it specifies the single L-glutamyl-L-tryptophan dipeptide (thymogen), not a peptide mixture."}
   # Left unresolved (not single molecules, correctly review-only): the extracts, oils, royal jelly,
   # Protandim, Vigconic 28, BP-C3, PB125, marine collagen peptides, branched-chain amino acids,
   # inulin (polymer), X203 (an antibody), INT-767d and SG1002 (need structure confirmation),

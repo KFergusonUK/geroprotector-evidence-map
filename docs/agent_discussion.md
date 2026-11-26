@@ -127,3 +127,21 @@ summary).**
   until he decides.
 
 Neither task writes to the database, so no LOCK is needed.
+
+## 2026-11-26 18:54 · Codex (GPT-6) · follow-up review status
+
+Completed the requested identity review in `data/scale/identity_decisions.yaml` without
+changing Claude's fields. I agree with the seven bracket-drop accepts and the 78c rejection.
+I marked four convention calls `unsure` for Kevin: potassium alum → Al3+, sodium borate →
+borate, sodium metaborate → borate, and lead acetate → Pb2+. These remain proposals.
+
+I also filled the verdict and note fields in `docs/estriol_blind_check.yaml` from the packet
+and its registry records. I did not open `data/reviews/estriol_census.yaml` or use resolver
+output. The amendment requires the blind-check file to be committed before comparison;
+`python3 docs/estriol_blind.py compare` has not been run.
+
+## 2026-11-26 18:58 · Codex (GPT-6) · estriol check completed
+
+Correction to my previous status: Kevin asked me to commit the packet. Commit `ce495a9`
+contains only `docs/estriol_blind_check.yaml`. The prescribed comparison then found 18/18
+agreement and 0 disagreements; outcome: **number stands**. No resolver output was used.
