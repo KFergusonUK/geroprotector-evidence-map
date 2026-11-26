@@ -10,6 +10,7 @@ Outcomes per DrugAge name:
   not_found  PubChem knows no such name
   mixture    the parent is multi-component, or PubChem gives no parent
   rejected   a named person rejected the mechanical resolution
+  lookup_error PubChem did not answer: NOT the same as not_found; re-run before use
   needs_check resolved only after dropping a trailing bracketed description: no automatic
              synonyms until a named person signs it off (data/scale/identity_decisions.yaml)
 """
@@ -43,23 +44,30 @@ def clean_name(name: str) -> str:
     return n
 
 
+class LookupFailed(Exception):
+    """PubChem did not answer (a non-cacheable HTTP status). Distinct from 'no such name' (404)."""
+
+
 def _lookup(f, name: str) -> list[int]:
     try:
         return [c for c in pubchem.cids_for_name(f, name) if c]
-    except HttpError:
-        return []
+    except HttpError as e:          # 404 is cached and returns []; only real failures land here
+        raise LookupFailed(str(e)[:120]) from e
 
 
 def resolve_name(f, name: str) -> dict:
     row = {"drugage_name": name, "n_cids": 0, "parent_cid": "", "inchikey": "", "formula": "",
            "pubchem_title": "", "detail": ""}
-    cids = _lookup(f, name.strip())
-    if not cids:
-        cleaned = clean_name(name)
-        if cleaned != name.strip():
-            cids = _lookup(f, cleaned)
-            if cids:
-                row["detail"] = f"looked up as {cleaned!r}; "
+    try:
+        cids = _lookup(f, name.strip())
+        if not cids:
+            cleaned = clean_name(name)
+            if cleaned != name.strip():
+                cids = _lookup(f, cleaned)
+                if cids:
+                    row["detail"] = f"looked up as {cleaned!r}; "
+    except LookupFailed as e:
+        return {**row, "outcome": "lookup_error", "detail": str(e)}
     if not cids:
         return {**row, "outcome": "not_found"}
     bracket_dropped = bool(row["detail"]) and " ".join(name.split()) != clean_name(name)
@@ -88,6 +96,7 @@ def resolve_name(f, name: str) -> dict:
 
 
 DECISIONS = OUT.parent / "identity_decisions.yaml"
+DECISION_VALUES = {"accept", "collapse", "alias", "reject", "leave_mixture", "leave_unresolved"}
 
 
 def load_decisions() -> dict[str, dict]:
@@ -112,6 +121,9 @@ def load_decisions() -> dict[str, dict]:
 def apply_decision(f, row: dict, dec: dict) -> dict:
     """A recorded decision overrides the mechanical outcome. Accepted targets are re-checked
     against the InChIKey recorded at decision time, so PubChem drift cannot swap a molecule."""
+    if dec.get("decision") not in DECISION_VALUES:   # fail closed: a typo must never resolve anything
+        raise ValueError(f"{row['drugage_name']}: unknown decision {dec.get('decision')!r}; "
+                         f"allowed {sorted(DECISION_VALUES)}")
     tag = f"decision {dec['decision']} by {dec['decided_by']} {dec.get('decided_at', '')}"
     if dec["decision"] == "reject":
         return {**row, "outcome": "rejected", "detail": tag}
@@ -148,6 +160,8 @@ def run(conn: sqlite3.Connection, limit: int | None = None) -> dict:
         w.writerows(rows)
     resolved = [r for r in rows if r["outcome"] == "resolved"]
     dup = Counter(r["inchikey"] for r in resolved)
+    if any(r["outcome"] == "lookup_error" for r in rows):
+        print(f"WARNING: {sum(r['outcome'] == 'lookup_error' for r in rows)} PubChem lookup failures; re-run before use")
     return {"names": len(rows), "outcomes": dict(Counter(r["outcome"] for r in rows)),
             "resolved_inchikeys": len(dup),
             "inchikey_shared_by_several_names": {k: n for k, n in dup.items() if n > 1},

@@ -61,17 +61,19 @@ class PubchemFilter:
         return t, None
 
 
-def chembl_names(f, inchikey: str) -> tuple[str | None, str | None, list[tuple[str, str]]]:
-    """(chembl_id, pref_name, [(synonym, syn_type)]) for the parent and its salt forms."""
+def chembl_names(f, inchikey: str) -> tuple[str | None, str | None, list[tuple[str, str]], str]:
+    """(chembl_id, pref_name, [(synonym, syn_type)], error) for the parent and its salt forms.
+    `error` is non-empty when ChEMBL failed, so incomplete output is visible, not silent."""
     try:
         mols = chembl.molecules_by_inchikey(f, inchikey)
-    except HttpError:
-        return None, None, []
+    except HttpError as e:
+        return None, None, [], f"parent lookup: {str(e)[:80]}"
     if not mols:
-        return None, None, []
+        return None, None, [], ""
     m = mols[0]
     cid = m["molecule_chembl_id"]
     names = [(s["molecule_synonym"], s["syn_type"]) for s in m.get("molecule_synonyms") or []]
+    err = ""
     try:  # trade names usually sit on salt forms, whose parent is this molecule
         status, data = f.get_json("molecule.json", {"molecule_hierarchy__parent_chembl_id": cid, "limit": 50})
         for child in (data or {}).get("molecules", []) if status == 200 else []:
@@ -79,9 +81,9 @@ def chembl_names(f, inchikey: str) -> tuple[str | None, str | None, list[tuple[s
                 names += [(s["molecule_synonym"], s["syn_type"]) for s in child.get("molecule_synonyms") or []]
                 if child.get("pref_name"):
                     names.append((child["pref_name"], "SALT_PREF_NAME"))
-    except HttpError:
-        pass
-    return cid, m.get("pref_name"), names
+    except HttpError as e:
+        err = f"salt-form lookup: {str(e)[:80]}"
+    return cid, m.get("pref_name"), names, err
 
 
 def _slug(s: str) -> str:
@@ -103,7 +105,7 @@ def run(conn: sqlite3.Connection) -> dict:
     seed_keys = {c["key"] for c in fx["compounds"]}
     for ik, rs in sorted(by_key.items()):
         cid = int(rs[0]["parent_cid"])
-        chembl_id, pref, ch_names = chembl_names(ch, ik)
+        chembl_id, pref, ch_names, ch_err = chembl_names(ch, ik)
         canonical = (pref or rs[0]["pubchem_title"] or rs[0]["drugage_name"]).strip()
         key = "s-" + _slug(canonical)
         while key in compounds or key in seed_keys:
@@ -133,7 +135,7 @@ def run(conn: sqlite3.Connection) -> dict:
                 dropped.append((s, why))
         compounds[key] = {"key": key, "canonical_name": canonical.lower(), "inchikey": ik, "pubchem_cid": cid,
                           "chembl_id": chembl_id, "drugage_names": sorted({r["drugage_name"] for r in rs}),
-                          "cand": cand, "query": query, "dropped": dropped}
+                          "cand": cand, "query": query, "dropped": dropped, "chembl_error": ch_err}
 
     # Collisions under the resolver's normalisation: normalise() and strip() forms.
     forms = lambda s: {f for f in (res.normalise(s), res.strip(res.normalise(s))) if f}
@@ -173,7 +175,8 @@ def run(conn: sqlite3.Connection) -> dict:
         out.append({"key": k, "role": "scaled", "canonical_name": c["canonical_name"], "inchikey": c["inchikey"],
                     "pubchem_cid": c["pubchem_cid"], "chembl_id": c["chembl_id"], "drugage_names": c["drugage_names"],
                     "must_match": match, "must_not_match": [], "needs_review": review, "route_excluded": [],
-                    "query_terms": sorted(q for q in c["query"] if q in match)})
+                    "query_terms": sorted(q for q in c["query"] if q in match),
+                    **({"chembl_error": c["chembl_error"]} if c["chembl_error"] else {})})
 
     with open(SCALE / "synonyms.csv", "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=["compound_key", "inchikey", "synonym", "sources", "fate", "query", "collides_with"])
@@ -189,4 +192,5 @@ def run(conn: sqlite3.Connection) -> dict:
             "strings_by_fate": dict(fate.most_common()),
             "match_terms": sum(len(c["must_match"]) for c in out),
             "query_terms_unique": len(qterms),
-            "compounds_with_no_match_term": sum(1 for c in out if not c["must_match"])}
+            "compounds_with_no_match_term": sum(1 for c in out if not c["must_match"]),
+            "chembl_errors": sum(1 for c in out if c.get("chembl_error"))}

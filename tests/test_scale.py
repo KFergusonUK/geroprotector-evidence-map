@@ -100,5 +100,37 @@ class CombinationProducts(unittest.TestCase):
         self.assertEqual({r["fate"] for r in rows if not r["fate"].startswith("dropped")}, {"review_combination_product"})
 
 
+
+class CodexReviewFixes(unittest.TestCase):
+    """Findings from Codex's code review, 2026-11-26 (docs/agent_discussion.md)."""
+
+    def test_unknown_decision_fails_closed(self):
+        f = FakePubchem({1084: {"InChIKey": "DHCDFWKWKRSZHF-UHFFFAOYSA-L", "MolecularFormula": "O3S2-2", "Title": "x"}})
+        with self.assertRaises(ValueError):
+            scale_identity.apply_decision(f, dict(Decisions.ROW), {**Decisions.DEC, "decision": "accep"})
+
+    def test_pubchem_failure_is_not_not_found(self):
+        from agesdk.raw import HttpError
+
+        class Down:
+            def get_json(self, *a, **k):
+                raise HttpError("pubchem: HTTP 503")
+        r = scale_identity.resolve_name(Down(), "Some compound")
+        self.assertEqual(r["outcome"], "lookup_error")
+
+    def test_scaled_fixture_carries_and_checks_rules_version(self):
+        import tempfile
+        from pathlib import Path
+        import yaml
+        from agesdk import fixture
+        fx = fixture.load_with_scaled()
+        self.assertEqual(fx["scaled_rules_version"], yaml.safe_load(open(fixture.SCALED_PATH))["rules_version"])
+        with tempfile.TemporaryDirectory() as d:
+            stale = Path(d) / "scaled.yaml"
+            stale.write_text(yaml.safe_dump({"rules_version": "synonyms-v0", "compounds": []}))
+            with self.assertRaises(ValueError):
+                fixture.load_with_scaled(scaled_path=stale)
+
+
 if __name__ == "__main__":
     unittest.main()
