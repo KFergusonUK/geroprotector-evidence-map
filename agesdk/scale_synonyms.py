@@ -150,6 +150,7 @@ def run(conn: sqlite3.Connection) -> dict:
         for s in [c["canonical_name"]] + list(c["must_match"]) + list(c.get("needs_review", [])):
             seed_forms |= forms(s)
 
+    combo_rx = re.compile(rules["combination_product_pattern"], re.IGNORECASE)
     out = []
     for k, c in compounds.items():
         match, review = [], []
@@ -159,7 +160,9 @@ def run(conn: sqlite3.Connection) -> dict:
                 continue
             others = set().union(*(owner[f] for f in fm)) - {k}
             seed_hit = bool(fm & seed_forms)
-            fate = "review_collision_seed" if seed_hit else "review_collision" if others else "match"
+            combo = bool(combo_rx.search(s))
+            fate = ("review_combination_product" if combo else "review_collision_seed" if seed_hit
+                    else "review_collision" if others else "match")
             (match if fate == "match" else review).append(s)
             rows.append({"compound_key": k, "inchikey": c["inchikey"], "synonym": s, "sources": "|".join(sorted(src)),
                          "fate": fate, "query": s in c["query"] and fate == "match",

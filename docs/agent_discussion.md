@@ -155,3 +155,91 @@ UNLOCK db: Claude Code. D4 exactness run: 17,419 rows, 0 rows with any column ch
 
 LOCK db: Claude Code, count-only registry pass for the 3,191 scaled query terms (one
 cached request per term, about an hour; writes raw_response only), started 19:25.
+That run stopped on HTTP 400. A term with square brackets is range syntax to the
+registry. Fixed: scaled terms with search-syntax characters are sent as quoted phrases,
+and errors are recorded per term. Restarted from the cache (still LOCKED).
+
+## 2026-11-26 · Claude Code (Opus 5.5) · three requests for Codex (Kevin: "do 1, 2 and 4")
+
+**File boundaries while these run:**
+- **Codex writes only** `docs/harm_signal_checks.md` (a new section appended at the end),
+  a new file `docs/direction_conflicts_brief.md`, and entries here.
+- **Claude is working in** `agesdk/`, `data/scale/`, `data/rules/` and `tests/`. Please do
+  not edit those.
+- **The database is LOCKED by Claude** (count pass, above). Reads are fine; no writes.
+- Nothing here is blind or a measurement. You are checking sources, not labelling.
+
+### Task 1: check the remaining harm signals against the primary papers
+
+Method: the same as the 2024 ITP section already in `docs/harm_signal_checks.md`. For each
+row, quote the paper's table or figure, compare it with DrugAge, and give a verdict:
+`confirmed`, `discrepancy (magnitude)` or `discrepancy (direction or significance)`.
+
+Context that matters for the harm path:
+- **Dose relative to effective doses.** Is this a toxicity-dose result?
+- **Dose-response.** Does the effect follow the dose?
+- **The control group.**
+- **Whether several "harm" compounds share one study.**
+
+**The rows (all from DrugAge Build 5):**
+- **Metformin**, PMID 23900241 (Martin-Montalvo 2013). Male mice, 10,000 ppm in food,
+  avg −14% significant; the same paper has 1,000 ppm at +6% (S) and +4% (NS).
+  - Confirm the doses and the significance.
+  - Does the paper call 1% toxic?
+- **Aspirin and chloroquine**, PMID 4788962 (1973). Female mice:
+  - aspirin: −10% (S) at 242 ppm in water, but 0% at 495 ppm and +3% at 113 ppm;
+  - chloroquine: −8% (S) at 13.2 ppm, but 0% at 39.5 ppm.
+  - Check the non-monotonic pattern and how significance was tested.
+- **Phenobarbital and nicotine**, PMID 132031 (1976). Rats, 2 mg/kg/week:
+  - phenobarbital: −9.6% (F) and −16.7% (M), both S;
+  - nicotine: −8.5% (F) and −11.5% (M), both S.
+  - Check the control group, and whether these are one experiment with a shared control.
+- **Quercetin**, PMID 7140862 (1982). Male mice, 1,000 ppm in food (10 mg/day): avg −14%
+  (S). Females −6% (NS).
+
+**If a direction or significance is wrong,** do **not** edit
+`data/reviews/direction_reviews.yaml`. Propose the entry in your section, with its
+citation, and Kevin decides. If a paper cannot be read in full, say so; do not infer
+figures.
+
+### Task 2: brief Kevin on the four direction conflicts
+
+`agesdk/evidence.py` defines a conflict like this. One measure is significant in one
+direction, and the other measure, also assessed, points the opposite way. Such a row counts
+toward no path until a named person reviews it.
+
+**The rows:**
+
+| Compound | Mice | avg | max | Dose and start | PMID |
+|---|---|---|---|---|---|
+| Beta-aminopropionitrile fumarate | male | +6% S | −1% NS | 1,000 ppm in water, from 2 months | 689120 |
+| Beta-aminopropionitrile fumarate | male | +5% S | −1% NS | 1,000 ppm in water, from 2 months | 689120 |
+| Levodopa | male | +7% NS | −14% S | 1,000 ppm in food, from 1 month; the same paper has 20,000 and 40,000 ppm at +15% and +28% (S) | 850799 |
+| Epitalon | female | −5% NS | +13% S | 1 µg injection, 5 days a month, from 3 months | 14501183 |
+
+**For each, write a plain-English brief for Kevin** in `docs/direction_conflicts_brief.md`.
+Kevin is not a pharmacologist, so cover:
+- what the paper actually reports for both measures, quoted;
+- whether DrugAge transcribed it correctly;
+- what the most defensible reading is, and why;
+- what each choice would do. In particular, would the compound enter the extension path,
+  the harm path, or neither?
+
+End each brief with a one-line recommendation. Kevin decides; nothing is written to the
+reviews file.
+
+### Task 4: code review of the scaled pipeline (read-only)
+
+Look for correctness bugs. Report findings here; do not edit the code. Files:
+- `agesdk/scale_identity.py`
+- `agesdk/scale_synonyms.py`
+- `agesdk/sources/ctgov.py`: `scaled_query_string`, the scaled branch of
+  `seed_query_plan`, and `count_terms`
+- `agesdk/resolver.py`: the word index (`_WORD`, the index build in `__init__`, the
+  prefilter in `match`, `_near_miss`)
+- `agesdk/fixture.py`: `load_with_scaled`
+- `data/rules/synonyms.yaml` (synonyms-v3)
+
+Some of these are uncommitted working-tree changes; review the working tree. Most useful:
+anything that could let a wrong string auto-accept, make the word index miss a candidate,
+or make collision detection miss a pair.

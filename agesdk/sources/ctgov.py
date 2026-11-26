@@ -31,7 +31,7 @@ from datetime import date, timedelta
 import yaml
 
 from agesdk.db import PROJECT_ROOT
-from agesdk.raw import CachedFetcher, HttpClient, StoredResponse, last_watermark, log_fetch
+from agesdk.raw import HttpError, CachedFetcher, HttpClient, StoredResponse, last_watermark, log_fetch
 
 SOURCE = "ctgov"
 BASE = "https://clinicaltrials.gov/api/v2"
@@ -99,6 +99,17 @@ def normalise_term(s: str) -> str:
     return " ".join(unicodedata.normalize("NFKC", s).translate(DASHES).split())
 
 
+SEARCH_SYNTAX = re.compile(r'[()\[\]{}"^~*?:\\]|\b(AND|OR|NOT)\b')
+
+
+def scaled_query_string(term: str) -> str:
+    """A scaled compound's name as sent to query.intr: a quoted phrase if it carries
+    search-syntax characters (internal double quotes removed), otherwise unchanged."""
+    if SEARCH_SYNTAX.search(term):
+        return '"' + " ".join(term.replace('"', " ").split()) + '"'
+    return term
+
+
 def seed_query_plan(fx: dict, roles=PLAN_ROLES, rules: dict | None = None) -> list[dict]:
     """Query strings for the fixture compounds: canonical name plus the fixture's must_match
     synonyms. Strings carrying a dose ("aspirin 81 mg") are resolver test inputs, not names,
@@ -116,7 +127,10 @@ def seed_query_plan(fx: dict, roles=PLAN_ROLES, rules: dict | None = None) -> li
             # D1 (docs/synonym_pipeline.md, decided by Kevin Ferguson): scaled compounds are
             # searched only on their official names (DrugAge, ChEMBL preferred/INN/USAN/BAN/JAN/
             # trade), never on PubChem-only synonyms, which are used for matching only.
-            candidates = [(q, "scaled_query_term") for q in c.get("query_terms", [])]
+            # Terms carrying search-syntax characters are sent as quoted phrases: unquoted,
+            # [ ] is a range (HTTP 400) and ( ) is grouping ("Omnipen (ampicillin)" searched
+            # ampicillin, 889 hits; quoted: 0). Seed terms are left as they were.
+            candidates = [(scaled_query_string(q), "scaled_query_term") for q in c.get("query_terms", [])]
         else:
             candidates = ([(c["canonical_name"], "canonical_name")] + [(m, "must_match") for m in c["must_match"]]
                           + [(d, "trap_decoy") for d in decoys.get(c["key"], [])]
@@ -364,7 +378,10 @@ def count_terms(conn: sqlite3.Connection, terms: list[str], *, client: HttpClien
     f = Fetcher(conn, client or HttpClient(min_interval_s=MIN_INTERVAL_S))
     out = []
     for term in terms:
-        resp = f.get("studies", {"query.intr": term, "fields": "NCTId", "pageSize": 1, "countTotal": "true",
-                                 "format": "json"})
-        out.append({"query_term": term, "total": json.loads(resp.body).get("totalCount", 0)})
+        try:
+            resp = f.get("studies", {"query.intr": term, "fields": "NCTId", "pageSize": 1, "countTotal": "true",
+                                     "format": "json"})
+            out.append({"query_term": term, "total": json.loads(resp.body).get("totalCount", 0), "error": ""})
+        except HttpError as e:
+            out.append({"query_term": term, "total": None, "error": str(e)[:120]})
     return out

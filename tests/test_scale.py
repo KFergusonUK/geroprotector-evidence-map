@@ -74,5 +74,31 @@ class Decisions(unittest.TestCase):
         self.assertEqual(scale_identity.clean_name("Ursolic  acid"), "Ursolic acid")
 
 
+
+class QueryStrings(unittest.TestCase):
+    def test_search_syntax_is_quoted(self):
+        from agesdk.sources.ctgov import scaled_query_string as q
+        self.assertEqual(q("metformin"), "metformin")
+        self.assertEqual(q("1,2,4-triazolo[1,5-a]pyridine"), '"1,2,4-triazolo[1,5-a]pyridine"')   # [ ] gave HTTP 400
+        self.assertEqual(q("Omnipen (ampicillin)"), '"Omnipen (ampicillin)"')                     # ( ) regrouped the query
+        self.assertEqual(q('Germa-medica "mg"'), '"Germa-medica mg"')
+
+    def test_seed_terms_unchanged(self):
+        from agesdk import fixture
+        from agesdk.sources import ctgov
+        plan = ctgov.seed_query_plan(fixture.load(), rules=ctgov.load_rules())
+        self.assertIn("Y-27632 (Y)", {p["query_term"] for p in plan})
+
+
+class CombinationProducts(unittest.TestCase):
+    def test_component_of_names_never_match(self):
+        import csv
+        from pathlib import Path
+        path = Path(__file__).resolve().parent.parent / "data" / "scale" / "synonyms.csv"
+        rows = [r for r in csv.DictReader(open(path, encoding="utf-8")) if "component of" in r["synonym"].lower()]
+        self.assertTrue(rows)
+        self.assertEqual({r["fate"] for r in rows if not r["fate"].startswith("dropped")}, {"review_combination_product"})
+
+
 if __name__ == "__main__":
     unittest.main()

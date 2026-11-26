@@ -1,6 +1,6 @@
 # Scaled synonym rules (docs/synonym_pipeline.md). Versioned: bump on any change; the hash
 # goes into the step-7 frozen inputs. D1-D3 decided by Kevin Ferguson 2026-11-26.
-version: synonyms-v2
+version: synonyms-v3
 created: "2026-11-26"
 
 # D1: registry QUERY strings come only from these (plus every DrugAge name and the ChEMBL
@@ -36,3 +36,9 @@ pubchem_max_len: 60           # systematic names longer than this: dropped
 pubchem_max_rank: 25
 # Single-token PubChem synonyms that are ordinary words are dropped.
 dictionary_files: [/usr/share/dict/british-english, /usr/share/dict/american-english]
+
+# v3: names of combination products ("Reserpine component of hydroserpine plus (r-h-h)",
+# "Hydrocortisone acetate component of cortisporin") appear among ChEMBL trade names and
+# PubChem synonyms. An intervention named after the product is NOT the single compound:
+# such strings go to review, never to matching or querying, whatever their source.
+combination_product_pattern: '\bcomponent of\b'
