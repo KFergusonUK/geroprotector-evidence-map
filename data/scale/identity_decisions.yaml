@@ -1,0 +1,49 @@
+# Stage-1 identity decisions for scaled compounds (docs/synonym_pipeline.md).
+# DRAFT: Claude's recommendation per entry; nothing here takes effect until `decided_by` is a
+# named person. Same standing as the fixture's manual salt-collapse overrides (SPEC §5.1).
+# Scope: the 159-compound mammal universe first (the headline); the rest of DrugAge later.
+
+needs_check:   # resolved only after dropping a trailing bracketed description
+  - {drugage_name: "78c (CD38 inhibitor)", pubchem: "CID 71447315 Cyclopentyl 2-oxo-4-phenylazetidine-1-carboxylate",
+     recommend: reject, why: "Wrong molecule: the CD38 inhibitor 78c is a thiazoloquin(az)olinone. The bare code hit an unrelated record.", decided_by: null}
+  - {drugage_name: "NSC 11926 (Aristolochic acid I)", pubchem: "CID 2236 Aristolochic Acid",
+     recommend: accept, why: "Bracket names the same molecule.", decided_by: null}
+  - {drugage_name: "NSC 45923 (8-Methyoxypsoralen)", pubchem: "CID 4114 8-Methoxypsoralen",
+     recommend: accept, why: "Bracket names the same molecule (DrugAge typo 'Methyoxy').", decided_by: null}
+  - {drugage_name: "NSC170984 (Pimozide)", pubchem: "CID 16362 Pimozide",
+     recommend: accept, why: "Bracket names the same molecule.", decided_by: null}
+  - {drugage_name: "SRT1720 (SIRT1 activator)", pubchem: "CID 24180125",
+     recommend: accept, why: "Imidazothiazole quinoxaline carboxamide: the published SRT1720 structure.", decided_by: null}
+  - {drugage_name: "TM5441 (PAI-1 inhibitor)", pubchem: "CID 44250349 TM-5441",
+     recommend: accept, why: "PubChem title is the code itself.", decided_by: null}
+  - {drugage_name: "LY444711 (GHS-R1a agonist)", pubchem: "CID 91229598 LY-444711",
+     recommend: accept, why: "PubChem title is the code itself.", decided_by: null}
+  - {drugage_name: "MIF098 (CD74 antagonist)", pubchem: "CID 44631884 3-(3-hydroxybenzyl)-5-methylbenzoxazol-2-one",
+     recommend: accept, why: "Benzoxazolone MIF/CD74 antagonist; matches the published MIF098 class. Least certain of the seven.", decided_by: null}
+
+salt_collapse:  # mammal-universe names that PubChem cannot give a parent for (outcome: mixture)
+  organic_parent_unambiguous:   # recommend: collapse to the organic parent
+    - {drugage_name: "Beta-aminopropionitrile fumarate", to: "beta-aminopropionitrile (BAPN)", note: "one of the four open direction conflicts", decided_by: null}
+    - {drugage_name: "Hydroxylamine hydrochloride", to: "hydroxylamine", decided_by: null}
+  inorganic_active_ion:   # recommend: decide per entry; human trials of these are rare
+    - {drugage_name: "Sodium tungstate", to: "tungstate", note: "harm candidate (rat -13%)", decided_by: null}
+    - {drugage_name: "Aluminium chloride", to: "aluminium(3+)", note: "harm candidate (mouse -7%)", decided_by: null}
+    - {drugage_name: "Aluminum potassium sulfate", to: "aluminium(3+)? (alum)", decided_by: null}
+    - {drugage_name: "Mercuric chloride", to: "mercury(2+)", decided_by: null}
+    - {drugage_name: "Beryllium sulfate", to: "beryllium(2+)", decided_by: null}
+    - {drugage_name: "Sodium thiosulfate", to: "thiosulfate", note: "ITP-tested (PMID 38753230); used clinically (cisplatin otoprotection, calciphylaxis)", decided_by: null}
+    - {drugage_name: "Sodium borate", to: "borate", decided_by: null}
+    - {drugage_name: "Sodium metaborate", to: "borate", decided_by: null}
+    - {drugage_name: "Vanadyl sulfate", to: "vanadyl(2+)", decided_by: null}
+  true_mixture:   # recommend: leave as mixture (review only)
+    - {drugage_name: "Lovaza", why: "omega-3 acid ethyl esters: a mixture", decided_by: null}
+
+aliases:   # mammal-universe names PubChem does not know, but which are single molecules
+  - {drugage_name: "Butylated hydroxytoluene", to: "2,6-di-tert-butyl-4-methylphenol (CID 31404)", decided_by: null}
+  - {drugage_name: "Sodim cyclamate", to: "sodium cyclamate -> cyclamic acid", why: "DrugAge typo", decided_by: null}
+  - {drugage_name: "Lead acetate", to: "lead(2+)?", why: "inorganic: same question as the salts above", decided_by: null}
+  - {drugage_name: "L-Glu-L-Trp dipeptide", to: "Glu-Trp (thymogen)", why: "a defined dipeptide: single molecule", decided_by: null}
+  # Left unresolved (not single molecules, correctly review-only): the extracts, oils, royal jelly,
+  # Protandim, Vigconic 28, BP-C3, PB125, marine collagen peptides, branched-chain amino acids,
+  # inulin (polymer), X203 (an antibody), INT-767d and SG1002 (need structure confirmation),
+  # (R/S)-1,3-butanediol (racemate: which identity?).
