@@ -9,6 +9,7 @@ Outcomes per DrugAge name:
   ambiguous  the name maps to several parent CIDs
   not_found  PubChem knows no such name
   mixture    the parent is multi-component, or PubChem gives no parent
+  rejected   a named person rejected the mechanical resolution
   needs_check resolved only after dropping a trailing bracketed description: no automatic
              synonyms until a named person signs it off (data/scale/identity_decisions.yaml)
 """
@@ -19,6 +20,8 @@ import re
 import sqlite3
 from collections import Counter
 from pathlib import Path
+
+import yaml
 
 from agesdk import fixture
 from agesdk.raw import HttpError
@@ -84,14 +87,60 @@ def resolve_name(f, name: str) -> dict:
     return {**row, "outcome": "resolved"}
 
 
+DECISIONS = OUT.parent / "identity_decisions.yaml"
+
+
+def load_decisions() -> dict[str, dict]:
+    """Named-person decisions only (decided_by set), keyed by DrugAge name."""
+    if not DECISIONS.exists():
+        return {}
+    d = yaml.safe_load(open(DECISIONS, encoding="utf-8")) or {}
+    out = {}
+    def walk(x):
+        if isinstance(x, dict):
+            if "drugage_name" in x and x.get("decided_by"):
+                out[x["drugage_name"]] = x
+            for v in x.values():
+                walk(v)
+        elif isinstance(x, list):
+            for v in x:
+                walk(v)
+    walk(d)
+    return out
+
+
+def apply_decision(f, row: dict, dec: dict) -> dict:
+    """A recorded decision overrides the mechanical outcome. Accepted targets are re-checked
+    against the InChIKey recorded at decision time, so PubChem drift cannot swap a molecule."""
+    tag = f"decision {dec['decision']} by {dec['decided_by']} {dec.get('decided_at', '')}"
+    if dec["decision"] == "reject":
+        return {**row, "outcome": "rejected", "detail": tag}
+    if dec["decision"] in ("leave_mixture", "leave_unresolved"):
+        return {**row, "detail": (row["detail"] + "; " if row["detail"] else "") + tag}
+    props = pubchem.properties(f, int(dec["target_cid"])) or {}
+    if props.get("InChIKey") != dec["target_inchikey"]:
+        raise ValueError(f"{row['drugage_name']}: CID {dec['target_cid']} now has InChIKey {props.get('InChIKey')}, "
+                         f"decision recorded {dec['target_inchikey']}")
+    return {**row, "outcome": "resolved", "parent_cid": dec["target_cid"], "inchikey": dec["target_inchikey"],
+            "formula": props.get("MolecularFormula", ""), "pubchem_title": props.get("Title", ""),
+            "detail": f"{tag}: {dec['decision']} -> {dec.get('target', '')}"}
+
+
 def run(conn: sqlite3.Connection, limit: int | None = None) -> dict:
     seed_names = {n for c in fixture.load()["compounds"] for n in c.get("drugage_names", [])}
     names = sorted({r["compound_name"] for r in drugage.current_rows(conn)})
     f = pubchem.fetcher(conn)
+    decisions = load_decisions()
     rows = []
     for name in names[:limit] if limit else names:
-        rows.append({**dict.fromkeys(FIELDS, ""), "drugage_name": name, "outcome": "seed"} if name in seed_names
-                    else resolve_name(f, name))
+        if name in seed_names:
+            rows.append({**dict.fromkeys(FIELDS, ""), "drugage_name": name, "outcome": "seed"})
+            continue
+        row = resolve_name(f, name)
+        rows.append(apply_decision(f, row, decisions[name]) if name in decisions else row)
+    missing = set(decisions) - set(names)
+    if missing:
+        raise ValueError(f"decisions for names not in DrugAge: {sorted(missing)}")
     OUT.parent.mkdir(parents=True, exist_ok=True)
     with open(OUT, "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=FIELDS)

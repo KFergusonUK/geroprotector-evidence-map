@@ -74,7 +74,7 @@ drugage_name,outcome,n_cids,parent_cid,inchikey,formula,pubchem_title,detail
 "7-cyclopentyl-5-(4-phenoxy)phenyl-7H-pyrrolo[2,3-d]pyrimidin-4-ylamine",resolved,1,6603792,FMETVQKSDIOGPX-UHFFFAOYSA-N,C23H22N4O,"7-Cyclopentyl-5-(4-phenoxy)phenyl-7H-pyrrolo(2,3-d)pyrimidin-4-ylamine",
 7-methyl-Dehydrosilybin,not_found,0,,,,,
 7-methylxanthine,resolved,1,68374,PFWLFWPASULGAN-UHFFFAOYSA-N,C6H6N4O2,7-Methylxanthine,
-78c (CD38 inhibitor),needs_check,1,71447315,HXGULOODWVYRBT-ZDUSSCGKSA-N,C15H17NO3,Cyclopentyl 2-Oxo-4-Phenylazetidine-1-Carboxylate,looked up as '78c'; resolved only after dropping a bracket
+78c (CD38 inhibitor),rejected,1,71447315,HXGULOODWVYRBT-ZDUSSCGKSA-N,C15H17NO3,Cyclopentyl 2-Oxo-4-Phenylazetidine-1-Carboxylate,decision reject by Kevin Ferguson 2026-11-26
 AA26-3,not_found,0,,,,,
 AA26-7,not_found,0,,,,,
 AA26-8,resolved,1,46829239,IFXGAMVQLDJRBQ-UHFFFAOYSA-N,C7H10N4O,"Pyrrolidin-1-yl(1H-1,2,3-triazol-1-yl)methanone",
@@ -134,10 +134,10 @@ Alpha‐ketoisovalerate,resolved,1,49,QHKABHOOEWYVLI-UHFFFAOYSA-N,C5H8O3,3-Methy
 Alpha‐keto‐beta‐methylvalerate,ambiguous,2,,,,,"parents [47, 439286]"
 Alpha‐linolenic acid,resolved,1,5280934,DTOSIQBPPRVQHS-PDBXOOCHSA-N,C18H30O2,Linolenic Acid,
 Alsterpaullone,resolved,1,5005498,OLUKILHGKRVDCT-UHFFFAOYSA-N,C16H11N3O3,Alsterpaullone,
-Aluminium chloride,mixture,1,,,,,no PubChem parent for a CID
+Aluminium chloride,resolved,1,104727,REDXJYDRNCIFBQ-UHFFFAOYSA-N,Al+3,Aluminum Cation,decision collapse by Kevin Ferguson 2026-11-26: collapse -> Aluminium cation (Al3+)
 Aluminium nitrate,mixture,1,,,,,no PubChem parent for a CID
 Aluminum acetylsalicylate,not_found,0,,,,,
-Aluminum potassium sulfate,mixture,1,,,,,no PubChem parent for a CID
+Aluminum potassium sulfate,mixture,1,,,,,no PubChem parent for a CID; decision leave_unresolved by Kevin Ferguson 2026-11-26
 Aluminum sulfate,mixture,1,,,,,no PubChem parent for a CID
 Amethopterin,resolved,1,126941,FBOZXECLQNJBKD-ZDUSSCGKSA-N,C20H22N8O5,Methotrexate,
 Amikacin hydrate,resolved,1,37768,LKCWBDHBTVXHDL-RMDFUYIESA-N,C22H43N5O13,Amikacin,
@@ -185,9 +185,9 @@ Barium acetate,resolved,1,176,QTBSBXVTEAMEQO-UHFFFAOYSA-N,C2H4O2,Acetic Acid,
 Benzalkonium chloride,resolved,1,2330,VVZBFOKBSDGVGZ-UHFFFAOYSA-N,C22H40N+,Benzalkonium,
 Benzethonium,resolved,1,2335,SIYLLGKDQZGJHK-UHFFFAOYSA-N,C27H42NO2+,Benzethonium,
 Berberine,resolved,1,2353,YBHILYKTIRIUTE-UHFFFAOYSA-N,C20H18NO4+,Berberine,
-Beryllium sulfate,mixture,1,,,,,no PubChem parent for a CID
+Beryllium sulfate,resolved,1,107649,PWOSZCQLSAMRQW-UHFFFAOYSA-N,Be+2,Beryllium cation,decision collapse by Kevin Ferguson 2026-11-26: collapse -> Beryllium(2+)
 Beta-alanine,resolved,1,239,UCMIRNVEIXFBKS-UHFFFAOYSA-N,C3H7NO2,Beta-Alanine,
-Beta-aminopropionitrile fumarate,mixture,1,,,,,no PubChem parent for a CID
+Beta-aminopropionitrile fumarate,resolved,1,1647,AGSPXMVUFBBBMO-UHFFFAOYSA-N,C3H6N2,3-Aminopropionitrile,decision collapse by Kevin Ferguson 2026-11-26: collapse -> 3-Aminopropionitrile (BAPN)
 Beta-carotene,resolved,1,5280489,OENHQHLEOONYIE-JLTXGRSLSA-N,C40H56,Beta-Carotene,
 Beta-caryophyllene,resolved,1,5281515,NPNUFJAVOOONJE-GFUGXAQUSA-N,C15H24,(-)-Caryophyllene,
 Beta-estradiol,resolved,1,5757,VOXZDWNPVJITMN-ZBRFXRBCSA-N,C18H24O2,Estradiol,
@@ -213,7 +213,7 @@ Butein,resolved,1,5281222,AYMYWHCQALZEGT-ORCRQEGFSA-N,C15H12O5,Butein,
 Buthionine Sulfoximine ,resolved,1,21157,KJQFBVYMGADDTQ-UHFFFAOYSA-N,C8H18N2O3S,2-amino-4-(S-butylsulfonimidoyl)butanoic acid,
 Buthus martensii Karsch Polypeptide Toxin ,not_found,0,,,,,
 Butylated hydroxyanisole,not_found,0,,,,,
-Butylated hydroxytoluene,not_found,0,,,,,
+Butylated hydroxytoluene,resolved,0,31404,NLZUEZXRPGMBCV-UHFFFAOYSA-N,C15H24O,"2,6-Di-tert-butyl-4-methylphenol","decision alias by Kevin Ferguson 2026-11-26: alias -> 2,6-Di-tert-butyl-4-methylphenol (BHT)"
 C60 fullerene,resolved,1,123591,XMWRBQBLMFGWIX-UHFFFAOYSA-N,C60,Fullerenes,
 C75,resolved,1,6482234,VCWLZDVWHQVAJU-NWDGAFQWSA-N,C14H22O4,4-Methylidene-2-octyl-5-oxooxolane-3-carboxylic acid,
 CASIN,resolved,1,2882155,RXIUMAOXORBRCY-UHFFFAOYSA-N,C20H22N2O,"2-((6-phenyl-2,3,4,9-tetrahydro-1H-carbazol-1-yl)amino)ethanol",
@@ -496,7 +496,7 @@ Hydrocortisone,resolved,1,5754,JYGXADMDTFJGBT-VWUMJDOOSA-N,C21H30O5,Cortisol,
 Hydrocortisone acetate,resolved,1,5744,ALEXXDVDDISNDU-JZYPGELDSA-N,C23H32O6,Hydrocortisone Acetate,
 Hydrogen Sulphide,mixture,1,,,,,no PubChem parent for a CID
 Hydrogen iodide,mixture,1,,,,,no PubChem parent for a CID
-Hydroxylamine hydrochloride,mixture,1,,,,,no PubChem parent for a CID
+Hydroxylamine hydrochloride,resolved,1,787,AVXURJPOCDRRFD-UHFFFAOYSA-N,H3NO,Hydroxylamine,decision collapse by Kevin Ferguson 2026-11-26: collapse -> Hydroxylamine
 Hydroxyprogesterone caproate,resolved,1,169870,DOMWKUIIPQCAJU-LJHIYBGHSA-N,C27H40O4,Hydroxyprogesterone Caproate,
 Hypotaurine,resolved,1,107812,VVIUBCNYACGLLV-UHFFFAOYSA-N,C2H7NO2S,Hypotaurine,
 I-BET,not_found,0,,,,,
@@ -577,7 +577,7 @@ Korean mistletoe extract,not_found,0,,,,,
 Krill oil,not_found,0,,,,,
 Kynurenic acid,resolved,1,3845,HCZHHEIFKROPDY-UHFFFAOYSA-N,C10H7NO3,Kynurenic Acid,
 L-Carnitine,resolved,1,10918,PHIQHXFUZVPYII-ZCFIWIBFSA-O,C7H16NO3+,(3-Carboxy-2-(R)-Hydroxy-Propyl)-Trimethyl-Ammonium,
-L-Glu-L-Trp dipeptide,not_found,0,,,,,
+L-Glu-L-Trp dipeptide,resolved,0,100094,LLEUXCDZPQOJMY-AAEUAGOBSA-N,C16H19N3O5,Thymogen,decision alias by Kevin Ferguson 2026-11-26: alias -> Thymogen (L-Glu-L-Trp)
 L-Gulonolactone,resolved,1,439373,SXZYCXMUPBBULW-SKNVOMKLSA-N,C6H10O6,"L-Gulonic acid, gamma-lactone",
 L-Thyroxine sodium,resolved,1,5819,XUIIKFGFIJCVMT-LBPRGKRZSA-N,C15H11I4NO4,Thyroxine,
 L-Valine,resolved,1,6287,KZSNJWFQEVHDMF-BYPYZUCNSA-N,C5H11NO2,L-Valine,
@@ -590,12 +590,12 @@ LFM-A13,resolved,1,54676905,UVSVTDVJQAJIFG-VURMDHGXSA-N,C11H8Br2N2O2,Lfm-A13,
 LY-294002,resolved,1,3973,CZQHHVNHHHRRDU-UHFFFAOYSA-N,C19H17NO3,2-(4-morpholinyl)-8-phenyl-4H-1-benzopyran-4-one,
 "LY-367,265",resolved,1,4605800,BJIPVHLRWSDKOS-UHFFFAOYSA-N,C24H25FN4O2S,LY 367265,
 LY165_163,not_found,0,,,,,
-LY444711 (GHS-R1a agonist),needs_check,1,91229598,KBYHHVYRPWWGLR-HVIPQOSHSA-N,C32H42N6O4,LY-444711,looked up as 'LY444711'; resolved only after dropping a bracket
+LY444711 (GHS-R1a agonist),resolved,1,91229598,KBYHHVYRPWWGLR-HVIPQOSHSA-N,C32H42N6O4,LY-444711,decision accept by Kevin Ferguson 2026-11-26: accept -> LY-444711
 Lactic acid,resolved,1,612,JVTAAEKCZFNVCJ-UHFFFAOYSA-N,C3H6O3,Lactic Acid,
 Lamotrigine,resolved,1,3878,PYZRQGJRPPTADH-UHFFFAOYSA-N,C9H7Cl2N5,Lamotrigine,
 Lappaol C,resolved,1,46173978,BWOAMGHNXHLWMX-BAOMQRJLSA-N,C30H34O10,Lappaol C,
 Lappaol F,resolved,1,73425459,YXNKOCZXAVTXTG-NYGVLQSXSA-N,C40H42O12,Lappaol F,
-Lead acetate,not_found,0,,,,,
+Lead acetate,not_found,0,,,,,decision leave_unresolved by Kevin Ferguson 2026-11-26
 Leucine,resolved,1,6106,ROHFNLRQFUQHCH-YFKPBYRVSA-N,C6H13NO2,L-Leucine,
 Levodopa,resolved,1,6047,WTDRDQBEARUVNC-LURJTMIESA-N,C9H11NO4,Levodopa,
 Levosulpiride,resolved,1,688272,BGRJTUBHPOOWDU-NSHDSACASA-N,C15H23N3O4S,Levosulpiride,
@@ -611,7 +611,7 @@ Loratadine,resolved,1,3957,JCCNYMKQOSZNPW-UHFFFAOYSA-N,C22H23ClN2O2,Loratadine,
 Lorglumide Sodium,resolved,1,3960,IEKOTSCYBBDIJC-UHFFFAOYSA-N,C22H32Cl2N2O4,Lorglumide,
 Losartan,resolved,1,3961,PSIFNNKUMBGKDQ-UHFFFAOYSA-N,C22H23ClN6O,Losartan,
 Lovastin,ambiguous,3,,,,,"parents [3962, 53232, 151177]"
-Lovaza,mixture,1,,,,,no PubChem parent for a CID
+Lovaza,mixture,1,,,,,no PubChem parent for a CID; decision leave_mixture by Kevin Ferguson 2026-11-26
 Loxapine,resolved,1,3964,XJGVXQDUIWGIRW-UHFFFAOYSA-N,C18H18ClN3O,Loxapine,
 Loxapine succinate,resolved,1,3964,XJGVXQDUIWGIRW-UHFFFAOYSA-N,C18H18ClN3O,Loxapine,
 Ludwigia octovalvis extract,not_found,0,,,,,
@@ -621,7 +621,7 @@ Lysine,resolved,1,5962,KDXKERNSBIXSRK-YFKPBYRVSA-N,C6H14N2O2,L-Lysine,
 M084,resolved,1,284016,OKKUCNXCFWODOE-UHFFFAOYSA-N,C11H15N3,"N-butyl-1H-1,3-benzodiazol-2-amine",
 MAHMA-NONOate,ambiguous,2,,,,,"parents [135487863, 135573954]"
 MG624,resolved,1,5824382,YIMFXBPXUPTIEJ-OUKQBFOZSA-N,C22H30NO+,Stilonium,
-MIF098 (CD74 antagonist),needs_check,1,44631884,JJXKGUBHEQGADG-UHFFFAOYSA-N,C15H13NO3,3-(3-Hydroxybenzyl)-5-methylbenzooxazol-2-one,looked up as 'MIF098'; resolved only after dropping a bracket
+MIF098 (CD74 antagonist),resolved,1,44631884,JJXKGUBHEQGADG-UHFFFAOYSA-N,C15H13NO3,3-(3-Hydroxybenzyl)-5-methylbenzooxazol-2-one,decision accept by Kevin Ferguson 2026-11-26: accept -> MIF098
 MJN200,not_found,0,,,,,
 MJN202,not_found,0,,,,,
 MPTP,resolved,1,1388,PLRACCBDVIHHLZ-UHFFFAOYSA-N,C12H15N,"1-Methyl-4-phenyl-1,2,3,6-tetrahydropyridine",
@@ -637,7 +637,7 @@ Medium-chain triglyceride oil,not_found,0,,,,,
 Melatonin,resolved,1,896,DRLFMBDRBRZALE-UHFFFAOYSA-N,C13H16N2O2,Melatonin,
 Memantine Hydrochloride,resolved,1,4054,BUGYDGFZZOZRHP-UHFFFAOYSA-N,C12H21N,Memantine,
 Menadione,resolved,1,4055,MJVAVZPDRWSRRC-UHFFFAOYSA-N,C11H8O2,Menadione,
-Mercuric chloride,mixture,1,,,,,no PubChem parent for a CID
+Mercuric chloride,resolved,1,26623,BQPIGGFYSBELGY-UHFFFAOYSA-N,Hg+2,Mercuric cation,decision collapse by Kevin Ferguson 2026-11-26: collapse -> Mercury(2+)
 Metamizole,resolved,1,3111,LVWZTYCIRDMTEY-UHFFFAOYSA-N,C13H17N3O4S,Metamizole,
 Metergoline,resolved,1,28693,WZHJKEUHNJHDLS-QTGUNEKASA-N,C25H29N3O2,Metergoline,
 Metformin,seed,,,,,,
@@ -680,9 +680,9 @@ N6-benzyladenine,resolved,1,62389,NWBJYWHLCVSVIJ-UHFFFAOYSA-N,C12H11N5,Benzylami
 N6-isopentenyladenine,resolved,1,92180,HYVABZIGRDEKCD-UHFFFAOYSA-N,C10H13N5,Isopentenyladenine,
 NP1,not_found,0,,,,,
 NS-398,resolved,1,4553,KTDZCOWXCWUPEO-UHFFFAOYSA-N,C13H18N2O5S,N-(2-(Cyclohexyloxy)-4-nitrophenyl)methanesulfonamide,
-NSC 11926 (Aristolochic acid I),needs_check,1,2236,BBFQZRXNYIEMAW-UHFFFAOYSA-N,C17H11NO7,Aristolochic Acid,looked up as 'NSC 11926'; resolved only after dropping a bracket
-NSC 45923 (8-Methyoxypsoralen),needs_check,1,4114,QXKHYNVANLEOEG-UHFFFAOYSA-N,C12H8O4,8-Methoxypsoralen,looked up as 'NSC 45923'; resolved only after dropping a bracket
-NSC170984 (Pimozide),needs_check,1,16362,YVUQSNJEYSNKRX-UHFFFAOYSA-N,C28H29F2N3O,Pimozide,looked up as 'NSC170984'; resolved only after dropping a bracket
+NSC 11926 (Aristolochic acid I),resolved,1,2236,BBFQZRXNYIEMAW-UHFFFAOYSA-N,C17H11NO7,Aristolochic Acid,decision accept by Kevin Ferguson 2026-11-26: accept -> Aristolochic acid I
+NSC 45923 (8-Methyoxypsoralen),resolved,1,4114,QXKHYNVANLEOEG-UHFFFAOYSA-N,C12H8O4,8-Methoxypsoralen,decision accept by Kevin Ferguson 2026-11-26: accept -> 8-Methoxypsoralen
+NSC170984 (Pimozide),resolved,1,16362,YVUQSNJEYSNKRX-UHFFFAOYSA-N,C28H29F2N3O,Pimozide,decision accept by Kevin Ferguson 2026-11-26: accept -> Pimozide
 NSC666076,resolved,1,54676228,QYSPLQLAKJAUJT-UHFFFAOYSA-N,C15H13N3O4S,Piroxicam,
 NT219,resolved,1,135914977,XDDQKKXXQHUUHJ-DUXPYHPUSA-N,C16H14BrNO5S,Nt-219,
 Nafadotride,resolved,1,3408722,IDZASIQMRGPBCQ-UHFFFAOYSA-N,C22H27N3O2,Nafadotride,
@@ -868,7 +868,7 @@ SKF95282 dimaleate,not_found,0,,,,,
 SP600125,resolved,1,8515,ACPOUJIDANTYHO-UHFFFAOYSA-N,C14H8N2O,"anthra(1,9-cd)pyrazol-6(2H)-one",
 SQDB,not_found,0,,,,,
 SR27897,resolved,1,122077,ILNRQFBVVQUOLP-UHFFFAOYSA-N,C20H14ClN3O3S,Lintitript,
-SRT1720 (SIRT1 activator),needs_check,1,24180125,IASPBORHOMBZMY-UHFFFAOYSA-N,C25H23N7OS,"N-(2-(3-(piperazin-1-ylmethyl)imidazo(2,1-b)thiazol-6-yl)phenyl)quinoxaline-2-carboxamide",looked up as 'SRT1720'; resolved only after dropping a bracket
+SRT1720 (SIRT1 activator),resolved,1,24180125,IASPBORHOMBZMY-UHFFFAOYSA-N,C25H23N7OS,"N-(2-(3-(piperazin-1-ylmethyl)imidazo(2,1-b)thiazol-6-yl)phenyl)quinoxaline-2-carboxamide",decision accept by Kevin Ferguson 2026-11-26: accept -> SRT1720 (free base; stage-1 parent)
 STX64,resolved,1,5287541,DSLPMJSGSBLWRE-UHFFFAOYSA-N,C14H15NO5S,Irosustat,
 SU 4312,resolved,1,6450842,UAKWLVYMKBWHMX-PTNGSMBKSA-N,C17H16N2O,(3Z)-3-[[4-(dimethylamino)phenyl]methylidene]-1H-indol-2-one,
 Salicylamide,resolved,1,5147,SKZKKFZAGNVIMN-UHFFFAOYSA-N,C7H7NO2,Salicylamide,
@@ -899,21 +899,21 @@ Silydianin,resolved,1,11982272,CYGIJEJDYJOUAN-JSGXPVSSSA-N,C25H22O10,Silydianin,
 Silymarin,resolved,1,5213,SEBFKMXJBCUCAI-UHFFFAOYSA-N,C25H22O10,Silymarin,
 Simvastatin,resolved,1,54454,RYMZZMVNJRMUDD-HGQWONQESA-N,C25H38O5,Simvastatin,
 SkQ1,resolved,1,16679092,ZFUDULLGKXSPPH-UHFFFAOYSA-N,C36H42O2P+,Skq-1 ion,
-Sodim cyclamate,not_found,0,,,,,
+Sodim cyclamate,resolved,0,7533,HCAJEUSONLESMK-UHFFFAOYSA-N,C6H13NO3S,Cyclamate,decision alias by Kevin Ferguson 2026-11-26: alias -> Cyclamate / cyclamic acid
 Sodium Chloride,mixture,1,,,,,no PubChem parent for a CID
 Sodium Nitroprusside,mixture,1,,,,,no PubChem parent for a CID
 Sodium Yeast Nucleate,not_found,0,,,,,
 Sodium azide,mixture,1,,,,,no PubChem parent for a CID
-Sodium borate,mixture,1,,,,,no PubChem parent for a CID
+Sodium borate,mixture,1,,,,,no PubChem parent for a CID; decision leave_unresolved by Kevin Ferguson 2026-11-26
 Sodium butyrate,resolved,1,264,FERIUCNNQQJTOY-UHFFFAOYSA-N,C4H8O2,Butyric Acid,
 Sodium citrate,resolved,1,311,KRKNYBCHXYNGOX-UHFFFAOYSA-N,C6H8O7,Citric Acid,
 Sodium fluoride,mixture,1,,,,,no PubChem parent for a CID
 Sodium hypophosphite,mixture,1,,,,,no PubChem parent for a CID
-Sodium metaborate,mixture,1,,,,,no PubChem parent for a CID
+Sodium metaborate,mixture,1,,,,,no PubChem parent for a CID; decision leave_unresolved by Kevin Ferguson 2026-11-26
 Sodium pyruvate,resolved,1,1060,LCTONWCANYUPML-UHFFFAOYSA-N,C3H4O3,Pyruvic Acid,
 Sodium salicylate,resolved,1,338,YGSDEFSMJLZEOE-UHFFFAOYSA-N,C7H6O3,Salicylic Acid,
-Sodium thiosulfate,mixture,1,,,,,no PubChem parent for a CID
-Sodium tungstate,mixture,1,,,,,no PubChem parent for a CID
+Sodium thiosulfate,resolved,1,1084,DHCDFWKWKRSZHF-UHFFFAOYSA-L,O3S2-2,Thiosulfate ion,"decision collapse by Kevin Ferguson 2026-11-26: collapse -> Thiosulfate ion (S2O3 2-), not hydrogen thiosulfate CID 439208"
+Sodium tungstate,resolved,1,24465,PBYZMCDFOULPGH-UHFFFAOYSA-N,O4W-2,Tungstate,decision collapse by Kevin Ferguson 2026-11-26: collapse -> Tungstate (WO4 2-)
 Sorbitol,resolved,1,5780,FBPFZTCFMRRESA-JGWLITMVSA-N,C6H14O6,Sorbitol,
 Soybean trypsin inhibitor,not_found,0,,,,,
 Specioside,resolved,1,11948661,SKNVKBJSSSJNCI-UIBFFPKISA-N,C24H28O12,Specioside,
@@ -931,7 +931,7 @@ Sulindac,resolved,1,1548887,MLKXDPUZXIRXEP-MFOYZWKCSA-N,C20H17FO3S,Sulindac,
 Sulindac Sulfide,resolved,1,5352624,LFWHFZJPXXOYNR-MFOYZWKCSA-N,C20H17FO2S,Sulindac Sulfide,
 Supercinnamaldehyde,resolved,1,53421694,CZKBLHCEDVWPRN-UHFFFAOYSA-N,C12H11NO2,1-Methyl-3-(2-oxopropylidene)indol-2-one,
 Syringaresinol,resolved,1,100067,KOWMJRJXZMEZLD-UHFFFAOYSA-N,C22H26O8,Syringaresinol,
-TM5441 (PAI-1 inhibitor),needs_check,1,44250349,BGGMLMAPVODXAU-UHFFFAOYSA-N,C21H17ClN2O6,TM-5441,looked up as 'TM5441'; resolved only after dropping a bracket
+TM5441 (PAI-1 inhibitor),resolved,1,44250349,BGGMLMAPVODXAU-UHFFFAOYSA-N,C21H17ClN2O6,TM-5441,decision accept by Kevin Ferguson 2026-11-26: accept -> TM-5441
 TPEN,resolved,1,5519,CVRXLMUYFMERMJ-UHFFFAOYSA-N,C26H28N6,"N,N,N',N'-Tetrakis(2-pyridylmethyl)ethylenediamine",
 Tamarixetin,resolved,1,5281699,FPLMIPQZHHQWHN-UHFFFAOYSA-N,C16H12O7,Tamarixetin,
 Tanespimycin,resolved,1,6505803,AYUNIORJHRXIBJ-TXHRRWQRSA-N,C31H43N3O8,Tanespimycin,
@@ -1004,7 +1004,7 @@ Ursolic  acid,resolved,1,64945,WCGUUGGRBIKTOS-GPOJBZKASA-N,C30H48O3,(+)-Ursolic 
 Vaccinium angustifolium extract,not_found,0,,,,,
 Valine,resolved,1,6287,KZSNJWFQEVHDMF-BYPYZUCNSA-N,C5H11NO2,L-Valine,
 Valproic acid,resolved,1,3121,NIJJYAXOARWZEE-UHFFFAOYSA-N,C8H16O2,Valproic Acid,
-Vanadyl sulfate,mixture,1,,,,,no PubChem parent for a CID
+Vanadyl sulfate,resolved,1,34008,MHHDXUNFNAZUGB-UHFFFAOYSA-N,OV+2,Vanadyl,decision collapse by Kevin Ferguson 2026-11-26: collapse -> Vanadyl (VO2+)
 Verapamil,resolved,1,2520,SGTNSNPWRIOYBX-UHFFFAOYSA-N,C27H38N2O4,Verapamil,
 Verminoside,resolved,1,12000883,MZQXNUBTVLKMLP-QOEJBJAYSA-N,C24H28O13,Verminoside,
 Vigconic 28,not_found,0,,,,,

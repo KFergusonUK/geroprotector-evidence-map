@@ -484,6 +484,46 @@ compounds:
   - ISOLEUCINE
   - Isoleucine
   - L-isoleucine
+- key: s-3-aminopropionitrile
+  role: scaled
+  canonical_name: 3-aminopropionitrile
+  inchikey: AGSPXMVUFBBBMO-UHFFFAOYSA-N
+  pubchem_cid: 1647
+  chembl_id: CHEMBL1618272
+  drugage_names:
+  - Beta-aminopropionitrile fumarate
+  must_match:
+  - .beta.-Alaninenitrile
+  - .beta.-Aminopropionitrile
+  - .beta.-Cyanoethylamine
+  - 2-Cyanoethylamine
+  - 3-Aminopropanenitrile
+  - 3-Aminopropanitrile
+  - 3-Aminopropiononitrile
+  - 3-amino-propionitrile
+  - 3-aminopropionitrile
+  - 3-aminopropionitrile (stabilized with k2co3)
+  - Aminopropionitrile
+  - BETA-AMINOPROPIONITRILE
+  - Beta-aminopropionitrile fumarate
+  - H2NCH2CH2CN
+  - Propanenitrile, 3-amino-
+  - Propionitrile, 3-amino-
+  - b-Alaminenitrile
+  - b-Alaninenitrile
+  - b-Cyanoethylamine
+  - beta Aminopropionitrile
+  - beta-Alaminenitrile
+  - beta-Alaninenitrile
+  - beta-Aminoethyl cyanide
+  - beta-Cyanoethylamine
+  - beta-amino-propionitrile
+  - ethane, 1-amino-2-cyano-
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - Beta-aminopropionitrile fumarate
 - key: s-ornithine
   role: scaled
   canonical_name: ornithine
@@ -1233,6 +1273,48 @@ compounds:
   - Totacillin
   - Totacillin-n
   - Vidopen
+- key: s-hydroxyamine
+  role: scaled
+  canonical_name: hydroxyamine
+  inchikey: AVXURJPOCDRRFD-UHFFFAOYSA-N
+  pubchem_cid: 787
+  chembl_id: CHEMBL1191361
+  drugage_names:
+  - Hydroxylamine hydrochloride
+  must_match:
+  - (1) hydroxylamine
+  - H2NHO
+  - H2NOH
+  - HONH2
+  - HYDROXYAMINE
+  - HYDROXYLAMINE
+  - HYDROXYLAMMONIUM CHLORIDE
+  - Hydroxylamin
+  - Hydroxylamine hydrochloride
+  - N-hydroxyamine
+  - NH2OH
+  - Nitroxide
+  - Oxammonium
+  - Oxyammonia
+  - Phospholipase A2
+  - amine N-oxide
+  - amino alcohol
+  - amino-alcohol
+  - arninoalcohol
+  - azinous acid
+  - dihydridohydroxidonitrogen
+  - hydroxy amine
+  - hydroxyl amine
+  - hydroxyl-amine
+  - hydroxylamine
+  - hyroxylamine
+  - sPLA2 (Type III)
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - HYDROXYAMINE
+  - Hydroxylamine hydrochloride
 - key: s-2-phenyl-1-3-2-benzooxazaphosphole-2-3h-
   role: scaled
   canonical_name: 2-phenyl-1,3,2-benzooxazaphosphole-2(3h)-thione
@@ -1473,6 +1555,45 @@ compounds:
   route_excluded: []
   query_terms:
   - Nicotinamide adenine dinucleotide
+- key: s-aristolochic-acid
+  role: scaled
+  canonical_name: aristolochic acid
+  inchikey: BBFQZRXNYIEMAW-UHFFFAOYSA-N
+  pubchem_cid: 2236
+  chembl_id: CHEMBL93353
+  drugage_names:
+  - NSC 11926 (Aristolochic acid I)
+  must_match:
+  - ARISTOLOCHIA A
+  - ARISTOLOCHIC ACID
+  - ARISTOLOCHINE
+  - Aristolochia HRS
+  - Aristolochiazaeure
+  - Aristolochic acid
+  - Aristolochic acid 1
+  - Aristolochic acid A
+  - Aristolochic acid I
+  - Aristolochic acid I;TR 1736
+  - Aristolochic acid-I
+  - Aristolochic-acid-A
+  - AristolochicacidA
+  - Aristolochin
+  - Birthwort
+  - DivK1c_006544
+  - Epitope ID:2157311
+  - Mixture of Aristolochic Acid A and B
+  - NCIMech_000812
+  - NSC 11926 (Aristolochic acid I)
+  - Phenanthro[3,3-dioxole-5-carboxylic acid, 8-methoxy-6-nitro-
+  - TR 1736
+  - Tardolyt
+  - aris-tolochic acid
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - ARISTOLOCHIC ACID
+  - NSC 11926 (Aristolochic acid I)
 - key: s-piericidin-a
   role: scaled
   canonical_name: piericidin a
@@ -1564,6 +1685,27 @@ compounds:
   query_terms:
   - Cupric formate
   - FORMIC ACID
+- key: s-tm-5441
+  role: scaled
+  canonical_name: tm-5441
+  inchikey: BGGMLMAPVODXAU-UHFFFAOYSA-N
+  pubchem_cid: 44250349
+  chembl_id: CHEMBL4204253
+  drugage_names:
+  - TM5441 (PAI-1 inhibitor)
+  must_match:
+  - BGGMLMAPVODXAU-UHFFFAOYSA-N
+  - EX-A2553
+  - TM 5441
+  - TM5441 (PAI-1 inhibitor)
+  - TM5441 S6778
+  - TM5441, 10 mM in DMSO
+  - TM5441?
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - TM5441 (PAI-1 inhibitor)
 - key: s-levosulpiride
   role: scaled
   canonical_name: levosulpiride
@@ -1968,6 +2110,35 @@ compounds:
   - Sevredol
   - Srm-rhotard
   - Zomorph
+- key: s-mercuric-cation
+  role: scaled
+  canonical_name: mercuric cation
+  inchikey: BQPIGGFYSBELGY-UHFFFAOYSA-N
+  pubchem_cid: 26623
+  chembl_id: null
+  drugage_names:
+  - Mercuric chloride
+  must_match:
+  - Hg(2+)
+  - Mercuric cation
+  - Mercuric chloride
+  - Mercuric ion
+  - Mercury (2+)
+  - Mercury (II) ion
+  - Mercury II
+  - Mercury dication
+  - Mercury ion (Hg2+)
+  - Mercury(2+) ions
+  - Mercury, ion (Hg2+)
+  - mercury (II)
+  - mercury ion
+  - mercury(2+)
+  - mercury(2+) ion
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - Mercuric chloride
 - key: s-memantine
   role: scaled
   canonical_name: memantine
@@ -4315,6 +4486,38 @@ compounds:
   query_terms:
   - NARINGIN
   - Naringin
+- key: s-thiosulfate-ion
+  role: scaled
+  canonical_name: thiosulfate ion
+  inchikey: DHCDFWKWKRSZHF-UHFFFAOYSA-L
+  pubchem_cid: 1084
+  chembl_id: null
+  drugage_names:
+  - Sodium thiosulfate
+  must_match:
+  - (SO3S)(2-)
+  - DHCDFWKWKRSZHF-UHFFFAOYSA-L
+  - S2O3(2-)
+  - Sodium thiosulfate
+  - THIOSULFATE ION
+  - THIOSULPHATE (S2O32-)
+  - THIOSULPHATE ION(2-)
+  - Thiosulfate (2-)
+  - Thiosulfate (S2O32-)
+  - Thiosulfate ion(2-)
+  - Thiosulfates
+  - Thiosulphate
+  - Thiosulphate ion
+  - dioxido-oxo-sulfanylidene-lambda6-sulfane
+  - sulfurothioate
+  - thiosulfate(2-)
+  - trioxido-1kappa(3)O-disulfate(S--S)(2-)
+  - trioxidosulfidosulfate(2-)
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - Sodium thiosulfate
 - key: s-glycine
   role: scaled
   canonical_name: glycine
@@ -7163,6 +7366,52 @@ compounds:
   - Ethosuximide
   - Suxinutin
   - Zarontin
+- key: s-cyclamic-acid
+  role: scaled
+  canonical_name: cyclamic acid
+  inchikey: HCAJEUSONLESMK-UHFFFAOYSA-N
+  pubchem_cid: 7533
+  chembl_id: CHEMBL1206440
+  drugage_names:
+  - Sodim cyclamate
+  must_match:
+  - (sulfonatoazaniumyl)cyclohexane
+  - CYCLAMATE
+  - CYCLAMIC ACID
+  - Cyclamate
+  - Cyclamic acid
+  - Cyclamsaeure
+  - Cyclohexanesulfamic acid
+  - Cyclohexanesulphamic acid
+  - Cyclohexylamide sulfate
+  - Cyclohexylamidosulfuric acid
+  - Cyclohexylamidosulphuric acid
+  - Cyclohexylamine sulfamic acid
+  - Cyclohexylaminesulfonic acid
+  - Cyclohexylaminesulphonic acid
+  - Cyclohexylsulfamic acid
+  - Cyclohexylsulphamic acid
+  - Cylamic acid
+  - E-952(I)
+  - Hexamic acid
+  - INS NO.952(I)
+  - INS-952(I)
+  - N-Cyclohexylsulfamic acid
+  - N-Cyclohexylsulphamic acid
+  - NSC-220327
+  - Sodim cyclamate
+  - Sucaryl
+  - Sucaryl acid
+  - Sulfamic acid, cyclohexyl-
+  - Zyklamat
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - CYCLAMIC ACID
+  - Cyclamic acid
+  - Hexamic acid
+  - Sodim cyclamate
 - key: s-doxylamine
   role: scaled
   canonical_name: doxylamine
@@ -8515,6 +8764,30 @@ compounds:
   route_excluded: []
   query_terms:
   - Colchine
+- key: s-n-2-3-piperazin-1-ylmethyl-imidazo-2-1-b
+  role: scaled
+  canonical_name: n-(2-(3-(piperazin-1-ylmethyl)imidazo(2,1-b)thiazol-6-yl)phenyl)quinoxaline-2-carboxamide
+  inchikey: IASPBORHOMBZMY-UHFFFAOYSA-N
+  pubchem_cid: 24180125
+  chembl_id: CHEMBL257991
+  drugage_names:
+  - SRT1720 (SIRT1 activator)
+  must_match:
+  - 925434-55-5 (free base)
+  - EX-A033
+  - EX-A7228
+  - F3390-0301
+  - IASPBORHOMBZMY-UHFFFAOYSA-N
+  - PMITPQ-carboxamide
+  - SRT 1720
+  - SRT-1720 free base
+  - SRT1720 (SIRT1 activator)
+  - SRT1720?
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - SRT1720 (SIRT1 activator)
 - key: s-dimethyl-sulfoxide
   role: scaled
   canonical_name: dimethyl sulfoxide
@@ -10177,6 +10450,23 @@ compounds:
   route_excluded: []
   query_terms:
   - PNU-74654
+- key: s-3-3-hydroxybenzyl-5-methylbenzooxazol-2-
+  role: scaled
+  canonical_name: 3-(3-hydroxybenzyl)-5-methylbenzooxazol-2-one
+  inchikey: JJXKGUBHEQGADG-UHFFFAOYSA-N
+  pubchem_cid: 44631884
+  chembl_id: CHEMBL1255975
+  drugage_names:
+  - MIF098 (CD74 antagonist)
+  must_match:
+  - 3-(3-hydroxybenzyl)-5-methylbenzooxazol-2-one
+  - EX-A9316
+  - MIF098 (CD74 antagonist)
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - MIF098 (CD74 antagonist)
 - key: s-4-1-1-biphenyl-4-yl-1h-1-2-3-triazol-1-y
   role: scaled
   canonical_name: (4-(1,1'-biphenyl)-4-yl-1h-1,2,3-triazol-1-yl)(2-(phenylmethyl)-1-piperidinyl)-methanone
@@ -11259,6 +11549,21 @@ compounds:
   query_terms:
   - LUTEIN
   - Lutein
+- key: s-ly-444711
+  role: scaled
+  canonical_name: ly-444711
+  inchikey: KBYHHVYRPWWGLR-HVIPQOSHSA-N
+  pubchem_cid: 91229598
+  chembl_id: null
+  drugage_names:
+  - LY444711 (GHS-R1a agonist)
+  must_match:
+  - LY444711 (GHS-R1a agonist)
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - LY444711 (GHS-R1a agonist)
 - key: s-edetic-acid
   role: scaled
   canonical_name: edetic acid
@@ -13361,6 +13666,56 @@ compounds:
   route_excluded: []
   query_terms:
   - Fructose
+- key: s-oglufanide
+  role: scaled
+  canonical_name: oglufanide
+  inchikey: LLEUXCDZPQOJMY-AAEUAGOBSA-N
+  pubchem_cid: 100094
+  chembl_id: CHEMBL2111029
+  drugage_names:
+  - L-Glu-L-Trp dipeptide
+  must_match:
+  - E-W Dipeptide
+  - EW dipeptide
+  - Glu-trp
+  - Glufanide disodium
+  - Glutamyl tryptophan
+  - Glutamyltryptophan
+  - H-Glu-Trp-OH
+  - IM 862 dipeptide
+  - IM-862
+  - IM862
+  - L-Glu-L-Trp
+  - L-Glu-L-Trp dipeptide
+  - L-Tryptophan, L-alpha-glutamyl-
+  - L-Tryptophan, N-L-alpha-glutamyl-
+  - L-alpha-Glu-L-Trp
+  - L-alpha-Glutamyl-L-tryptophan
+  - L-glutamyl-L-tryptophan
+  - NSC-334073
+  - OGLUFANIDE
+  - OGLUFANIDE DISODIUM
+  - Oglufanida
+  - Oglufanide
+  - Oglufanide dis
+  - Oglufanide disodium
+  - Oglufanide sodium
+  - Thymogen
+  - Thymogen(Oglufanide)
+  - Thymogen(Oglufanide)?
+  - Timogen
+  - alpha-Glu-Trp
+  - glutamyl-tryptophan
+  - oglufanida
+  - oglufanidum
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - L-Glu-L-Trp dipeptide
+  - OGLUFANIDE
+  - Oglufanide
+  - Oglufanide disodium
 - key: s-kn-93
   role: scaled
   canonical_name: kn-93
@@ -14373,6 +14728,31 @@ compounds:
   query_terms:
   - CORTISONE
   - Cortisone
+- key: s-vanadyl
+  role: scaled
+  canonical_name: vanadyl
+  inchikey: MHHDXUNFNAZUGB-UHFFFAOYSA-N
+  pubchem_cid: 34008
+  chembl_id: null
+  drugage_names:
+  - Vanadyl sulfate
+  must_match:
+  - (Oxido)vanadium(2+)
+  - Oxovanadium IV
+  - Oxovanadium(2+)
+  - VO(2+)
+  - Vanadium(4+) oxide ion
+  - Vanadyl
+  - Vanadyl ion(2+)
+  - Vanadyl sulfate
+  - Vanadyl(2+)ions
+  - oxidovanadium(2+)
+  - oxovanadium(IV)
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - Vanadyl sulfate
 - key: s-oleanolic-acid
   role: scaled
   canonical_name: oleanolic_acid
@@ -15739,6 +16119,59 @@ compounds:
   route_excluded: []
   query_terms:
   - Tyrosine-Alanine Dipeptide
+- key: s-butylated-hydroxytoluene
+  role: scaled
+  canonical_name: butylated hydroxytoluene
+  inchikey: NLZUEZXRPGMBCV-UHFFFAOYSA-N
+  pubchem_cid: 31404
+  chembl_id: CHEMBL146
+  drugage_names:
+  - Butylated hydroxytoluene
+  must_match:
+  - 2,6-Di-t-butyl-4-methylphenol
+  - 2,6-Di-tert-butyl-4-methylphenol
+  - 2,6-Di-tert-butyl-p-cresol
+  - 2,6-di-tert-butyl-p-cresol
+  - 2,6-ditertiary-butyl-p-cresol
+  - Antioxidant 29
+  - Antioxidant 30
+  - Antioxidant 4K
+  - Antioxidant KB
+  - BUTYLATED HYDROXYTOLUENE
+  - Bht
+  - Butylated hydroxytoluene
+  - Butylated hydroxytoluene (e 321)
+  - Butylhydroxytoluene
+  - Butylhydroxytoluenum
+  - Dalpac
+  - Deenax
+  - E-321
+  - E321
+  - FEMA NO. 2184
+  - INS NO.321
+  - INS-321
+  - Impruvol
+  - Ionol
+  - Ionol CP
+  - Ionole
+  - Kerabit
+  - NSC-6347
+  - Stavox
+  - Sumilizer BHT
+  - Sustane BHT
+  - Tenamene 3
+  - Topanol
+  - Topanol O
+  - Topanol OC
+  - Vanlube PC
+  - Vanlube PCX
+  - Vianol
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - BUTYLATED HYDROXYTOLUENE
+  - Butylated hydroxytoluene
 - key: s-azacitidine
   role: scaled
   canonical_name: azacitidine
@@ -17320,6 +17753,32 @@ compounds:
   route_excluded: []
   query_terms:
   - ABC99
+- key: s-tungstate
+  role: scaled
+  canonical_name: tungstate
+  inchikey: PBYZMCDFOULPGH-UHFFFAOYSA-N
+  pubchem_cid: 24465
+  chembl_id: null
+  drugage_names:
+  - Sodium tungstate
+  must_match:
+  - Sodium tungstate
+  - Tungstate (W12(OH)2O4010-)
+  - Tungstate ion
+  - Tungstate(Vi)ion
+  - Tungsten (VI) tetraoxide
+  - WO4(2-)
+  - Wolframat
+  - dioxido(dioxo)tungsten
+  - tetraoxidotungstate(2-)
+  - tetraoxidotungstate(VI)
+  - tungstate
+  - wolframate
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - Sodium tungstate
 - key: s-2-isopropylphenyl-2-naphthalen-2-yl-ethy
   role: scaled
   canonical_name: 2-isopropylphenyl (2-(naphthalen-2-yl)ethyl)carbamate
@@ -18514,6 +18973,31 @@ compounds:
   route_excluded: []
   query_terms:
   - D609
+- key: s-beryllium-cation
+  role: scaled
+  canonical_name: beryllium cation
+  inchikey: PWOSZCQLSAMRQW-UHFFFAOYSA-N
+  pubchem_cid: 107649
+  chembl_id: null
+  drugage_names:
+  - Beryllium sulfate
+  must_match:
+  - BERYLLIUM ION
+  - Be(2+)
+  - Beryllium (II) ion
+  - Beryllium bead
+  - Beryllium cation
+  - Beryllium ion(2+)
+  - Beryllium sulfate
+  - Beryllium, ion (Be2+)
+  - beryllium cations
+  - beryllium(2+)
+  - beryllium(II) cation
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - Beryllium sulfate
 - key: s-promethazine
   role: scaled
   canonical_name: promethazine
@@ -20178,6 +20662,7 @@ compounds:
   chembl_id: CHEMBL416
   drugage_names:
   - Methoxypsoralen
+  - NSC 45923 (8-Methyoxypsoralen)
   must_match:
   - 8-MOP
   - 8-Methoxyfuranocoumarin
@@ -20199,6 +20684,7 @@ compounds:
   - Methoxsalen
   - Methoxypsoralen
   - Metoxalen
+  - NSC 45923 (8-Methyoxypsoralen)
   - NSC-45923
   - New-Meladinin
   - O-methylxanthotoxol
@@ -20226,6 +20712,7 @@ compounds:
   - Meladinine
   - Methoxsalen
   - Methoxypsoralen
+  - NSC 45923 (8-Methyoxypsoralen)
   - Oxsoralen
   - Oxsoralen-ultra
   - Puvasoralen-8
@@ -20606,6 +21093,41 @@ compounds:
   - Methylthioninium chloride proveblue
   - Provayblue
   - Urolene blue
+- key: s-aluminum-cation
+  role: scaled
+  canonical_name: aluminum cation
+  inchikey: REDXJYDRNCIFBQ-UHFFFAOYSA-N
+  pubchem_cid: 104727
+  chembl_id: null
+  drugage_names:
+  - Aluminium chloride
+  must_match:
+  - ALUMINIUM CATION
+  - ALUMINIUMION
+  - ALUMINUM ION
+  - Al(3+)
+  - Al+++
+  - AlIII
+  - Aluminium chloride
+  - Aluminium(III)
+  - Aluminium, ion (Al3+)
+  - Aluminum (III) ion
+  - Aluminum (ion)
+  - Aluminum 3+
+  - Aluminum(III)
+  - Aluminum, ion (Al3+)
+  - Alumunum ion
+  - REDXJYDRNCIFBQ-UHFFFAOYSA-N
+  - aluminium ion
+  - aluminium(3+)
+  - aluminum cation
+  - aluminum(3+)
+  - aluminum(iii) ion
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - Aluminium chloride
 - key: s-ku-0063794
   role: scaled
   canonical_name: ku-0063794
@@ -29203,6 +29725,47 @@ compounds:
   query_terms:
   - PROTOCATECHUIC ACID
   - Protocatechuic acid
+- key: s-pimozide
+  role: scaled
+  canonical_name: pimozide
+  inchikey: YVUQSNJEYSNKRX-UHFFFAOYSA-N
+  pubchem_cid: 16362
+  chembl_id: CHEMBL1423
+  drugage_names:
+  - NSC170984 (Pimozide)
+  must_match:
+  - MCN-JR-6238
+  - McN-JR 6238
+  - McN-JR-6238
+  - N05AG02
+  - NSC-170984
+  - NSC170984 (Pimozide)
+  - Neoperidole
+  - Opiran
+  - Orap
+  - Orap (TN)
+  - Orap forte
+  - PIMOZIDE
+  - Pimozida
+  - Pimozide
+  - Pimozide?
+  - Pimozidum
+  - Primozida
+  - Primozide
+  - R 623
+  - R 6238
+  - R-623
+  - R-6238
+  - pimozida
+  - pimozide
+  must_not_match: []
+  needs_review: []
+  route_excluded: []
+  query_terms:
+  - NSC170984 (Pimozide)
+  - Orap
+  - PIMOZIDE
+  - Pimozide
 - key: s-lappaol-f
   role: scaled
   canonical_name: lappaol f
