@@ -1,0 +1,3178 @@
+# Role-2 labelling packet (docs/role2_protocol.md). Rules: docs/role2_rules.md (v2): read them first.
+# Copy this file to data/reviews/role2_labels_<you>.yaml. For each row set `label` to one of
+#   experimental | comparator | background | unclear
+# and a `note` naming the question that decided it, e.g. "Q1: same 1000 mg in both arms".
+# The five questions, in order (full wording and examples in docs/role2_rules.md):
+#   Q1 Same dose and form in every arm, its use not compared?                     -> background
+#   Q2 Record calls it a probe/challenge, or supporting care for something else?  -> background
+#   Q3 Record calls it the control/reference/standard/usual treatment?            -> comparator
+#   Q4 Record evaluates its effect, presence vs absence, or its dose/schedule/form? -> experimental
+#   Q5 Still uncertain or contradictory?                                          -> unclear
+# Label in order, do not skip; stopping early is fine. COMMIT your file before any comparison.
+# Do not open data/measurements/role2_resolver_roles.csv or another reader's labels.
+rows:
+- id: 1
+  nct_id: NCT00445627
+  registry_url: https://clinicaltrials.gov/study/NCT00445627
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames: null
+    description: null
+    armGroupLabels:
+    - Overweight Obese Controls
+  all_interventions:
+  - Metformin
+  - Insulin
+  - Nutrition counseling
+  - Exercise counseling
+  arm_groups:
+  - label: Healthy Lean Controls
+    type: null
+    description: Cross-sectional analyses of continuous variables (e.g. hormonal measurements, inflammatory markers,
+      lipids, BMI, and body composition measurements) will be compared using ANOVA
+    interventionNames:
+    - 'Behavioral: Nutrition counseling'
+    - 'Behavioral: Exercise counseling'
+  - label: Overweight Obese Controls
+    type: null
+    description: Cross-sectional analyses of continuous variables (e.g. hormonal measurements, inflammatory markers,
+      lipids, BMI, and body composition measurements) will be compared using ANOVA
+    interventionNames:
+    - 'Drug: Metformin'
+    - 'Behavioral: Nutrition counseling'
+    - 'Behavioral: Exercise counseling'
+  - label: Type 1 Diabetes
+    type: null
+    description: Cross-sectional analyses of continuous variables (e.g. hormonal measurements, inflammatory markers,
+      lipids, BMI, and body composition measurements) will be compared using ANOVA
+    interventionNames:
+    - 'Drug: Insulin'
+    - 'Behavioral: Nutrition counseling'
+    - 'Behavioral: Exercise counseling'
+  study_type: OBSERVATIONAL
+  title: Natural History of Type 2 Diabetes Mellitus in Children and Young Adults
+  summary: 'This study will determine whether resting beta cells (cells in the pancreas that produce insulin) for
+    2 weeks will improve the ability of patients with Type 2 diabetes mellitus (T2DM) to make insulin. Beta cells
+    can rest by giving patients insulin shots. The study will also examine how teenagers with T2DM feel about having
+    diabetes and explore differences between young people with and without T2DM.
+
+
+    This study includes patients 12 to 25 years of age with T2DM who are overweight and who were diagnosed within
+    2 years of enrolling in the study. Healthy individuals of normal weight or who are overweight are also eligible.
+    Candidates are screened with a medical history, physical examination and laboratory tests.
+
+
+    Participants with T2DM are assigned to one of two groups. Group 1 takes an anti-diabetes medicine called metformin
+    and follows a diet prescribed by a study staff dietitian for 2 weeks. Group 2 takes metformin, follows the prescribed
+    diet, and receives insulin through a pump under the skin for 2 weeks. During these two weeks, all participants
+    have the following tests:
+
+
+    * Frequent blood sugar checks.
+
+    * Oral glucose tolerance test (routine diabetes test in which blood samples are '
+  label: null
+  note: ''
+- id: 2
+  nct_id: NCT02906930
+  registry_url: https://clinicaltrials.gov/study/NCT02906930
+  question: Role of semaglutide in this trial (the intervention object below names it)
+  compound: semaglutide
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: semaglutide
+    otherNames: null
+    description: Oral administration once daily.
+    armGroupLabels:
+    - 14 mg oral semaglutide
+    - 3 mg oral semaglutide
+    - 7 mg oral semaglutide
+  all_interventions:
+  - semaglutide
+  - placebo
+  arm_groups:
+  - label: 3 mg oral semaglutide
+    type: EXPERIMENTAL
+    description: null
+    interventionNames:
+    - 'Drug: semaglutide'
+  - label: 7 mg oral semaglutide
+    type: EXPERIMENTAL
+    description: null
+    interventionNames:
+    - 'Drug: semaglutide'
+  - label: 14 mg oral semaglutide
+    type: EXPERIMENTAL
+    description: null
+    interventionNames:
+    - 'Drug: semaglutide'
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: null
+    interventionNames:
+    - 'Drug: placebo'
+  study_type: INTERVENTIONAL
+  title: Efficacy and Safety of Oral Semaglutide Versus Placebo in Subjects With Type 2 Diabetes Mellitus Treated
+    With Diet and Exercise Only.
+  summary: This trial is conducted globally. The aim of this trial is to investigate efficacy and safety of oral
+    semaglutide versus placebo in subjects with type 2 diabetes mellitus treated with diet and exercise only.
+  label: null
+  note: ''
+- id: 3
+  nct_id: NCT03489317
+  registry_url: https://clinicaltrials.gov/study/NCT03489317
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames: null
+    description: Participants with high glucose levels will usually be prescribed Metformin 250 mg three times daily.
+      Can be prescribed to either metabolic syndrome-partial or full groups depending on their metabolic syndrome
+      conditions.
+    armGroupLabels:
+    - Metabolic syndrome- full
+    - Metabolic syndrome- partial
+  all_interventions:
+  - Metformin
+  - lifestyle modification
+  - Simvastatin 10mg
+  - Amlodipine 5mg
+  arm_groups:
+  - label: No metabolic syndrome
+    type: null
+    description: Participants who do not fulfill any of the five criteria for metabolic syndrome defined by the
+      International Diabetes Federation.
+    interventionNames: null
+  - label: Metabolic syndrome- partial
+    type: null
+    description: Participants who fulfill one or two of the five criteria for metabolic syndrome defined by the
+      International Diabetes Federation.
+    interventionNames:
+    - 'Drug: Metformin'
+    - 'Behavioral: lifestyle modification'
+    - 'Drug: Simvastatin 10mg'
+    - 'Drug: Amlodipine 5mg'
+  - label: Metabolic syndrome- full
+    type: null
+    description: Participants who fulfill three or more of the five criteria for metabolic syndrome defined by the
+      International Diabetes Federation.
+    interventionNames:
+    - 'Drug: Metformin'
+    - 'Behavioral: lifestyle modification'
+    - 'Drug: Simvastatin 10mg'
+    - 'Drug: Amlodipine 5mg'
+  study_type: OBSERVATIONAL
+  title: Gut Microbiomes and Viromes in Patients With Metabolic Syndrome
+  summary: Metabolic syndrome (MS) is defined by a manifestation of cardiometabolic risk factors including high
+    blood pressure, glucose and triglycerides, low high-density lipoprotein (HDL) cholesterol, and abdominal obesity.
+    It is closely associated with other diseases such as fatty liver and gouty arthritis. In recent years there
+    is evidence that gut microorganisms are intimately linked to health and wellbeing. Here, the investigators hypothesize
+    that gut microorganisms are involved in the regulation and/or onset of MS and its symptoms.
+  label: null
+  note: ''
+- id: 4
+  nct_id: NCT01624259
+  registry_url: https://clinicaltrials.gov/study/NCT01624259
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 2
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames: null
+    description: null
+    armGroupLabels:
+    - 1.5 mg LY2189265
+    - Liraglutide
+  all_interventions:
+  - LY2189265
+  - Liraglutide
+  - Metformin
+  arm_groups:
+  - label: 1.5 mg LY2189265
+    type: EXPERIMENTAL
+    description: 'LY2189265 (Dulaglutide): 1.5 milligrams (mg), subcutaneous (SC), once weekly for 26 weeks
+
+
+      Metformin: at least 1500 mg/day, oral, for 26 weeks'
+    interventionNames:
+    - 'Drug: LY2189265'
+    - 'Drug: Metformin'
+  - label: Liraglutide
+    type: ACTIVE_COMPARATOR
+    description: 'Liraglutide 0.6 mg, SC, once daily for 7 days, then titrated up to Liraglutide 1.2 mg, SC, once
+      daily for 7 days, then titrated up to Liraglutide 1.8 mg, SC, once daily for 24 weeks
+
+
+      Metformin: at least 1500 mg/day, oral, for 26 weeks'
+    interventionNames:
+    - 'Drug: Liraglutide'
+    - 'Drug: Metformin'
+  study_type: INTERVENTIONAL
+  title: 'A Randomized, Open-Label, Parallel-Arm Study Comparing the Effect of Once-Weekly Dulaglutide With Once-Daily
+    Liraglutide in Patients With Type 2 Diabetes (AWARD-6: Assessment of Weekly AdministRation of LY2189265 in Diabetes-6)'
+  summary: The purpose of the study is to assess the benefits and risks of once-weekly dulaglutide compared to once-daily
+    liraglutide in participants with type 2 diabetes who have inadequate glycemic control on metformin.
+  label: null
+  note: ''
+- id: 5
+  nct_id: NCT01809327
+  registry_url: https://clinicaltrials.gov/study/NCT01809327
+  question: Role of canagliflozin in this trial (the intervention object below names it)
+  compound: canagliflozin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Canagliflozin 300 mg
+    otherNames: null
+    description: One 300 mg capsule taken orally (by mouth) once daily either before the morning meal (for the Canagliflozin
+      300 mg arm) or with the evening meal (for the Canagliflozin 300 mg + Metformin XR arm).
+    armGroupLabels:
+    - Canagliflozin 300 mg
+    - Canagliflozin 300 mg + Metformin XR
+  all_interventions:
+  - Canagliflozin 100 mg
+  - Canagliflozin 300 mg
+  - Metformin XR
+  arm_groups:
+  - label: Canagliflozin 100 mg
+    type: EXPERIMENTAL
+    description: Participants will receive one 100 mg canagliflozin capsule before the morning meal and one matching
+      placebo capsule with the evening meal plus placebo tablets with the evening meal (to match the metformin XR
+      tablets administered in other treatment arms) for 26 weeks.
+    interventionNames:
+    - 'Drug: Canagliflozin 100 mg'
+  - label: Canagliflozin 300 mg
+    type: EXPERIMENTAL
+    description: Participants will receive one 300 mg canagliflozin capsule before the morning meal and one matching
+      placebo capsule with the evening meal plus placebo tablets with the evening meal (to match the metformin XR
+      tablets administered in other treatment arms) for 26 weeks.
+    interventionNames:
+    - 'Drug: Canagliflozin 300 mg'
+  - label: Metformin XR
+    type: EXPERIMENTAL
+    description: Participants will receive metformin XR tablets (in doses titrated over 9 weeks) once daily with
+      the evening meal, plus one placebo capsule before the morning meal and one placebo capsule with the evening
+      meal (to match the canagliflozin capsules administered in other treatment arms) for 26 weeks.
+    interventionNames:
+    - 'Drug: Metformin XR'
+  - label: Canagliflozin 100 mg + Metformin XR
+    type: EXPERIMENTAL
+    description: Participants will receive one 100 mg canagliflozin capsule with the evening meal and one matching
+      placebo capsule before the morning meal plus metformin XR tablets (in doses titrated over 9 weeks) once daily
+      with the evening meal for 26 weeks.
+    interventionNames:
+    - 'Drug: Canagliflozin 100 mg'
+    - 'Drug: Metformin XR'
+  - label: Canagliflozin 300 mg + Metformin XR
+    type: EXPERIMENTAL
+    description: Participants will receive one 300 mg canagliflozin capsule with the evening meal and one matching
+      placebo capsule before the morning meal plus metformin XR tablets (in doses titrated over 9 weeks) once daily
+      with the evening meal for 26 weeks.
+    interventionNames:
+    - 'Drug: Canagliflozin 300 mg'
+    - 'Drug: Metformin XR'
+  study_type: INTERVENTIONAL
+  title: A Randomized, Double-Blind, 5-Arm, Parallel-Group, 26-Week, Multicenter Study to Evaluate the Efficacy,
+    Safety, and Tolerability of Canagliflozin in Combination With Metformin as Initial Combination Therapy in the
+    Treatment of Subjects With Type 2 Diabetes Mellitus With Inadequate Glycemic Control With Diet and Exercise
+  summary: The purpose of this study is to assess the effectiveness of the co-administration of canagliflozin and
+    metformin extended release (XR) compared with canagliflozin alone, and metformin XR alone in patients with type
+    2 diabetes mellitus with inadequate control despite treatment with diet and exercise. The safety and tolerability
+    of canagliflozin will also be assessed.
+  label: null
+  note: ''
+- id: 6
+  nct_id: NCT03198585
+  registry_url: https://clinicaltrials.gov/study/NCT03198585
+  question: Role of empagliflozin in this trial (the intervention object below names it)
+  compound: empagliflozin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Empagliflozin 10 MG
+    otherNames: null
+    description: Capsule, once a day for 90 days
+    armGroupLabels:
+    - Empagliflozin 10 mg
+  all_interventions:
+  - Empagliflozin 10 MG
+  - Placebo
+  arm_groups:
+  - label: Empagliflozin 10 mg
+    type: ACTIVE_COMPARATOR
+    description: null
+    interventionNames:
+    - 'Drug: Empagliflozin 10 MG'
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: null
+    interventionNames:
+    - 'Other: Placebo'
+  study_type: INTERVENTIONAL
+  title: 'Empagliflozin in Heart Failure Patients With Reduced Ejection Fraction: A Randomized Clinical Trial (Empire
+    HF)'
+  summary: 'To assess the effect of Empagliflozin on cardiac biomarkers, cardiac function at rest and during stress,
+    cardiac hemodynamics, renal function, metabolism, daily activity level and health-related quality of life in
+    stable, symptomatic heart failure patients with reduced left ventricular ejection fraction.
+
+
+    The primary hypothesis is that 3 months'' treatment with Empagliflozin 10 mg a day will reduce the plasma concentrations
+    of N-terminal pro-brain natriuretic peptide (NT-proBNP).'
+  label: null
+  note: ''
+- id: 7
+  nct_id: NCT05254314
+  registry_url: https://clinicaltrials.gov/study/NCT05254314
+  question: Role of semaglutide in this trial (the intervention object below names it)
+  compound: semaglutide
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Semaglutide Pen Injector 2.4mg weekly
+    otherNames:
+    - Wegovy
+    description: Once weekly subcutaneous injection
+    armGroupLabels:
+    - Study Drug (Semaglutide)
+  all_interventions:
+  - Semaglutide Pen Injector 2.4mg weekly
+  - Placebo
+  arm_groups:
+  - label: Study Drug (Semaglutide)
+    type: EXPERIMENTAL
+    description: Semaglutide 2.4mg once weekly
+    interventionNames:
+    - 'Drug: Semaglutide Pen Injector 2.4mg weekly'
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: Placebo 2.4mg once weekly
+    interventionNames:
+    - 'Other: Placebo'
+  study_type: INTERVENTIONAL
+  title: Glucagon-Like Peptide-1 Receptor Agonist Treatment in Adult, Obesity-related, Symptomatic Asthma (GATA-3)
+  summary: This is a randomized placebo-controlled trial of semaglutide, an FDA-approved therapy for the treatment
+    of type 2 diabetes mellitus and obesity, in adults with symptomatic asthma despite the use of inhaled steroids
+    and with excess body weight. This study will test the central hypothesis that semaglutide will improve asthma
+    control and reduce airway inflammation due to direct effects on the respiratory tract in adult asthma associated
+    with obesity.
+  label: null
+  note: ''
+- id: 8
+  nct_id: NCT02589353
+  registry_url: https://clinicaltrials.gov/study/NCT02589353
+  question: Role of acarbose in this trial (the intervention object below names it)
+  compound: acarbose
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Acarbose
+    otherNames: null
+    description: Acarbose solution will be swabbed on the tip of the tongue to inhibit salivary alpha amylase activity;
+      each swab will contain \~484 microgram acarbose; total maximum exposure of each subject to acarbose will be
+      \~14-30 mg each session (1-20 sessions)
+    armGroupLabels:
+    - Acarbose
+  all_interventions:
+  - Acarbose
+  arm_groups:
+  - label: Acarbose
+    type: EXPERIMENTAL
+    description: Acarbose solution will be swabbed on the tip of the tongue to inhibit salivary alpha amylase activity;
+      each swab will contain \~484 microgram acarbose; total maximum exposure of each subject to acarbose will be
+      \~14-30 mg each session (1-20 sessions)
+    interventionNames:
+    - 'Drug: Acarbose'
+  study_type: INTERVENTIONAL
+  title: The Role of Salivary Contents in Taste Perception of Starch and Its Hydrolysis Products
+  summary: Although salivary contents play a major role in the early stage of food digestion process, their role
+    in taste perception of glucose polymers is essentially unknown. It is hypothesized that the differences in salivary
+    contents, more specifically salivary amylase concentration and activity, influence taste perception of glucose
+    polymers and ultimately eating behavior, which is related to risks in various diseases. The current project
+    will investigate the variation in salivary contents across individuals and its role in taste perception of glucose
+    polymers.
+  label: null
+  note: ''
+- id: 9
+  nct_id: NCT02980276
+  registry_url: https://clinicaltrials.gov/study/NCT02980276
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Metformin Hydrochloride
+    otherNames: null
+    description: Women randomised to the metformin group will receive metformin 500mg once daily, with the dose
+      titrated upwards every 2 days over 10 days increasing to a maximum of 2500mg Metformin daily (5 tablets) or
+      maximum tolerated dose, in addition to usual care (exercise and MNT), and taken until delivery.
+    armGroupLabels:
+    - Treatment
+  all_interventions:
+  - Metformin Hydrochloride
+  - Placebo
+  arm_groups:
+  - label: Treatment
+    type: ACTIVE_COMPARATOR
+    description: Participants randomised to the treatment arm will receive active metformin in addition to standard
+      care. Metformin tablets will be titrated according to a dosing schedule to achieve the pre-specified glucose
+      targets. Tablets will be in 500mg doses and will commence at 1 tablet per day (500mg) increasing to a maximum
+      of 5 tablets per day (2500mg).
+    interventionNames:
+    - 'Drug: Metformin Hydrochloride'
+  - label: Control
+    type: PLACEBO_COMPARATOR
+    description: Participants randomised to the placebo arm will receive placebo in addition to standard care. Placebo
+      will be titrated according to the dosing schedule to achieve the pre-specified glucose targets. Placebo tablets
+      will commence at 1 tablet per day and will be increased to a maximum of 5 tablets per day over 10 days as
+      with the treatment group.
+    interventionNames:
+    - 'Other: Placebo'
+  study_type: INTERVENTIONAL
+  title: A Randomised Placebo Controlled Trial of the Effectiveness of Early MEtformin in Addition to Usual Care
+    in the Reduction of Gestational Diabetes Mellitus Effects (EMERGE)
+  summary: The overall objective of the EMERGE trial is to determine whether metformin + usual care, compared to
+    placebo + usual care (introduced at the time of initial diagnosis of GDM), reduces a) the need for insulin use,
+    or hyperglycemia (primary outcome measure); b) excessive maternal weight gain; c) maternal and neonatal morbidities
+    and, d) cost of treatment for women with Gestational Diabetes Mellitus.
+  label: null
+  note: ''
+- id: 10
+  nct_id: NCT00971789
+  registry_url: https://clinicaltrials.gov/study/NCT00971789
+  question: Role of rapamycin in this trial (the intervention object below names it)
+  compound: rapamycin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: sirolimus
+    otherNames:
+    - Rapamune
+    description: sirolimus 6 mg by mouth loading dose and 2 mg by mouth daily in a 28 day treatment cycle. Patients
+      who do not have cancer take the drug for a total of two cycles (56 days) unless they develop unacceptable
+      side effects. Those who have cancer may continue sirolimus beyond cycle 2 until their disease worsens or they
+      develop unacceptable side effects
+    armGroupLabels:
+    - Sirolimus Patients
+  all_interventions:
+  - fludeoxyglucose F 18
+  - sirolimus
+  - Clinical Videography
+  arm_groups:
+  - label: Sirolimus Patients
+    type: EXPERIMENTAL
+    description: sirolimus 6 mg by mouth loading dose and 2 mg by mouth daily in a 28 day treatment cycle. Patients
+      who do not have cancer take the drug for a total of two cycles (56 days) unless they develop unacceptable
+      side effects. Those who have cancer may continue sirolimus beyond cycle 2 until their disease worsens or they
+      develop unacceptable side effects.
+    interventionNames:
+    - 'Radiation: fludeoxyglucose F 18'
+    - 'Drug: sirolimus'
+    - 'Other: Clinical Videography'
+  study_type: INTERVENTIONAL
+  title: A Pilot Study of Sirolimus (Rapamycin, Rapamune[Registered Trademark]) in Subjects With Cowden Syndrome
+    or Other Syndromes Characterized by Germline Mutations in PTEN
+  summary: 'Background:
+
+
+    People with phosphatase and tensin homolog deleted on chromosome 10 (PTEN) hamartomatous tumor syndromes (PHTS)
+    have a mutation in one of their genes called PTEN that can lead to benign tumors called hamartomas throughout
+    the body. This puts them at increased risk for breast, thyroid and endometrial cancer.
+
+
+    People with a PTEN mutation have increased activity of proteins such as protein kinase B (AKT) and mammalian
+    target of rapamycin (mTOR), which may be responsible for tumor growth and their increased risk of these cancers.
+
+
+    Experiments show that a drug called sirolimus, which is used to prevent the immune system from rejecting transplanted
+    organs, can inhibit cancer cell growth by blocking the mTOR protein.
+
+
+    Objectives:
+
+
+    To test the ability of sirolimus to decrease the activity of proteins that are regulated by mTOR in both benign
+    and cancerous tumor tissue.
+
+
+    Eligibility:
+
+
+    People 18 years of age and older with Cowden syndrome or other PHTS.
+
+
+    Design:
+
+
+    Sirolimus treatment. Patients take sirolimus once a day in 28-day treatment cycles. Patients who do not have
+    cancer take the drug for a total of two cycles (56 days) unless they develop unacceptable side effects. Those '
+  label: null
+  note: ''
+- id: 11
+  nct_id: NCT01761916
+  registry_url: https://clinicaltrials.gov/study/NCT01761916
+  question: Role of captopril in this trial (the intervention object below names it)
+  compound: captopril
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: CAPTOPRIL
+    otherNames:
+    - CAP
+    description: Postpartum patients with very high blood pressure will be treated with oral captopril (25mg)
+    armGroupLabels:
+    - CAPTOPRIL
+  all_interventions:
+  - CLONIDINE
+  - CAPTOPRIL
+  arm_groups:
+  - label: CLONIDINE
+    type: EXPERIMENTAL
+    description: Postpartum patients with very high blood pressure will be treated with oral clonidine (0,1mg)
+    interventionNames:
+    - 'Drug: CLONIDINE'
+  - label: CAPTOPRIL
+    type: ACTIVE_COMPARATOR
+    description: Postpartum patients with very high blood pressure will be treated with oral CAPTOPRIL (25mg)
+    interventionNames:
+    - 'Drug: CAPTOPRIL'
+  study_type: INTERVENTIONAL
+  title: Randomized Clinical Trial for Effectiveness of Clonidine Versus Captopril for Treatment of Postpartum Very
+    High Blood Pressure
+  summary: 'The postpartum period represents a stage of the pregnancy-puerperal still rarely addressed scientifically.
+    There are no reports in the literature and concrete enough to elucidate important issues, especially in the
+    field of hypertension and pregnancy.
+
+
+    Searches based on current evidence concentrate their focus on the diagnosis of hypertensive disorders and treatment
+    of these diseases maternofetais repercussions. However, the prognosis in the short and long term, as the BP
+    outcome in mothers with severe preeclampsia, the most effective treatment for the control of hypertensive crisis
+    and metabolic and cardiovascular events after two years of termination of pregnancy require further clarification.
+
+
+    The main idea for developing this research came from the clinical experience with the use of captopril in Obstetric
+    ICU IMIP. This drug has long been used in postpartum women with severe preeclampsia or chronic hypertension
+    exacerbated by pregnancy for control of hypertensive crisis and keeping pressure levels. Following the technical
+    standards of the institution and during his administration, there were reports of side effects such as dry cough
+    and nausea, beyond the threshold dose of 150'
+  label: null
+  note: ''
+- id: 12
+  nct_id: NCT06613750
+  registry_url: https://clinicaltrials.gov/study/NCT06613750
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames: null
+    description: Participants in this arm will receive metformin 500 mg to 2000 mg per day, divided into two doses,
+      for 12 weeks
+    armGroupLabels:
+    - Metformin Group
+  all_interventions:
+  - Sitagliptin and Gliclazide
+  - Metformin
+  arm_groups:
+  - label: Sitagliptin and Gliclazide Group
+    type: EXPERIMENTAL
+    description: Participants in this arm will receive sitagliptin phosphate 100 mg once daily combined with gliclazide
+      sustained-release tablets 30-120 mg once daily for 12 weeks.
+    interventionNames:
+    - 'Drug: Sitagliptin and Gliclazide'
+  - label: Metformin Group
+    type: ACTIVE_COMPARATOR
+    description: Participants in this arm will receive metformin 500 mg to 2000 mg per day, divided into two doses,
+      for 12 weeks.
+    interventionNames:
+    - 'Drug: Metformin'
+  study_type: INTERVENTIONAL
+  title: 'Comparative Efficacy and Safety of Sitagliptin Plus Gliclazide SR Versus Metformin in Treatment-Naïve
+    Type 2 Diabetes Patients: A Randomized Non-Inferiority Study'
+  summary: This study compares the efficacy and safety of sitagliptin phosphate combined with gliclazide sustained-release
+    tablets versus metformin in treatment-naïve patients with type 2 diabetes mellitus (T2DM) and glucotoxicity.
+    The trial assesses glycemic control, patient compliance, and adverse events over a 12-week period using a randomized
+    controlled design to determine the non-inferiority of the combined treatment.
+  label: null
+  note: ''
+- id: 13
+  nct_id: NCT00414648
+  registry_url: https://clinicaltrials.gov/study/NCT00414648
+  question: Role of rapamycin in this trial (the intervention object below names it)
+  compound: rapamycin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Sirolimus
+    otherNames:
+    - Rapamycin
+    description: A sirolimus dose of 2 tablets (1 mg/tablet) per day for 1 year.
+    armGroupLabels:
+    - Active Agent (Sirolimus)
+  all_interventions:
+  - Sirolimus
+  - Placebo
+  arm_groups:
+  - label: Active Agent (Sirolimus)
+    type: EXPERIMENTAL
+    description: Participants receive sirolimus daily for 1 year and are followed with serial pulmonary function
+      tests, 6-minute walk tests, and symptom and QOL questionnaires over a 2-year period.
+    interventionNames:
+    - 'Drug: Sirolimus'
+  - label: Placebo Arm
+    type: PLACEBO_COMPARATOR
+    description: Participants receive placebo daily for 1 year and followed with serial pulmonary function tests,
+      6-minute walk tests, and symptom and QOL questionnaires over a 2-year period.
+    interventionNames:
+    - 'Drug: Placebo'
+  study_type: INTERVENTIONAL
+  title: Multicenter International Lymphangioleiomyomatosis Efficacy and Safety of Sirolimus Trial
+  summary: Lymphangioleiomyomatosis (LAM) is a rare lung disease of women that is caused by genetic mutations. It
+    results in the uncontrolled growth of an unusual type of smooth muscle cell in the lung. These cells invade
+    lung tissue, including the airways, blood vessels, and lymph vessels, and restrict the flow of air, blood, and
+    lymph, respectively. Respiratory failure, lung collapse (pneumothorax), and pleural effusions (chylothorax)
+    are hallmarks of the disease. This study will evaluate the safety and effectiveness of sirolimus, an inhibitor
+    of the mTOR pathway, in stabilizing or improving lung function in people with LAM.
+  label: null
+  note: ''
+- id: 14
+  nct_id: NCT01781611
+  registry_url: https://clinicaltrials.gov/study/NCT01781611
+  question: Role of aspirin in this trial (the intervention object below names it)
+  compound: aspirin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: 81mg aspirin
+    otherNames:
+    - ASA
+    description: half a tablet twice daily for 24 weeks
+    armGroupLabels:
+    - aspirin
+  all_interventions:
+  - extended release dipyridamole 200mg/aspirin 25mg
+  - 81mg aspirin
+  arm_groups:
+  - label: extended release dipyridamole/aspirin
+    type: EXPERIMENTAL
+    description: extended release dipyridamole 200mg/aspirin 25mg twice daily for 24 weeks
+    interventionNames:
+    - 'Drug: extended release dipyridamole 200mg/aspirin 25mg'
+  - label: aspirin
+    type: ACTIVE_COMPARATOR
+    description: half a tablet of a 81mg aspirin twice daily for 24 weeks
+    interventionNames:
+    - 'Drug: 81mg aspirin'
+  study_type: INTERVENTIONAL
+  title: Dipyridamole Assessment for Flare Reduction in SLE
+  summary: Dipyridamole, a medication extensively used in combination with aspirin for stroke prevention, is a promising
+    new treatment for lupus. Dipyridamole has been shown to inhibit certain lymphocyte populations that are over-reactive
+    in lupus and to delay the emergence of lupus-related pathology in mice with lupus. The investigators are interested
+    in investigating the efficacy of dipyridamole in preventing flares in patients with lupus and its impact on
+    biomarkers of disease activity.
+  label: null
+  note: ''
+- id: 15
+  nct_id: NCT02179788
+  registry_url: https://clinicaltrials.gov/study/NCT02179788
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames:
+    - Glucophage
+    description: 'The metformin arm will be consuming Glucophage XR (metformin hydrochloride extended release, 750
+      or 500 mg, encapsulated in #00 opaque capsules for 4 weeks according to the following schedule:
+
+
+      * Days 1-7, take one 750 mg capsule with evening meal (750 mg/day)
+
+      * Days 8-14, take three 500 mg capsule with evening meal (1500 mg/day)
+
+      * Days 14-28 (or through completion of post-intervention data collection), take four 500 mg capsules with
+      evening meal (2000 mg/day)
+
+
+      Actual increase in dose may occur more slowly if standard titration schedule is not well tolerated. Adjustments
+      to schedule will be made in consultation with the adult medicine study co-investigator.
+
+
+      The trial duration is 28 days (with a +/- 3 day cushion)'
+    armGroupLabels:
+    - Standard care plus metformin
+  all_interventions:
+  - Standard care
+  - Metformin
+  - Placebo
+  arm_groups:
+  - label: Standard care plus metformin
+    type: EXPERIMENTAL
+    description: 67% of stage 2 eligible mothers will be randomly allocated to this arm. Mothers will be instructed
+      to thoroughly empty their breasts at least 8 times per day and to take the assigned study drug.
+    interventionNames:
+    - 'Behavioral: Standard care'
+    - 'Drug: Metformin'
+  - label: Standard Care plus placebo
+    type: PLACEBO_COMPARATOR
+    description: '33% of Stage 2 eligible mothers will be randomly allocated to this arm. Mothers will be instructed
+      to thoroughly empty their breasts at least 8 times per day (Standard Care) and to take the assigned study
+      drug. The placebo arm will be consuming methylcellulose USP Powder encapsulated in #00 opaque capsules (supplied
+      by PCCA, Houston TX) for 4 weeks according to the following schedule:
+
+
+      * Days 1-7, take 1 capsule with evening meal
+
+      * Days 8-14, take 3 capsules with evening meal
+
+      * Days 14-28 (or through completion of post-intervention data collection), take four capsules with evening
+      meal
+
+
+      Actual increase in dose may occur more slowly if standard titration schedule is not well tolerated. Adjustments
+      to schedule will be made in consultation with the adult medicine study co-investigator.'
+    interventionNames:
+    - 'Behavioral: Standard care'
+    - 'Drug: Placebo'
+  study_type: INTERVENTIONAL
+  title: Metformin to Augment Low Milk Supply in Pre-diabetic Mothers, a Phase I/II Randomized Clinical Trial
+  summary: Most new mothers in the United States will start off breastfeeding. For some mothers, despite following
+    best practices, they are not able to meet their breastfeeding goals due to unexplained low milk supply. At the
+    same time, nearly 1 in 4 new mothers are pre-diabetic (elevated blood sugar, but not yet diabetic). My progression
+    of research suggests that the same metabolic factors causing pre-diabetes may also be causing low milk supply.
+    Metformin is a widely prescribed drug to treat high blood sugar. This study is a preliminary, small scale randomized
+    trial designed to test for a trend in the hypothesis that metformin is safe and potentially effective in treating
+    low milk supply in insulin resistant and pre-diabetic mothers.
+  label: null
+  note: ''
+- id: 16
+  nct_id: NCT00489281
+  registry_url: https://clinicaltrials.gov/study/NCT00489281
+  question: Role of rapamycin in this trial (the intervention object below names it)
+  compound: rapamycin
+  intervention_index: 3
+  intervention:
+    type: DRUG
+    name: Sirolimus
+    otherNames:
+    - Rapamune
+    description: The first dose of Sirolimus is 6 mg PO on Day +5. Further dosing is adjusted according to drug
+      levels. Sirolimus is continued through Day +365.
+    armGroupLabels:
+    - Transplant - 200 cGy
+    - Transplant - 400 cGy
+  all_interventions:
+  - Cyclophosphamide
+  - Fludarabine
+  - Mycophenolate mofetil
+  - Sirolimus
+  - Allogeneic bone marrow transplant
+  - Total body irradiation - 200
+  - Levetiracetam
+  - Anti-thymocyte globulin
+  - Total body irradiation - 400
+  arm_groups:
+  - label: Transplant - 200 cGy
+    type: EXPERIMENTAL
+    description: Conditioning regimen with anti-thymocyte globulin, fludarabine, cyclophosphamide, and total body
+      irradiation - 200. Seizure prophylaxis with levetiracetam. Allogeneic bone marrow transplant infusion on Day
+      0. Graft-vs-host-disease (GVHD) prophylaxis with cyclophosphamide, mycophenolate mofetil, and sirolimus.
+    interventionNames:
+    - 'Drug: Cyclophosphamide'
+    - 'Drug: Fludarabine'
+    - 'Drug: Mycophenolate mofetil'
+    - 'Drug: Sirolimus'
+    - 'Procedure: Allogeneic bone marrow transplant'
+    - 'Radiation: Total body irradiation - 200'
+    - 'Drug: Levetiracetam'
+    - 'Biological: Anti-thymocyte globulin'
+  - label: Transplant - 400 cGy
+    type: EXPERIMENTAL
+    description: Conditioning regimen with anti-thymocyte globulin, fludarabine, cyclophosphamide, and total body
+      irradiation - 400. Seizure prophylaxis with levetiracetam. Allogeneic bone marrow transplant infusion on Day
+      0. Graft-vs-host-disease (GVHD) prophylaxis with cyclophosphamide, mycophenolate mofetil, and sirolimus.
+    interventionNames:
+    - 'Drug: Cyclophosphamide'
+    - 'Drug: Fludarabine'
+    - 'Drug: Mycophenolate mofetil'
+    - 'Drug: Sirolimus'
+    - 'Procedure: Allogeneic bone marrow transplant'
+    - 'Drug: Levetiracetam'
+    - 'Biological: Anti-thymocyte globulin'
+    - 'Radiation: Total body irradiation - 400'
+  study_type: INTERVENTIONAL
+  title: A Phase II Trial of Non-Myeloablative Conditioning and Transplantation of Partially HLA-Mismatched and
+    HLA-Matched Bone Marrow for Patients With Sickle Cell Anemia and Other Hemoglobinopathies
+  summary: 'RATIONALE: Giving low doses of chemotherapy, such as fludarabine and cyclophosphamide, and total-body
+    irradiation before a donor bone marrow transplant helps stop the growth of abnormal cells. It also helps stop
+    the patient''s immune system from rejecting the donor''s stem cells. When the healthy stem cells from a donor
+    are infused into the patient they may help the patient''s bone marrow make stem cells, red blood cells, white
+    blood cells, and platelets. Sometimes the transplanted cells from a donor can make an immune response against
+    the body''s normal cells. Giving sirolimus and mycophenolate mofetil after transplant may stop this from happening.
+
+
+    PURPOSE: This phase II trial is studying how well giving fludarabine and cyclophosphamide together with total-body
+    irradiation followed by a donor bone marrow transplant works in treating patients with sickle cell anemia and
+    other blood disorders.'
+  label: null
+  note: ''
+- id: 17
+  nct_id: NCT07093476
+  registry_url: https://clinicaltrials.gov/study/NCT07093476
+  question: Role of empagliflozin in this trial (the intervention object below names it)
+  compound: empagliflozin
+  intervention_index: 2
+  intervention:
+    type: DRUG
+    name: empagliflozin
+    otherNames: null
+    description: tablets, QD, oral administration
+    armGroupLabels:
+    - Study group 1
+    - Study group 2
+  all_interventions:
+  - Metformin
+  - Alogliptin
+  - empagliflozin
+  arm_groups:
+  - label: Study group 1
+    type: ACTIVE_COMPARATOR
+    description: Metformin + Alogliptin + Empagliflozin Xmg
+    interventionNames:
+    - 'Drug: Metformin'
+    - 'Drug: Alogliptin'
+    - 'Drug: empagliflozin'
+  - label: Study group 2
+    type: ACTIVE_COMPARATOR
+    description: Metformin + Alogliptin + Empagliflozin Ymg
+    interventionNames:
+    - 'Drug: Metformin'
+    - 'Drug: Alogliptin'
+    - 'Drug: empagliflozin'
+  - label: Control Group
+    type: PLACEBO_COMPARATOR
+    description: Metformin + Alogliptin
+    interventionNames:
+    - 'Drug: Metformin'
+    - 'Drug: Alogliptin'
+  study_type: INTERVENTIONAL
+  title: A Multicenter, Randomized, Double-Blind, Placebo-Controlled, Phase 3 Clinical Trial and Open-Label Extension
+    Study to Evaluate the Efficacy and Safety of Add-On Therapy With Empagliflozin for Patients With Inadequately
+    Controlled Type 2 DiabetesMellitus in the Combination Treatment With Metformin and Alogliptin
+  summary: Phase 3 study to assess the Efficacy and Safety of CT-L02-301 in Type 2 Diabetes Patients with Insufficient
+    Glycemic Control with Metformin and Alogliptin Combination Therapy.
+  label: null
+  note: ''
+- id: 18
+  nct_id: NCT01663038
+  registry_url: https://clinicaltrials.gov/study/NCT01663038
+  question: Role of aspirin in this trial (the intervention object below names it)
+  compound: aspirin
+  intervention_index: 2
+  intervention:
+    type: DRUG
+    name: Aspirin
+    otherNames:
+    - 'Aspirin: Astrix'
+    description: null
+    armGroupLabels:
+    - Clopidogrel and Aspirin
+  all_interventions:
+  - Clopidogrel
+  - Fixed dose combination of clopidogrel/Aspirin
+  - Aspirin
+  arm_groups:
+  - label: Clopidogrel and Aspirin
+    type: ACTIVE_COMPARATOR
+    description: null
+    interventionNames:
+    - 'Drug: Clopidogrel'
+    - 'Drug: Aspirin'
+  - label: Copidogrel
+    type: EXPERIMENTAL
+    description: null
+    interventionNames:
+    - 'Drug: Fixed dose combination of clopidogrel/Aspirin'
+  study_type: INTERVENTIONAL
+  title: Comparative Pharmacokinetics of Clopidogrel 75mg and Aspirin 100mg After Single Oral Administration as
+    a Fixed Dose Combination Versus Separate Combination in Healthy Male Volunteers
+  summary: The purpose of this study is to compare pharmacokinetics between fixed-dose combination and separate
+    combination of clopidogrel 75mg/aspirin 100mg.
+  label: null
+  note: ''
+- id: 19
+  nct_id: NCT00353301
+  registry_url: https://clinicaltrials.gov/study/NCT00353301
+  question: Role of rapamycin in this trial (the intervention object below names it)
+  compound: rapamycin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Sirolimus
+    otherNames:
+    - Rapamune
+    description: Patients will receive a loading dose of 6 mg of Rapamune seven days after beginning treatment with
+      Tarceva™ followed by a dose of 2mg/day.
+    armGroupLabels:
+    - Erlotinib and Sirolimus
+  all_interventions:
+  - Erlotinib hydrochloride
+  - Sirolimus
+  arm_groups:
+  - label: Erlotinib and Sirolimus
+    type: EXPERIMENTAL
+    description: 'Erlotinib hydrochloride (Tarceva) will be self-administered in an open-label unblinded manner
+      to all patients enrolled in the study. During the treatment period, patients will receive single-agent Tarceva,
+      150 mg/day.
+
+
+      Sirolimus (Rapamune) will be self-administered in an open-label unblinded manner to all patients enrolled
+      in the study. Patients will receive a loading dose of 6 mg of Rapamune seven days after beginning treatment
+      with Tarceva™ followed by a dose of 2mg/day.'
+    interventionNames:
+    - 'Drug: Erlotinib hydrochloride'
+    - 'Drug: Sirolimus'
+  study_type: INTERVENTIONAL
+  title: A Phase II Single Arm Clinical Trial to Evaluate the Efficacy and Safety of the Combination of Tarceva™
+    (Erlotinib Hydrochloride) and Rapamune™ (Sirolimus) in the Treatment of Metastatic Renal Cell Carcinoma.
+  summary: The purpose of this study is to test the safety and efficacy of the combination of erlotinib hydrochloride
+    (Tarceva™) and sirolimus (Rapamune™) in the treatment of patients with metastatic kidney cancer.
+  label: null
+  note: ''
+- id: 20
+  nct_id: NCT00673465
+  registry_url: https://clinicaltrials.gov/study/NCT00673465
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 2
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames: null
+    description: Metformin extended release 750 mg, 2 tablets administered orally, once daily for 4 weeks (1500
+      mg total daily dose)
+    armGroupLabels:
+    - 'Treatment sequence 1: SCH 497079 → Placebo → Metformin'
+    - 'Treatment sequence 2: Placebo → Metformin → SCH 497079'
+    - 'Treatment sequence 3: Metformin → SCH 497079 → Placebo'
+    - 'Treatment sequence 4: SCH 497079 → Metformin → Placebo'
+    - 'Treatment sequence 5: Placebo → SCH 49709 → Metformin'
+    - 'Treatment sequence 6: Metformin → Placebo → SCH 497079'
+  all_interventions:
+  - SCH 497079
+  - Placebo
+  - Metformin
+  arm_groups:
+  - label: 'Treatment sequence 1: SCH 497079 → Placebo → Metformin'
+    type: EXPERIMENTAL
+    description: Participants received SCH 497079 daily for 4 weeks followed by placebo daily for 4 weeks followed
+      by metformin daily for 4 weeks.
+    interventionNames:
+    - 'Drug: SCH 497079'
+    - 'Drug: Placebo'
+    - 'Drug: Metformin'
+  - label: 'Treatment sequence 2: Placebo → Metformin → SCH 497079'
+    type: EXPERIMENTAL
+    description: Participants received placebo daily for 4 weeks followed by metformin daily for 4 weeks followed
+      by SCH 497079 daily for 4 weeks.
+    interventionNames:
+    - 'Drug: SCH 497079'
+    - 'Drug: Placebo'
+    - 'Drug: Metformin'
+  - label: 'Treatment sequence 3: Metformin → SCH 497079 → Placebo'
+    type: EXPERIMENTAL
+    description: Participants received metformin daily for 4 weeks followed by SCH 497079 daily for 4 weeks followed
+      by placebo daily for 4 weeks.
+    interventionNames:
+    - 'Drug: SCH 497079'
+    - 'Drug: Placebo'
+    - 'Drug: Metformin'
+  - label: 'Treatment sequence 4: SCH 497079 → Metformin → Placebo'
+    type: EXPERIMENTAL
+    description: Participants received SCH 497079 daily for 4 weeks followed by metformin daily for 4 weeks followed
+      by placebo daily for 4 weeks.
+    interventionNames:
+    - 'Drug: SCH 497079'
+    - 'Drug: Placebo'
+    - 'Drug: Metformin'
+  - label: 'Treatment sequence 5: Placebo → SCH 49709 → Metformin'
+    type: EXPERIMENTAL
+    description: Participants received placebo daily for 4 weeks followed by SCH 497079 daily for 4 weeks followed
+      by metformin daily for 4 weeks.
+    interventionNames:
+    - 'Drug: SCH 497079'
+    - 'Drug: Placebo'
+    - 'Drug: Metformin'
+  - label: 'Treatment sequence 6: Metformin → Placebo → SCH 497079'
+    type: EXPERIMENTAL
+    description: Participants received metformin daily for 4 weeks followed by placebo daily for 4 weeks followed
+      by SCH 497079 daily for 4 weeks.
+    interventionNames:
+    - 'Drug: SCH 497079'
+    - 'Drug: Placebo'
+    - 'Drug: Metformin'
+  study_type: INTERVENTIONAL
+  title: A Randomized, Placebo-controlled, Three-Way Crossover Study to Evaluate the Effect of SCH 497079 on Metabolic
+    Parameters and to Determine the Influence of Race/Ethnic Origin on Therapeutic Response
+  summary: The purpose of this study is to evaluate the effect of SCH 497079 on metabolic parameters and to determine
+    the influence of race/ethnic origin on therapeutic response.
+  label: null
+  note: ''
+- id: 21
+  nct_id: NCT06249945
+  registry_url: https://clinicaltrials.gov/study/NCT06249945
+  question: Role of empagliflozin in this trial (the intervention object below names it)
+  compound: empagliflozin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Empagliflozin 25 MG
+    otherNames:
+    - Jardiance 25 MG
+    description: The medication will be packed in a customized sealed jar and labeled on the exterior of the jar.
+    armGroupLabels:
+    - empagliflozin
+  all_interventions:
+  - Empagliflozin 25 MG
+  - Placebo
+  arm_groups:
+  - label: empagliflozin
+    type: EXPERIMENTAL
+    description: Jardiance, 25 mg, QD, for 6 months
+    interventionNames:
+    - 'Drug: Empagliflozin 25 MG'
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: QD, for 6 months
+    interventionNames:
+    - 'Drug: Placebo'
+  study_type: INTERVENTIONAL
+  title: The Safety and Efficacy of Empagliflozin in Patients With End-stage Renal Disease and Heart Failure With
+    Preserved Ejection Fraction - a Randomized Controlled Trial
+  summary: The presence of CKD has been linked to the development of HFpEF. Currently, the treatment for HFpEF is
+    limited. SGLT2i are one of the few drug classes that have proven efficacy in HFpEF in randomized controlled
+    trials. The results of mechanistic studies suggest that the benefits of SGLT2i on diastolic heart failure are
+    independent of their glycosuric actions and may still be present in anuric subjects. Despite the significance
+    of HFpEF in patients with CKD, patients with advanced kidney disease have been excluded from studies investigating
+    anti-heart failure drugs. The effects of SGLT2i in patients under maintenance dialysis are largely unknown.
+    Past pharmacokinetics and pharmacodynamics studies on empagliflozin in patients with end-stage renal disease
+    (ESRD) demonstrated that the use of empagliflozin in patients with ESRD seemed safe, yet its efficacy remains
+    to be explored.
+  label: null
+  note: ''
+- id: 22
+  nct_id: NCT07666698
+  registry_url: https://clinicaltrials.gov/study/NCT07666698
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Metformin Hydrochloride
+    otherNames: null
+    description: Metformin hydrochloride tablets, 250 mg and 500 mg, administered orally with a dose-escalation
+      schedule over 10 weeks to achieve target dose, followed by a maintenance period from Week 10 to Week 52. Dose
+      adjustments based on tolerability and renal function.
+    armGroupLabels:
+    - Metformin Group
+  all_interventions:
+  - Metformin Hydrochloride
+  - Placebo
+  arm_groups:
+  - label: Metformin Group
+    type: EXPERIMENTAL
+    description: 'Metformin hydrochloride tablets administered orally with a dose-escalation schedule to reduce
+      gastrointestinal adverse effects and risk of lactic acidosis. The titration schedule is as follows: Weeks
+      1-2: 250 mg once daily (after dinner); Weeks 3-4: 500 mg once daily (after dinner); Weeks 5-6: 750 mg total
+      daily (500 mg after dinner + 250 mg after breakfast); Weeks 7-8: 1000 mg total daily (500 mg after dinner
+      + 500 mg after breakfast) - target dose; Weeks 9-10: 1250 mg total daily (500 mg after dinner + 750 mg after
+      breakfast) - optional target dose. The maintenance period extends from Week 10 to Week 52, during which patients
+      maintain the target dose or maximum tolerated dose (must be ≥750 mg per day). Dose adjustment or temporary
+      withholding may be considered based on tolerability and renal function (eGFR).'
+    interventionNames:
+    - 'Drug: Metformin Hydrochloride'
+  - label: Placebo Group
+    type: PLACEBO_COMPARATOR
+    description: Matching placebo tablets, identical in appearance to metformin, administered orally following the
+      same dose-escalation schedule as the metformin group (based on tablet count), from Week 1 through Week 52.
+    interventionNames:
+    - 'Drug: Placebo'
+  study_type: INTERVENTIONAL
+  title: Study on the Effect of Metformin in Improving Cardiac Function After Implantation of Left Ventricular Assist
+    Devices
+  summary: 'This study investigates whether metformin, compared with placebo, improves cardiac function in patients
+    after Left Ventricular Assist Device (LVAD) implantation. Metformin is a widely used oral medication for type
+    2 diabetes, but emerging evidence suggests it may have beneficial effects on cardiac metabolism and function
+    independent of its glucose-lowering effects. This is a prospective, multicenter, randomized, double-blind, placebo-controlled
+    trial. A total of 108patients undergoing LVAD implantation will be enrolled from 5 centers in China. Eligible
+    participants will be randomly assigned in a 1:1 ratio to receive either metformin or placebo for 12 months.
+
+
+    The primary outcome is the incidence of Full Responder at 12 months post-implantation. A Full Responder is defined
+    as meeting all of the following four criteria: (1) left ventricular ejection fraction (LVEF) ≥40% and left ventricular
+    end-diastolic diameter (LVEDD) ≤6.0 cm (Utah-Inova Responder criteria); (2) soluble ST2 (sST2) ≤100 ng/mL at
+    both 6 months and 12 months post-implantation; (3) absolute value of left ventricular global longitudinal strain
+    (GLS) ≥12% at 12 months post-implantation.
+
+
+    Secondary outcomes include clini'
+  label: null
+  note: ''
+- id: 23
+  nct_id: NCT03060980
+  registry_url: https://clinicaltrials.gov/study/NCT03060980
+  question: Role of empagliflozin in this trial (the intervention object below names it)
+  compound: empagliflozin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Empagliflozin (oral)
+    otherNames: null
+    description: 10 mg/day and 25 mg/day
+    armGroupLabels:
+    - 'Experimental: Group 2'
+  all_interventions:
+  - ITCA 650 20/60 mcg/day
+  - Empagliflozin (oral)
+  - Glimepiride (oral)
+  arm_groups:
+  - label: 'Experimental: Group 1'
+    type: EXPERIMENTAL
+    description: ITCA 650 20/60 mcg/day
+    interventionNames:
+    - 'Drug: ITCA 650 20/60 mcg/day'
+  - label: 'Experimental: Group 2'
+    type: EXPERIMENTAL
+    description: Empagliflozin 10 mg/day and 25 mg/day
+    interventionNames:
+    - 'Drug: Empagliflozin (oral)'
+  - label: 'Experimental: Group 3'
+    type: EXPERIMENTAL
+    description: Glimepiride 1-6 mg/day
+    interventionNames:
+    - 'Drug: Glimepiride (oral)'
+  study_type: INTERVENTIONAL
+  title: A Phase 3b, Randomized, Active Comparator, Open-label, Multicenter Study to Compare the Efficacy, Safety,
+    and Tolerability of ITCA 650 to Empagliflozin and to Glimepiride as Add-on Therapy to Metformin in Patients
+    With Type 2 Diabetes
+  summary: A Phase 3b, open-label, randomized, multicenter, efficacy, safety, and tolerability study of ITCA 650
+    compared to Empagliflozin and to Glimepiride, as add-on therapy to Metformin in patients with Type 2 diabetes.
+  label: null
+  note: ''
+- id: 24
+  nct_id: NCT06813924
+  registry_url: https://clinicaltrials.gov/study/NCT06813924
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 3
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames: null
+    description: Participants will receive a single dose of metformin orally.
+    armGroupLabels:
+    - 'Period 1: digoxin+pitavastatin+metformin'
+    - 'Period 2: etavopivat+digoxin+pitavastatin+metformin'
+  all_interventions:
+  - Etavopivat
+  - Digoxin
+  - Pitavastatin
+  - Metformin
+  - Midazolam
+  - Rosuvastatin
+  arm_groups:
+  - label: 'Period 1: digoxin+pitavastatin+metformin'
+    type: EXPERIMENTAL
+    description: Participants will receive a single dose of oral digoxin, pitavastatin and metformin.
+    interventionNames:
+    - 'Drug: Digoxin'
+    - 'Drug: Pitavastatin'
+    - 'Drug: Metformin'
+  - label: 'Period 1: midazolam+rosuvastatin'
+    type: EXPERIMENTAL
+    description: Participants will receive a single dose of oral midazolam and rosuvastatin.
+    interventionNames:
+    - 'Drug: Midazolam'
+    - 'Drug: Rosuvastatin'
+  - label: 'Period 2: etavopivat+midazolam'
+    type: EXPERIMENTAL
+    description: Participants will receive a daily dose of oral etavopivat and single dose of oral midazolam.
+    interventionNames:
+    - 'Drug: Etavopivat'
+    - 'Drug: Midazolam'
+  - label: 'Period 2: etavopivat+midazolam+rosuvastatin'
+    type: EXPERIMENTAL
+    description: Participants will receive a daily dose of oral etavopivat, single dose of oral midazolam and rosuvastatin.
+    interventionNames:
+    - 'Drug: Etavopivat'
+    - 'Drug: Midazolam'
+    - 'Drug: Rosuvastatin'
+  - label: 'Period 2: etavopivat+digoxin+pitavastatin+metformin'
+    type: EXPERIMENTAL
+    description: Participants will receive a daily dose of oral etavopivat, single dose of oral digoxin, pitavastatin
+      and metformin.
+    interventionNames:
+    - 'Drug: Etavopivat'
+    - 'Drug: Digoxin'
+    - 'Drug: Pitavastatin'
+    - 'Drug: Metformin'
+  study_type: INTERVENTIONAL
+  title: An Open-Label, Fixed-Sequence Study to Evaluate the Effect of Etavopivat on the Single-Dose Pharmacokinetics
+    of Midazolam, Digoxin, Rosuvastatin, Pitavastatin, and Metformin in Healthy Adult Participants
+  summary: 'The study aims to test if a new medicine called etavopivat potentially affects other medicines in healthy
+    participants. The purpose of the study is to investigate whether the use of etavopivat affects the breakdown
+    and metabolism of commonly used medicines in the body. During the study, participants will receive etavopivat
+    and five different medicines that are already approved and available on the market, and which can be prescribed
+    by doctors. These marketed medicines are called substrate drugs and they are: digoxin, pitavastatin, metformin,
+    midazolam, and rosuvastatin. During a period of the study, participants will take 2 tablets of etavopivat daily
+    for 10 consecutive days. The study will last for about 34 to 64 days.'
+  label: null
+  note: ''
+- id: 25
+  nct_id: NCT00420511
+  registry_url: https://clinicaltrials.gov/study/NCT00420511
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 2
+  intervention:
+    type: DRUG
+    name: metformin
+    otherNames:
+    - glucophage
+    description: metformin 1000 mg twice a day (bid) by mouth (po)
+    armGroupLabels:
+    - Placebo arm
+    - Sitagliptin
+  all_interventions:
+  - Sitagliptin
+  - Placebo
+  - metformin
+  arm_groups:
+  - label: Sitagliptin
+    type: EXPERIMENTAL
+    description: Sitagliptin 100mg once a day (od) by mouth (po)
+    interventionNames:
+    - 'Drug: Sitagliptin'
+    - 'Drug: metformin'
+  - label: Placebo arm
+    type: PLACEBO_COMPARATOR
+    description: Placebo once a day (od) by mouth (po)
+    interventionNames:
+    - 'Drug: Placebo'
+    - 'Drug: metformin'
+  study_type: INTERVENTIONAL
+  title: A Randomized Controlled Pilot Study Assessing the Effect of Sitagliptin on the Preservation of Beta-Cell
+    Function in Patients With Type 2 Diabetes
+  summary: 'Type 2 diabetes mellitus (T2DM) is a chronic metabolic disorder characterized by progressive deterioration
+    in the function of the pancreatic beta-cells, which are the cells that produce and secrete insulin (the hormone
+    primarily responsible for the handling of glucose in the body). The investigators propose a double-blind, randomized
+    controlled pilot study comparing the effect of sitagliptin (a novel anti-diabetic drug with beta-cell protective
+    potential) versus placebo, on the preservation of beta-cell function over one year in patients with T2DM on
+    metformin, the first-line agent for the treatment of T2DM (ie. the study groups will be (i) sitagliptin and
+    metformin versus (ii) placebo and metformin). This study may demonstrate an important beta-cell protective capacity
+    of sitagliptin.
+
+
+    Hypothesis: In patients with T2DM on metformin, treatment with the DPP-IV inhibitor sitagliptin will preserve
+    pancreatic beta-cell function.'
+  label: null
+  note: ''
+- id: 26
+  nct_id: NCT07859150
+  registry_url: https://clinicaltrials.gov/study/NCT07859150
+  question: Role of semaglutide in this trial (the intervention object below names it)
+  compound: semaglutide
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Semaglutide weekly injection
+    otherNames: null
+    description: 'Semaglutide is supplied in pre-filled pens and administered subcutaneously once weekly, on the
+      same weekday, at any time of day. Dose escalation: 0.25 mg (weeks 0-3), 0.5 mg (weeks 4-7), 1.0 mg (weeks
+      8-11), 1.7 mg (weeks 12-15), 2.4 mg from week 16 to week 68. Participants with unacceptable gastrointestinal
+      symptoms may extend an escalation step by 4 weeks or down-titrate one step; the maintenance dose must be at
+      least 1.0 mg for the participant to remain on treatment, mirroring the tolerance management applied in BARI-STEP.'
+    armGroupLabels:
+    - GLP 1
+  all_interventions:
+  - Semaglutide weekly injection
+  - Placabo
+  arm_groups:
+  - label: GLP 1
+    type: ACTIVE_COMPARATOR
+    description: Once-weekly subcutaneous semaglutide, escalated over 16 weeks (0.25 / 0.5 / 1.0 / 1.7 / 2.4 mg)
+      to 2.4 mg or maximum tolerated dose (minimum 1.0 mg), for 68 weeks, as an adjunct to structured lifestyle
+      intervention (500 kcal/day deficit, \>=150 min/week moderate activity, protein \>=60 g/day)
+    interventionNames:
+    - 'Drug: Semaglutide weekly injection'
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: Matched placebo pen, identical escalation schedule, with the same lifestyle intervention
+    interventionNames:
+    - 'Drug: Placabo'
+  study_type: INTERVENTIONAL
+  title: 'Semaglutide 2.4 mg Once Weekly for Recurrent Weight Gain After Metabolic and Bariatric Surgery (RESURGE):
+    a Randomized, Double-Blind, Placebo-Controlled Trial'
+  summary: 'Metabolic and bariatric surgery (MBS) is the most effective durable treatment for severe obesity, yet
+    a clinically meaningful proportion of patients experience recurrent weight gain after an initially successful
+    operation. Until recently, research and care in this area were limited by the absence of standardized definitions:
+    reported prevalence of weight recurrence ranged from under 10% to over 90% depending on the metric and threshold
+    applied, and treatment decisions varied by provider.
+
+
+    In 2026, an international two-round modified Delphi study of 66 experts across surgery, obesity medicine, gastroenterology,
+    endocrinology, dietetics, and psychology (Wills et al.) established consensus definitions. The consensus specifies:
+    (i) percentage total weight loss (%TWL) as the preferred measurement approach (94.6% agreement); (ii) surgical
+    non-response as \<10% TWL at 12 months (73.0%); (iii) recurrent weight gain as regain of more than 25% of lost
+    weight from nadir (70.3%); and (iv) a change of up to 10% in percentage excess weight loss from nadir as a normal
+    physiologic fluctuation not requiring intervention (83.8%). The consensus also endorsed ''suboptimal'' as the
+    preferred terminology '
+  label: null
+  note: ''
+- id: 27
+  nct_id: NCT00391001
+  registry_url: https://clinicaltrials.gov/study/NCT00391001
+  question: Role of taurine in this trial (the intervention object below names it)
+  compound: taurine
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Taurine
+    otherNames: null
+    description: double-blind, placebo-controlled, adjunctive medication
+    armGroupLabels:
+    - '1'
+    - '2'
+  all_interventions:
+  - Taurine
+  arm_groups:
+  - label: '1'
+    type: EXPERIMENTAL
+    description: null
+    interventionNames:
+    - 'Drug: Taurine'
+  - label: '2'
+    type: PLACEBO_COMPARATOR
+    description: null
+    interventionNames:
+    - 'Drug: Taurine'
+  study_type: INTERVENTIONAL
+  title: 'Taurine as an Anti-Manic Agent: A Double-Blind, Placebo-Controlled Study in Adolescents With Bipolar Disorder'
+  summary: 'Recently, McLean hospital conducted a 4 month taurine study which showed a reduction in mania ratings.
+    As a follow-up to the preliminary taurine study, and complementary to the currently ongoing double-blind, placebo-controlled
+    trial for taurine in adults with bipolar disorder, this study will target adolescent bipolar subjects (type
+    I) with symptoms of mania or mixed mania. To our knowledge, this would be the first study to evaluate the effects
+    of the novel compound taurine in adolescent subjects with bipolar disorder.
+
+
+    We hypothesize there will be a positive response in some adolescents from taurine treatment, and this positive
+    response will be greater than that expected by chance. This study may demonstrate that taurine is a well-tolerated
+    and effective adjunct treatment for mania in bipolar disorder.'
+  label: null
+  note: ''
+- id: 28
+  nct_id: NCT06844669
+  registry_url: https://clinicaltrials.gov/study/NCT06844669
+  question: Role of empagliflozin in this trial (the intervention object below names it)
+  compound: empagliflozin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Empagliflozin
+    otherNames:
+    - Jardiance
+    description: 10 mg in the morning with or without food
+    armGroupLabels:
+    - 'Arm 2: Empagliflozin QD'
+    - 'Arm 3: Carvedilol BID + Empagliflozin QD'
+  all_interventions:
+  - Carvedilol
+  - Empagliflozin
+  arm_groups:
+  - label: 'Arm 1: Carvedilol BID'
+    type: EXPERIMENTAL
+    description: Carvedilol by mouth twice per day (BID) for 12 weeks.
+    interventionNames:
+    - 'Drug: Carvedilol'
+  - label: 'Arm 2: Empagliflozin QD'
+    type: EXPERIMENTAL
+    description: Empagliflozin by mouth daily (QD) for 12 weeks.
+    interventionNames:
+    - 'Drug: Empagliflozin'
+  - label: 'Arm 3: Carvedilol BID + Empagliflozin QD'
+    type: EXPERIMENTAL
+    description: Carvedilol by mouth twice per day (BID) for 12 weeks and empagliflozin by mouth daily (QD) for
+      12 weeks.
+    interventionNames:
+    - 'Drug: Carvedilol'
+    - 'Drug: Empagliflozin'
+  - label: 'Arm 4: Usual Care'
+    type: NO_INTERVENTION
+    description: No medications.
+    interventionNames: null
+  study_type: INTERVENTIONAL
+  title: 'HER2HEART-US: Primary Prevention of Cardiotoxicity in Breast Cancer Patients Receiving HER2-directed Therapy:
+    a Pilot 2x2 Factorial Randomized Controlled Trial'
+  summary: 'Ten to 15% of patients with breast cancer are HER2 positive, with treatment focused on targeting the
+    HER2 receptor. Although these treatments are generally well tolerated, they are associated with an increased
+    risk of cardiomyopathy. There are currently no treatments proven to prevent the cardiotoxicities associated
+    with HER2-targeted therapy, but there is convincing preclinical data demonstrating that prophylactic treatment
+    with a beta blocker (BB) and/or an SGLT2 inhibitor (SGLT2i) may each independently prevent cardiotoxicity and
+    HER-targeted treatment interruptions.
+
+
+    The proposed pilot study will assess the feasibility and preliminary efficacy and safety of therapy with both
+    a beta blocker (carvedilol) and an SGLT2 inhibitor (empagliflozin), alone and in combination, in a population
+    initiating HER2-directed therapy for HER2+ breast cancer.
+
+
+    The hypotheses being tested in this study are:
+
+
+    1. It is feasible to recruit 20-40 patients over 6 months
+
+    2. There are no differences in tolerability and safety between participants taking carvedilol and/or empagliflozin
+    and those receiving usual care.'
+  label: null
+  note: ''
+- id: 29
+  nct_id: NCT02637973
+  registry_url: https://clinicaltrials.gov/study/NCT02637973
+  question: Role of empagliflozin in this trial (the intervention object below names it)
+  compound: empagliflozin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Empagliflozin
+    otherNames:
+    - Jardiance
+    description: 25 mg once daily
+    armGroupLabels:
+    - Empagliflozin
+  all_interventions:
+  - Empagliflozin
+  - Placebo
+  arm_groups:
+  - label: Empagliflozin
+    type: EXPERIMENTAL
+    description: Empagliflozin, film-tablet, 25mg once daily
+    interventionNames:
+    - 'Drug: Empagliflozin'
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: Placebo, once daily
+    interventionNames:
+    - 'Drug: Placebo'
+  study_type: INTERVENTIONAL
+  title: Effects of Empagliflozin on Liver Fat Content, Energy Metabolism and Body Composition in Patients With
+    Type 2 Diabetes
+  summary: The effects of empagliflozin treatment on hepatocellular lipid content, liver energy metabolism and body
+    composition will be investigated in a multicentre, prospective, placebo-controlled, double-blind, randomized,
+    2-arm parallel, interventional and exploratory pilot study in patients with newly diagnosed type 2 diabetes.
+  label: null
+  note: ''
+- id: 30
+  nct_id: NCT07563322
+  registry_url: https://clinicaltrials.gov/study/NCT07563322
+  question: Role of nr in this trial (the intervention object below names it)
+  compound: nr
+  intervention_index: 0
+  intervention:
+    type: DIETARY_SUPPLEMENT
+    name: Nicotinamide Riboside (NR)
+    otherNames: null
+    description: Participants will be randomized to receive either 1000mg NR Daily or a placebo for 6 weeks, followed
+      by a 3-week washout period. After this, they will receive the alternate treatment for an additional 6 weeks.
+    armGroupLabels:
+    - Nicotinamide riboside (NR)
+  all_interventions:
+  - Nicotinamide Riboside (NR)
+  - Placebo
+  arm_groups:
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: Placebo portion of the trial
+    interventionNames:
+    - 'Drug: Placebo'
+  - label: Nicotinamide riboside (NR)
+    type: ACTIVE_COMPARATOR
+    description: NR Portion of the trial
+    interventionNames:
+    - 'Dietary Supplement: Nicotinamide Riboside (NR)'
+  study_type: INTERVENTIONAL
+  title: Mechanistic Study of Nicotinamide Riboside on NAD+ Biology in Individuals With Combined Pulmonary Hypertension
+  summary: 'Pulmonary hypertension (PH) is a serious condition that puts strain on the heart and lungs and often
+    leads to frequent hospital stays and shortened life expectancy. The most common cause is heart disease affecting
+    the left side of the heart. A particularly high-risk form, called combined pre- and post-capillary pulmonary
+    hypertension (CPH), occurs in about one in four people with heart failure. There are currently no approved treatments
+    for CPH, and many patients develop right-sided heart failure and die earlier than expected.
+
+
+    This study is based on a new approach that uses advanced computer methods to analyze a patient''s unique biology
+    and identify potential drug targets. Using this method, we identified nicotinamide riboside (NR) as a promising
+    option for people with CPH. NR is a form of vitamin B3 that helps the body make NAD⁺, a substance essential
+    for how cells produce energy and stay healthy. NAD⁺ plays an important role in how heart and blood vessel cells
+    function.
+
+
+    Previous research in animals suggests NR may help improve blood vessel changes in the lungs and support heart
+    function. NR has also shown potential benefits in human studies related to cell energy, mitochondrial'
+  label: null
+  note: ''
+- id: 31
+  nct_id: NCT01821027
+  registry_url: https://clinicaltrials.gov/study/NCT01821027
+  question: Role of canagliflozin in this trial (the intervention object below names it)
+  compound: canagliflozin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Canagliflozin (JNJ-28431754)
+    otherNames:
+    - JNJ-28431754
+    description: One 300 mg dose (ie, one 100 mg and one 200 mg over-encapsulated tablet) taken orally (by mouth)
+      on Days 2 through Day 7.
+    armGroupLabels:
+    - Canagliflozin + simvastatin
+  all_interventions:
+  - Simvastatin
+  - Canagliflozin (JNJ-28431754)
+  arm_groups:
+  - label: Canagliflozin + simvastatin
+    type: EXPERIMENTAL
+    description: Each volunteer will receive a single dose of simvastatin on Day 1, followed by canagliflozin (JNJ-28431754)
+      once daily on Days 2 through 6. On Day 7 volunteers will receive a single dose of simvastatin in combination
+      with a single dose of canagliflozin.
+    interventionNames:
+    - 'Drug: Simvastatin'
+    - 'Drug: Canagliflozin (JNJ-28431754)'
+  study_type: INTERVENTIONAL
+  title: A Open-Label, Single Sequence Study to Assess the Pharmacokinetics and Pharmacodynamics of Simvastatin
+    Alone and of Simvastatin in Combination With JNJ-28431754 in Healthy Adult Subjects
+  summary: The purpose of this study is to determine how multiple doses of canagliflozin (JNJ-28431754) affect the
+    pharmacokinetics (ie, how the body affects the drug) and pharmacodynamics (ie, how the drug affects the body)
+    of a single dose of simvastatin.
+  label: null
+  note: ''
+- id: 32
+  nct_id: NCT05081219
+  registry_url: https://clinicaltrials.gov/study/NCT05081219
+  question: Role of empagliflozin in this trial (the intervention object below names it)
+  compound: empagliflozin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Empagliflozin 10 MG
+    otherNames: null
+    description: Participants will be assigned to receive Empagliflozin 10 mg capsules to be taken by mouth once
+      daily.
+    armGroupLabels:
+    - Empagliflozin and Intranasal Insulin Placebo
+    - Intranasal Insulin and Empagliflozin
+  all_interventions:
+  - Insulin (Humulin® R U-100)
+  - Empagliflozin 10 MG
+  - Aptar Pharma CPS Intranasal Delivery Device
+  - Placebo (Insulin Diluent)
+  - Placebo (Capsules)
+  arm_groups:
+  - label: Intranasal Insulin and Empagliflozin Placebo
+    type: EXPERIMENTAL
+    description: '* 40 IU of intranasal insulin administered using the Aptar CPS device 30 minutes prior to eating
+      and 30 minutes before bedtime for a total of four (4) times daily
+
+      * Placebo capsules taken by mouth 30 minutes before breakfast once daily'
+    interventionNames:
+    - 'Drug: Insulin (Humulin® R U-100)'
+    - 'Device: Aptar Pharma CPS Intranasal Delivery Device'
+    - 'Drug: Placebo (Capsules)'
+  - label: Empagliflozin and Intranasal Insulin Placebo
+    type: EXPERIMENTAL
+    description: '* Empagliflozin 10 mg capsules taken by mouth 30 minutes before breakfast once daily
+
+      * 40 IU of intranasal insulin diluent (placebo) administered using the Aptar CPS device 30 minutes prior to
+      eating and 30 minutes before bedtime for a total of four (4) times daily'
+    interventionNames:
+    - 'Drug: Empagliflozin 10 MG'
+    - 'Device: Aptar Pharma CPS Intranasal Delivery Device'
+    - 'Drug: Placebo (Insulin Diluent)'
+  - label: Intranasal Insulin and Empagliflozin
+    type: EXPERIMENTAL
+    description: '* 40 IU of intranasal insulin administered using the Aptar CPS device 30 minutes prior to eating
+      and 30 minutes before bedtime for a total of four (4) times daily
+
+      * Empagliflozin 10 mg capsules taken by mouth 30 minutes before breakfast once daily'
+    interventionNames:
+    - 'Drug: Insulin (Humulin® R U-100)'
+    - 'Drug: Empagliflozin 10 MG'
+    - 'Device: Aptar Pharma CPS Intranasal Delivery Device'
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: '* 40 IU of intranasal insulin diluent (placebo) administered using the Aptar CPS device 30 minutes
+      prior to eating and 30 minutes before bedtime for a total of four (4) times daily
+
+      * Placebo capsules taken by mouth 30 minutes before breakfast once daily'
+    interventionNames:
+    - 'Device: Aptar Pharma CPS Intranasal Delivery Device'
+    - 'Drug: Placebo (Insulin Diluent)'
+    - 'Drug: Placebo (Capsules)'
+  study_type: INTERVENTIONAL
+  title: Study of Nasal Insulin to Fight Forgetfulness - Combination Intranasal Insulin and Empagliflozin Trial
+  summary: The proposed pilot study will provide safety and efficacy preliminary data regarding singular and combined
+    effects of two therapeutic approaches, intranasal insulin and treatment with the sodium-glucose cotransporter
+    type 2 inhibitor (SGLT2i) empagliflozin, to correct bioenergetic and vascular dysfunction in adults with preclinical
+    Alzheimer's disease (AD) and amnestic mild cognitive impairment (aMCI) or early AD.
+  label: null
+  note: ''
+- id: 33
+  nct_id: NCT02792400
+  registry_url: https://clinicaltrials.gov/study/NCT02792400
+  question: Role of empagliflozin in this trial (the intervention object below names it)
+  compound: empagliflozin
+  intervention_index: 5
+  intervention:
+    type: DRUG
+    name: Empagliflozin
+    otherNames:
+    - Jardiance
+    description: SGLT2-inhibitor
+    armGroupLabels:
+    - 'B3: GRA-placebo + MEAL + SGLT2-active'
+    - 'B4: GRA-active + MEAL + SGLT2-active'
+  all_interventions:
+  - LY2403021
+  - LY2403021 placebo
+  - Standardised liquid meal
+  - Linagliptin
+  - Linagliptin placebo
+  - Empagliflozin
+  - Empagliflozin placebo
+  arm_groups:
+  - label: 'A1: GRA-placebo + MEAL + DPP4-placebo'
+    type: PLACEBO_COMPARATOR
+    description: LY2409021 placebo + 4 hour standardised liquid mixed-meal test + linagliptin placebo
+    interventionNames:
+    - 'Drug: LY2403021 placebo'
+    - 'Procedure: Standardised liquid meal'
+    - 'Drug: Linagliptin placebo'
+  - label: 'A2: GRA-active + MEAL + DPP4-placebo'
+    type: PLACEBO_COMPARATOR
+    description: 300 mg LY2409021 + 4 hour standardised liquid mixed-meal test + linagliptin placebo
+    interventionNames:
+    - 'Drug: LY2403021'
+    - 'Procedure: Standardised liquid meal'
+    - 'Drug: Linagliptin placebo'
+  - label: 'A3: GRA-placebo + MEAL + DPP4-active'
+    type: ACTIVE_COMPARATOR
+    description: LY2409021 placebo + 4 hour standardised liquid mixed-meal test + 5 mg linagliptin (Trajenta)
+    interventionNames:
+    - 'Drug: LY2403021 placebo'
+    - 'Procedure: Standardised liquid meal'
+    - 'Drug: Linagliptin'
+  - label: 'A4: GRA-active + MEAL + DPP4-active'
+    type: ACTIVE_COMPARATOR
+    description: 300 mg LY2409021 + 4 hour standardised liquid mixed-meal test + 5 mg linagliptin (Trajenta)
+    interventionNames:
+    - 'Drug: LY2403021'
+    - 'Procedure: Standardised liquid meal'
+    - 'Drug: Linagliptin'
+  - label: 'B1: GRA-placebo + MEAL + SGLT2-placebo'
+    type: PLACEBO_COMPARATOR
+    description: LY2409021 placebo + 4 hour standardised liquid mixed-meal test + empagliflozin placebo
+    interventionNames:
+    - 'Drug: LY2403021 placebo'
+    - 'Procedure: Standardised liquid meal'
+    - 'Drug: Empagliflozin placebo'
+  - label: 'B2: GRA-active + MEAL + SGLT2-placebo'
+    type: PLACEBO_COMPARATOR
+    description: 300 mg LY2409021 + 4 hour standardised liquid mixed-meal test + empagliflozin placebo
+    interventionNames:
+    - 'Drug: LY2403021'
+    - 'Procedure: Standardised liquid meal'
+    - 'Drug: Empagliflozin placebo'
+  - label: 'B3: GRA-placebo + MEAL + SGLT2-active'
+    type: ACTIVE_COMPARATOR
+    description: LY2409021 placebo + 4 hour standardised liquid mixed-meal test + 25 mg empagliflozin (Jardiance)
+    interventionNames:
+    - 'Drug: LY2403021 placebo'
+    - 'Procedure: Standardised liquid meal'
+    - 'Drug: Empagliflozin'
+  - label: 'B4: GRA-active + MEAL + SGLT2-active'
+    type: ACTIVE_COMPARATOR
+    description: 300 mg LY2409021 + 4 hour standardised liquid mixed-meal test + 25 mg empagliflozin (Jardiance)
+    interventionNames:
+    - 'Drug: LY2403021'
+    - 'Procedure: Standardised liquid meal'
+    - 'Drug: Empagliflozin'
+  study_type: INTERVENTIONAL
+  title: The Role of Glucagon in the Effects of Dipeptidyl Peptidase-4 Inhibitors and Sodium-glucose Co-transporter-2
+    Inhibitors
+  summary: 'In normal physiology, glucagon from pancreatic alpha cells plays an important role in maintaining glucose
+    homeostasis via its regulatory effect on hepatic glucose production. Patients with type 2 diabetes exhibit elevated
+    plasma glucagon levels in the fasting state, and in response to ingestion of glucose or a mixed meal.glucagon,
+    glucagon concentrations fail to decrease appropriately and may even increase. This diabetic hyperglucagonaemia
+    may therefore contribute importantly to the hyperglycaemia of the patients.
+
+
+    Several glucose-lowering treatment modalities have been shown to affect glucagon levels in patients with type
+    2 diabetes, but the role of glucagon in the glucose-lowering effects of these treatment modalities has been
+    difficult to discern. By using a glucagon receptor antagonist (GRA) the investigators will exploit glucagon
+    receptor antagonism to delineate the role of glucagon during treatment with sodium-glucose co-transporter 2
+    (SGLT2) inhibitors and dipeptidyl peptidase 4 (DPP-4) inhibitors, which have been shown to increase and decrease
+    plasma glucagon levels, respectively.'
+  label: null
+  note: ''
+- id: 34
+  nct_id: NCT01707316
+  registry_url: https://clinicaltrials.gov/study/NCT01707316
+  question: Role of canagliflozin in this trial (the intervention object below names it)
+  compound: canagliflozin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: 'Treatment B: Canagliflozin 300 mg'
+    otherNames:
+    - JNJ-28431754
+    description: Volunteers will receive one 300 mg over-encapsulated tablet of canagliflozin as a single oral dose
+      on Day 1.
+    armGroupLabels:
+    - 'Sequence 1: Treatment A-B-C'
+    - 'Sequence 2: Treatment B-C-A'
+    - 'Sequence 3: Treatment C-A-B'
+  all_interventions:
+  - 'Treatment A: Canagliflozin 100 mg'
+  - 'Treatment B: Canagliflozin 300 mg'
+  - 'Treatment C: Placebo'
+  arm_groups:
+  - label: 'Sequence 1: Treatment A-B-C'
+    type: EXPERIMENTAL
+    description: The study consists of 3 single-dose treatment periods. Each treatment period will be 5 days in
+      duration. Successive treatment periods will be separated by a washout period (with no medication) of 10 days.
+    interventionNames:
+    - 'Drug: Treatment A: Canagliflozin 100 mg'
+    - 'Drug: Treatment B: Canagliflozin 300 mg'
+    - 'Other: Treatment C: Placebo'
+  - label: 'Sequence 2: Treatment B-C-A'
+    type: EXPERIMENTAL
+    description: The study consists of 3 single-dose treatment periods. Each treatment period will be 5 days in
+      duration. Successive treatment periods will be separated by a washout period (with no medication) of 10 days.
+    interventionNames:
+    - 'Drug: Treatment A: Canagliflozin 100 mg'
+    - 'Drug: Treatment B: Canagliflozin 300 mg'
+    - 'Other: Treatment C: Placebo'
+  - label: 'Sequence 3: Treatment C-A-B'
+    type: EXPERIMENTAL
+    description: The study consists of 3 single-dose treatment periods. Each treatment period will be 5 days in
+      duration. Successive treatment periods will be separated by a washout period (with no medication) of 10 days.
+    interventionNames:
+    - 'Drug: Treatment A: Canagliflozin 100 mg'
+    - 'Drug: Treatment B: Canagliflozin 300 mg'
+    - 'Other: Treatment C: Placebo'
+  study_type: INTERVENTIONAL
+  title: A Double-Blind, Randomized, Placebo-Controlled, 3-Way Cross-Over Study to Evaluate the Single-Dose Pharmacokinetics
+    and Pharmacodynamics of JNJ-28431754 (Canagliflozin) in Healthy Chinese Subjects
+  summary: The purpose of this study is to evaluate the pharmacokinetics (what the body does to the medication)
+    and pharmacodynamics (the action of the medication on the body) of JNJ-28431754 (canagliflozin) and its main
+    metabolites (break-down products) following 2 different doses of canagliflozin in healthy Chinese volunteers.
+    Safety and tolerability of canagliflozin will also be assessed.
+  label: null
+  note: ''
+- id: 35
+  nct_id: NCT03072082
+  registry_url: https://clinicaltrials.gov/study/NCT03072082
+  question: Role of aspirin in this trial (the intervention object below names it)
+  compound: aspirin
+  intervention_index: 2
+  intervention:
+    type: DRUG
+    name: Aspirin Enteric-coated Tablets
+    otherNames: null
+    description: 100 mg tablet, one tablet daily.
+    armGroupLabels:
+    - Danlou Tablet
+    - Danlou Tablet placebo
+  all_interventions:
+  - Danlou Tablet
+  - DanLou Tablet placebo
+  - Aspirin Enteric-coated Tablets
+  - Clopidogrel Hydrogen Sulfate 75 MG Oral Tablet
+  - Atorvastatin calcium
+  - Isosorbide Mononitrate Tab 20 MG
+  - Metoprolol Tartrate Tab 25 MG
+  - Trimetazidine Dihydrochloride Tablets
+  arm_groups:
+  - label: Danlou Tablet
+    type: EXPERIMENTAL
+    description: Danlou 0.3g tablet by mouth, 5 tablets three times daily for 6 months \& conventional western medicine
+      (including Aspirin Enteric-coated Tablets, Clopidogrel Hydrogen Sulfate 75 MG Oral Tablet, Atorvastatin Calcium,
+      Isosorbide Mononitrate Tab 20 MG, Metoprolol Tartrate Tab 25 MG, Trimetazidine Dihydrochloride Tablets)
+    interventionNames:
+    - 'Drug: Danlou Tablet'
+    - 'Drug: Aspirin Enteric-coated Tablets'
+    - 'Drug: Clopidogrel Hydrogen Sulfate 75 MG Oral Tablet'
+    - 'Drug: Atorvastatin calcium'
+    - 'Drug: Isosorbide Mononitrate Tab 20 MG'
+    - 'Drug: Metoprolol Tartrate Tab 25 MG'
+    - 'Drug: Trimetazidine Dihydrochloride Tablets'
+  - label: Danlou Tablet placebo
+    type: PLACEBO_COMPARATOR
+    description: Placebo Danlou 0.3g tablet by mouth, 5 tablets three times daily for 6 months \& conventional western
+      medicine (including Aspirin Enteric-coated Tablets, Clopidogrel Hydrogen Sulfate 75 MG Oral Tablet, Atorvastatin
+      Calcium, Isosorbide Mononitrate Tab 20 MG, Metoprolol Tartrate Tab 25 MG, Trimetazidine Dihydrochloride Tablets)
+    interventionNames:
+    - 'Drug: DanLou Tablet placebo'
+    - 'Drug: Aspirin Enteric-coated Tablets'
+    - 'Drug: Clopidogrel Hydrogen Sulfate 75 MG Oral Tablet'
+    - 'Drug: Atorvastatin calcium'
+    - 'Drug: Isosorbide Mononitrate Tab 20 MG'
+    - 'Drug: Metoprolol Tartrate Tab 25 MG'
+    - 'Drug: Trimetazidine Dihydrochloride Tablets'
+  study_type: INTERVENTIONAL
+  title: Study of Curative Effect Evaluation of DanLou Tablet on Coronary Artery Disease Not Amenable to Revascularization
+    on the Basis of Western Medicine Therapy
+  summary: The purpose of this study is to determine whether Danlou Tablet is effective in the treatment of coronary
+    artery disease not amenable to revascularization on the basis of western medicine therapy.
+  label: null
+  note: ''
+- id: 36
+  nct_id: NCT05537233
+  registry_url: https://clinicaltrials.gov/study/NCT05537233
+  question: Role of semaglutide in this trial (the intervention object below names it)
+  compound: semaglutide
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Semaglutide
+    otherNames: null
+    description: Semaglutide up to 1 mg per week in addition to standard closed-loop therapy
+    armGroupLabels:
+    - Semaglutide
+  all_interventions:
+  - Semaglutide
+  - Placebo
+  arm_groups:
+  - label: Semaglutide
+    type: EXPERIMENTAL
+    description: Participants in this group will receive semaglutide once weekly injection in addition to their
+      standard closed-loop therapy
+    interventionNames:
+    - 'Drug: Semaglutide'
+  - label: Control
+    type: PLACEBO_COMPARATOR
+    description: Participants in this group will receive placebo once weekly injection in addition to their standard
+      closed-loop therapy
+    interventionNames:
+    - 'Drug: Placebo'
+  study_type: INTERVENTIONAL
+  title: Efficacy and Safety of Once Weekly Semaglutide in Adults With Obesity and Inadequately Controlled Type
+    1 Diabetes Using Hybrid Closed-Loop System.
+  summary: The purpose of this study is to assess the use of once weekly semaglutide injection in inadequately controlled
+    obese adults with type 1 diabetes (T1D) using FDA-approved hybrid closed-loop therapies.
+  label: null
+  note: ''
+- id: 37
+  nct_id: NCT07567742
+  registry_url: https://clinicaltrials.gov/study/NCT07567742
+  question: Role of taurine in this trial (the intervention object below names it)
+  compound: taurine
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Taurine
+    otherNames: null
+    description: Oral taurine 1 g twice daily, administered from 3 days before the start of radiotherapy until 1
+      week after the completion of radiotherapy.
+    armGroupLabels:
+    - Taurine
+  all_interventions:
+  - Taurine
+  arm_groups:
+  - label: Taurine
+    type: EXPERIMENTAL
+    description: Oral taurine 1 g twice daily, starting 3 days before radiotherapy until 1 week after completion
+      of radiotherapy, plus standard of care for RIOM.
+    interventionNames:
+    - 'Drug: Taurine'
+  - label: Control
+    type: NO_INTERVENTION
+    description: Patients in the control arm will receive the standard of care for RIOM.
+    interventionNames: null
+  study_type: INTERVENTIONAL
+  title: 'Taurine for the Prevention and Treatment of Radiation-induced Oral Mucositis in Patients With Nasopharyngeal
+    Carcinoma: a Single-center, Open-label, Randomized Phase 2 Clinical Trial'
+  summary: This clinical trial aims to understand whether taurine can prevent and reduce severe radiation-induced
+    oral mucositis in patients with nasopharyngeal carcinoma undergoing radiotherapy.
+  label: null
+  note: ''
+- id: 38
+  nct_id: NCT01513070
+  registry_url: https://clinicaltrials.gov/study/NCT01513070
+  question: Role of aspirin in this trial (the intervention object below names it)
+  compound: aspirin
+  intervention_index: 5
+  intervention:
+    type: DRUG
+    name: Aspirin Enteric-coated Tablets
+    otherNames: null
+    description: Aspirin Enteric-coated Tablets，100mg，qd，po. for six months
+    armGroupLabels:
+    - Isosorbide Dinitrate group
+  all_interventions:
+  - Quick-Acting Heart Reliever
+  - Isosorbide Dinitrate
+  - Placebo of Isosorbide Dinitrate
+  - Aspirin Enteric-coated Tablets
+  - Placebo of Quick-Acting Heart Reliever
+  - Aspirin Enteric-coated Tablets
+  arm_groups:
+  - label: Quick-Acting Heart Reliever group
+    type: EXPERIMENTAL
+    description: 'Drug: Quick-Acting Heart Reliever and Placebo of isosorbide dinitrate and Aspirin Enteric-coated
+      Tablets'
+    interventionNames:
+    - 'Drug: Quick-Acting Heart Reliever'
+    - 'Drug: Placebo of Isosorbide Dinitrate'
+    - 'Drug: Aspirin Enteric-coated Tablets'
+  - label: Isosorbide Dinitrate group
+    type: ACTIVE_COMPARATOR
+    description: Isosorbide Dinitrate and Placebo of Quick-Acting Heart Reliever and Aspirin Enteric-coated Tablets
+    interventionNames:
+    - 'Drug: Isosorbide Dinitrate'
+    - 'Drug: Placebo of Quick-Acting Heart Reliever'
+    - 'Drug: Aspirin Enteric-coated Tablets'
+  study_type: INTERVENTIONAL
+  title: A Randomized Double-blind Placebo-controlled Clinical Trials of the Blood-quickening Stasis-transforming
+    Formula Quick-Acting Heart Reliever for Patients With Moderate Coronary Stenosis
+  summary: This study investigates the effective power of angina pectoris after Quick-Acting Heart Reliever and
+    isosorbide dinitrate interventing respectively the patients with moderate coronary stenosis for six months.
+    At the same time, the studying will assess the plaque, myocardial blood-supplying,quality of life and observe
+    the end point of the heart (including the myocardial revascularization, death and myocardial infarction). The
+    purpose is to study the function of the blood-quickening stasis-transforming formula Quick-Acting Heart Reliever
+    for moderate coronary stenosis lesions.
+  label: null
+  note: ''
+- id: 39
+  nct_id: NCT06475586
+  registry_url: https://clinicaltrials.gov/study/NCT06475586
+  question: Role of semaglutide in this trial (the intervention object below names it)
+  compound: semaglutide
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Semaglutide
+    otherNames:
+    - ozempic
+    description: 0.25mg 4 weeks, 0.5mg per 4 weeks and 1.0mg per 4 weeks, totally 12 weeks
+    armGroupLabels:
+    - semaglutide
+  all_interventions:
+  - Semaglutide
+  arm_groups:
+  - label: semaglutide
+    type: EXPERIMENTAL
+    description: The initial dose of the medicine is 0.25 mg once a week, for the duration of 4 weeks. Then the
+      dose is increased to 0.5 mg per week, for the duration of 4 weeks. After at least 4 weeks, the dose can be
+      increased from 0.5 mg to 1 mg per 4 week. Totally 12 weeks
+    interventionNames:
+    - 'Drug: Semaglutide'
+  - label: controled group
+    type: NO_INTERVENTION
+    description: Patients with DMT2 and psoriasis, who are already on metformin therapy in the maximally tolerated
+      dose and other oral antidiabetics, except on therapy with GLP-1 RA and SGLT-2 inhibitors.
+    interventionNames: null
+  study_type: INTERVENTIONAL
+  title: Effect of Semaglutide on the Inflammatory Response and Clinical Course of Psoriatic Lesions in Patients
+    With Type 2 Diabetes Mellitus
+  summary: The use of semaglutide in patients with DMT2 and psoriasis contributes to improving the clinical picture
+    of psoriasis and reducing the inflammatory response
+  label: null
+  note: ''
+- id: 40
+  nct_id: NCT02570672
+  registry_url: https://clinicaltrials.gov/study/NCT02570672
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames: null
+    description: Subjects will be randomized to metformin titrated to 1000mg twice daily as tolerated.
+    armGroupLabels:
+    - Metformin
+  all_interventions:
+  - Metformin
+  - Placebo
+  arm_groups:
+  - label: Metformin
+    type: EXPERIMENTAL
+    description: Subjects will be randomized to metformin (titrated up to 1000 mg twice daily, as tolerated)
+    interventionNames:
+    - 'Drug: Metformin'
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: Subjects will be randomized to metformin (titrated up to 1000 mg twice daily, as tolerated) vs.
+      placebo.
+    interventionNames:
+    - 'Drug: Placebo'
+  study_type: INTERVENTIONAL
+  title: Metformin for Preventing Frailty in High-risk Older Adults
+  summary: Frailty is a geriatric syndrome which leads to poor health outcomes in older adults, such as falls, disability,
+    hospitalization, institutionalization, and death. Due to the dramatic growth in the U.S. aging population and
+    the health care costs associated with frailty (estimated at more than $18 billion per year), frailty is a major
+    health care problem. There has been little research into potential pharmacologic interventions that would delay
+    or reduce the incidence of frailty. Thus, the major goal of this study is to test metformin as a novel intervention
+    for the prevention of frailty. The investigators propose that diabetes/insulin resistance and inflammation are
+    major contributors to frailty, and that the use of metformin to modulate diabetes/insulin resistance and inflammation
+    will prevent and/or ameliorate the progression of frailty.
+  label: null
+  note: ''
+- id: 41
+  nct_id: NCT03192059
+  registry_url: https://clinicaltrials.gov/study/NCT03192059
+  question: Role of aspirin in this trial (the intervention object below names it)
+  compound: aspirin
+  intervention_index: 3
+  intervention:
+    type: DRUG
+    name: Aspirin
+    otherNames: null
+    description: Efficacy of the combined treatment
+    armGroupLabels:
+    - experimental arm
+  all_interventions:
+  - Pembrolizumab
+  - Radiation
+  - Vitamin D
+  - Aspirin
+  - Lansoprazole
+  - Cyclophosphamide
+  - Curcumin
+  arm_groups:
+  - label: experimental arm
+    type: EXPERIMENTAL
+    description: Pembrolizumab, immune modulatory cocktail composed of Vitamin D, Lansoprazole Teva, Cyclophosphamide
+      and Aspirine, radiation and Curcumin
+    interventionNames:
+    - 'Drug: Pembrolizumab'
+    - 'Radiation: Radiation'
+    - 'Drug: Vitamin D'
+    - 'Drug: Aspirin'
+    - 'Drug: Lansoprazole'
+    - 'Drug: Cyclophosphamide'
+    - 'Dietary Supplement: Curcumin'
+  study_type: INTERVENTIONAL
+  title: A Phase II Investigation of Pembrolizumab (Keytruda) in Combination With Radiation and an Immune Modulatory
+    Cocktail in Patients With Cervical and Uterine Cancer (PRIMMO Trial)
+  summary: 'This is a Phase II study in patients with advanced and/refractory cervical cancer, endometrial carcinoma
+    or uterine sarcoma.
+
+
+    Patients will be treated with an immunomodulatory cocktail (Vitamin D, aspirin, Cyclophosphamide and Lansoprazole),
+    followed by pembrolizumab, combined with radiation. In addition, patients will take Curcumin, a food supplement.'
+  label: null
+  note: ''
+- id: 42
+  nct_id: NCT07511257
+  registry_url: https://clinicaltrials.gov/study/NCT07511257
+  question: Role of aspirin in this trial (the intervention object below names it)
+  compound: aspirin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Aspirin 100 mg
+    otherNames: null
+    description: Participants receive aspirin 100 mg once daily
+    armGroupLabels:
+    - Dual Antiplatelet Therapy
+  all_interventions:
+  - Aspirin 100 mg
+  - Clopidogrel 75 mg
+  - Rivaroxaban 15 mg
+  arm_groups:
+  - label: Dual Antiplatelet Therapy
+    type: ACTIVE_COMPARATOR
+    description: Participants receive standard dual antiplatelet therapy consisting of aspirin 100 mg once daily
+      plus clopidogrel 75 mg once daily
+    interventionNames:
+    - 'Drug: Aspirin 100 mg'
+    - 'Drug: Clopidogrel 75 mg'
+  - label: Antiplatelet Monotherapy Plus Oral Anticoagulation
+    type: EXPERIMENTAL
+    description: Participants receive antiplatelet monotherapy with clopidogrel 75 mg once daily plus oral anticoagulation
+      using rivaroxaban 15 mg once daily
+    interventionNames:
+    - 'Drug: Clopidogrel 75 mg'
+    - 'Drug: Rivaroxaban 15 mg'
+  study_type: INTERVENTIONAL
+  title: 'Dual Antiplatelet Therapy Versus Antiplatelet Monotherapy Plus Anticoagulation in Patients With Acute
+    Coronary Syndrome and Coronary Artery Ectasia: A Multicenter Randomized Clinical Trial'
+  summary: 'Coronary artery ectasia (CAE) is a condition in which a coronary artery becomes abnormally dilated,
+    measuring at least 50% larger than the adjacent normal segment. Although relatively uncommon, CAE is clinically
+    important because it can lead to abnormal blood flow and increase the risk of blood clot formation. Patients
+    with CAE are at higher risk of angina, myocardial infarction, and complications during coronary interventions.
+    Despite these risks, the optimal antithrombotic treatment for patients with acute coronary syndrome (ACS) and
+    CAE remains uncertain.
+
+
+    Dual antiplatelet therapy (aspirin plus clopidogrel) is currently the most commonly used treatment. However,
+    the abnormal blood flow patterns observed in CAE may promote clot formation through mechanisms that could potentially
+    be better addressed with anticoagulant therapy.
+
+
+    The OVER-TIME II trial is a multicenter randomized clinical trial designed to compare two antithrombotic strategies
+    in patients with ACS and CAE: standard dual antiplatelet therapy versus antiplatelet monotherapy combined with
+    anticoagulation. The study aims to determine whether the addition of anticoagulation reduces major cardiovascular
+    events without si'
+  label: null
+  note: ''
+- id: 43
+  nct_id: NCT07866066
+  registry_url: https://clinicaltrials.gov/study/NCT07866066
+  question: Role of semaglutide in this trial (the intervention object below names it)
+  compound: semaglutide
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Semaglutide
+    otherNames: null
+    description: Administered subcutaneously.
+    armGroupLabels:
+    - Semaglutide
+  all_interventions:
+  - Maridebart cafraglutide
+  - Semaglutide
+  arm_groups:
+  - label: Maridebart cafraglutide
+    type: EXPERIMENTAL
+    description: Participants will receive maridebart cafraglutide administered subcutaneously (SC) once every 4
+      weeks (Q4W) in a dose-escalation manner.
+    interventionNames:
+    - 'Drug: Maridebart cafraglutide'
+  - label: Semaglutide
+    type: ACTIVE_COMPARATOR
+    description: Participants will receive semaglutide administered SC once weekly (QW) in a dose-escalation manner.
+    interventionNames:
+    - 'Drug: Semaglutide'
+  study_type: INTERVENTIONAL
+  title: A Phase 3, Randomized, Open-Label Trial Comparing the Efficacy and Safety of Maridebart Cafraglutide Once
+    Monthly Versus Semaglutide Once Weekly as Add-on Therapy to Metformin With or Without a Sodium-glucose Cotransporter-2
+    Inhibitor in Participants With Type 2 Diabetes
+  summary: The main objective of this trial is to evaluate whether maridebart cafraglutide is non-inferior to semaglutide
+    in improving glycemic control in participants with type 2 diabetes (T2D) who are receiving metformin treatment,
+    with or without a sodium-glucose cotransporter-2 (SGLT-2) inhibitor.
+  label: null
+  note: ''
+- id: 44
+  nct_id: NCT01204775
+  registry_url: https://clinicaltrials.gov/study/NCT01204775
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 2
+  intervention:
+    type: DRUG
+    name: Metformin IR
+    otherNames: null
+    description: Tablets, Oral, 500 mg, Once Daily, 17-52 weeks
+    armGroupLabels:
+    - Placebo
+  all_interventions:
+  - Saxagliptin
+  - Placebo (Saxagliptin)
+  - Metformin IR
+  - Placebo (Metformin)
+  - Metformin (Active Rescue)
+  arm_groups:
+  - label: Saxagliptin
+    type: EXPERIMENTAL
+    description: Saxagliptin Tablet, 2.5 mg, or Saxagliptin Tablet, 5 mg, (based on subject's weight)
+    interventionNames:
+    - 'Drug: Saxagliptin'
+    - 'Drug: Metformin (Active Rescue)'
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: Placebo matching saxagliptin tablet
+    interventionNames:
+    - 'Drug: Placebo (Saxagliptin)'
+    - 'Drug: Metformin IR'
+    - 'Drug: Placebo (Metformin)'
+    - 'Drug: Metformin (Active Rescue)'
+  study_type: INTERVENTIONAL
+  title: A Multicenter, Randomized, Double-blind, Placebo-controlled Study to Evaluate the Efficacy, Safety, Tolerability,
+    and Pharmacokinetics of Saxagliptin (BMS-477118) as Monotherapy in Pediatric Patients With Type 2 Diabetes
+  summary: The purpose of this study is to evaluate the efficacy, safety, tolerability, of Saxagliptin in pediatric
+    patients with type 2 diabetes.
+  label: null
+  note: ''
+- id: 45
+  nct_id: NCT02964585
+  registry_url: https://clinicaltrials.gov/study/NCT02964585
+  question: Role of canagliflozin in this trial (the intervention object below names it)
+  compound: canagliflozin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Canagliflozin
+    otherNames:
+    - INVOKANA
+    description: 100 mg
+    armGroupLabels:
+    - Active Arm
+  all_interventions:
+  - Canagliflozin
+  - Placebo
+  arm_groups:
+  - label: Active Arm
+    type: ACTIVE_COMPARATOR
+    description: 100 mg of Canagliflozin for 16 weeks
+    interventionNames:
+    - 'Drug: Canagliflozin'
+  - label: Placebo Arm
+    type: PLACEBO_COMPARATOR
+    description: Placebo for 16 weeks
+    interventionNames:
+    - 'Drug: Placebo'
+  study_type: INTERVENTIONAL
+  title: Role of Canagliflozin on Gene Expression and Function of CD34+ Endothelial Progenitor Cells and Renal Function
+    in Patients With Type 2 Diabetes
+  summary: 'The investigators hypothesize that Cana may be able to improve number and function of CD34+ endothelial
+    progenitor cells. The investigators also propose that this expected cardiovascular benefit is independent of
+    HbA1C reduction.
+
+
+    Subjects will begin taking 100 mg of Cana or placebo after initial 4 weeks. Subjects will be withdrawn from
+    the study if the medication or placebo is not tolerated.'
+  label: null
+  note: ''
+- id: 46
+  nct_id: NCT01105702
+  registry_url: https://clinicaltrials.gov/study/NCT01105702
+  question: Role of lithium in this trial (the intervention object below names it)
+  compound: lithium
+  intervention_index: 2
+  intervention:
+    type: DRUG
+    name: Lithium Carbonate
+    otherNames:
+    - Lithobid
+    description: null
+    armGroupLabels:
+    - TBL/RT
+  all_interventions:
+  - Temozolomide
+  - Bevacizumab
+  - Lithium Carbonate
+  - Radiation
+  arm_groups:
+  - label: TBL/RT
+    type: EXPERIMENTAL
+    description: 'Cycle 1(One 42-day cycle)
+
+
+      * Temozolomide 75 mg/m\^2 orally (42 consecutive days), beginning the night prior to the first radiation treatment
+
+      * Radiation within 3-5 weeks of surgery
+
+      * Bevacizumab 10mg/kg, IV, starting 29 (+3) days post surgery and every 2 weeks
+
+
+      Treatment Cycles 2-7 (28 days per cycle)
+
+
+      * Temozolomide at a dose of 150 mg/m\^2 on Days 1-7
+
+      * Bevacizumab 10 mg/kg on Day 8 and Day 22
+
+      * Initiate Lithium carbonate treatment at 300 mg, orally, twice a day; dose increased every 7 days up to 600mg,
+      orally, twice a day, to a serum lithium level of 0.8-1.2 mEq/L.'
+    interventionNames:
+    - 'Drug: Temozolomide'
+    - 'Drug: Bevacizumab'
+    - 'Drug: Lithium Carbonate'
+    - 'Radiation: Radiation'
+  study_type: INTERVENTIONAL
+  title: 'Temozolomide, Bevacizumab, Lithium and Radiation Treatment for Newly Diagnosed High Grade Glioma: A Phase
+    II Study'
+  summary: This pilot phase II trial studies how well giving temozolomide, bevacizumab, lithium carbonate, and radiation
+    therapy works in treating patients with newly diagnosed high grade glioma.
+  label: null
+  note: ''
+- id: 47
+  nct_id: NCT01515657
+  registry_url: https://clinicaltrials.gov/study/NCT01515657
+  question: Role of aspirin in this trial (the intervention object below names it)
+  compound: aspirin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Immediate-Release Aspirin Tablets
+    otherNames: null
+    description: 325 mg aspirin; once per day for 3 days
+    armGroupLabels:
+    - Immediate-Release Aspirin Tablets
+  all_interventions:
+  - PL2200 Aspirin Capsules
+  - Immediate-Release Aspirin Tablets
+  - Enteric-coated aspirin caplets
+  arm_groups:
+  - label: PL2200 Aspirin Capsules
+    type: EXPERIMENTAL
+    description: Investigational drug arm; crossover design
+    interventionNames:
+    - 'Drug: PL2200 Aspirin Capsules'
+  - label: Immediate-Release Aspirin Tablets
+    type: ACTIVE_COMPARATOR
+    description: Active comparator; crossover design
+    interventionNames:
+    - 'Drug: Immediate-Release Aspirin Tablets'
+  - label: Enteric-coated aspirin caplets
+    type: ACTIVE_COMPARATOR
+    description: Active comparator; crossover design
+    interventionNames:
+    - 'Drug: Enteric-coated aspirin caplets'
+  study_type: INTERVENTIONAL
+  title: A Randomized, Actively Controlled, Crossover Pharmacodynamic Evaluation of PL2200 Versus Enteric-Coated
+    and Immediate Release Aspirin in Patients With Type II Diabetes
+  summary: This study will determine if aspirin from PL2200, an investigational product, gets into the blood stream
+    as quickly as plain aspirin and enteric coated aspirin, and to test whether PL2200 is able to prevent blood
+    clots as effectively as these other products, when administered to patients with diabetes.
+  label: null
+  note: ''
+- id: 48
+  nct_id: NCT03667326
+  registry_url: https://clinicaltrials.gov/study/NCT03667326
+  question: Role of aspirin in this trial (the intervention object below names it)
+  compound: aspirin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Aspirin tablet
+    otherNames:
+    - Aspirin
+    description: Low dose aspirin, 81mg tablets, PO
+    armGroupLabels:
+    - Low-Dose Aspirin (LDA) Intervention Group
+  all_interventions:
+  - Aspirin tablet
+  - Placebo oral capsule
+  arm_groups:
+  - label: Low-Dose Aspirin (LDA) Intervention Group
+    type: ACTIVE_COMPARATOR
+    description: Subjects diagnosed with severe preeclampsia prior to delivery (antepartum or intrapartum) will
+      take 81mg of aspirin daily for up to 3 weeks postpartum, starting within 4 days after delivery.
+    interventionNames:
+    - 'Drug: Aspirin tablet'
+  - label: Placebo Control Group
+    type: PLACEBO_COMPARATOR
+    description: Subjects diagnosed with severe preeclampsia prior to delivery (antepartum or intrapartum) will
+      take placebo oral capsule daily for up to 3 weeks postpartum, starting within 4 days after delivery.
+    interventionNames:
+    - 'Drug: Placebo oral capsule'
+  - label: Healthy Controls Group
+    type: NO_INTERVENTION
+    description: Subjects who are healthy volunteers (n = 10) without severe preeclampsia prior to delivery.
+    interventionNames: null
+  study_type: INTERVENTIONAL
+  title: Low-Dose Aspirin in the Postpartum Period and Endothelial Function in Patients With Preeclampsia
+  summary: The purpose of this research study is to find out whether women with severe preeclampsia taking low-dose
+    aspirin (LDA) for 3 weeks post-delivery will experience an improvement in endothelial function (measured as
+    flow-mediated dilation - FMD) and severity of disease, as the effects of preeclampsia can persist postpartum.
+    Women diagnosed with severe preeclampsia prior to delivery will be enrolled and randomized to receive either
+    low-dose aspirin (81mg) or placebo to take daily for up to 3 weeks post-delivery. Exploratory objective includes
+    healthy control postpartum patients without preeclampsia and not on LDA during pregnancy or postpartum in comparison
+    with the primary study population affected by preeclampsia with severe features.
+  label: null
+  note: ''
+- id: 49
+  nct_id: NCT00908466
+  registry_url: https://clinicaltrials.gov/study/NCT00908466
+  question: Role of rapamycin in this trial (the intervention object below names it)
+  compound: rapamycin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Sirolimus (rapamycin)
+    otherNames:
+    - Rapamycin, Rapamune, Sirolimus
+    description: Will receive intravitreal injections of sirolimus (rapamycin) 352 µg in study eye on Days 0, 60,
+      and 120.
+    armGroupLabels:
+    - Intravitreal Injection
+  all_interventions:
+  - Sirolimus (rapamycin)
+  - Sirolimus (rapamycin)
+  arm_groups:
+  - label: Intravitreal Injection
+    type: EXPERIMENTAL
+    description: Will receive intravitreal injections of sirolimus 352 µg in study eye on Days 0, 60, and 120.
+    interventionNames:
+    - 'Drug: Sirolimus (rapamycin)'
+  - label: Subconjunctival Injection
+    type: EXPERIMENTAL
+    description: Will receive subconjunctival injections of sirolimus 1320 µg in the study eye on Days 0, 60, and
+      120.
+    interventionNames:
+    - 'Drug: Sirolimus (rapamycin)'
+  study_type: INTERVENTIONAL
+  title: A Phase 1, Open-label, Randomized Clinical Study to Assess the Safety, Tolerability and Bioactivity of
+    Intravitreal and Subconjunctival Injection of Sirolimus in Patients With Non-infectious Uveitis
+  summary: The purpose of this study is to find out about the safety and effectiveness of the study drug, sirolimus,
+    in patients with uveitis and to utilize the potential effectiveness of sirolimus, and yet to avoid the potential
+    complications of systemic use of the drug. In this study, the investigators will administer sirolimus either
+    around (subconjunctival injection) or inside the eye (intravitreal injection). Local administration of sirolimus
+    to the eye is not expected to have effects on the rest of the body. Therefore, it may offer a safer way than
+    the current methods used to control the inflammation caused by non-infectious uveitis.
+  label: null
+  note: ''
+- id: 50
+  nct_id: NCT07056803
+  registry_url: https://clinicaltrials.gov/study/NCT07056803
+  question: Role of semaglutide in this trial (the intervention object below names it)
+  compound: semaglutide
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Oral semaglutide
+    otherNames: null
+    description: Starting dose 3 mg for a month, followed by 7 mg for a month increased up to 14 mg a month
+    armGroupLabels:
+    - oral semaglutide
+  all_interventions:
+  - Oral semaglutide
+  - subcutaneous semaglutide
+  arm_groups:
+  - label: oral semaglutide
+    type: null
+    description: oral semaglutide
+    interventionNames:
+    - 'Drug: Oral semaglutide'
+  - label: subcutaneous semaglutide
+    type: null
+    description: subcutaneous semaglutide
+    interventionNames:
+    - 'Drug: subcutaneous semaglutide'
+  study_type: OBSERVATIONAL
+  title: 'Sex Related Outcomes in Oral vs. Subcutaneous Semaglutide in Type 2 Diabetes Mellitus: A 12-month Real-world
+    Study'
+  summary: This real-world, comparative cohort study aims to evaluate the 12-month effectiveness of oral versus
+    subcutaneous semaglutide in patients with type 2 diabetes mellitus (T2D), with a specific focus on sex-based
+    differences in metabolic response. A total of 212 patients were enrolled and evenly assigned to either oral
+    or subcutaneous semaglutide. The primary outcome was the change in HbA1c, while secondary outcomes included
+    variations in weight, lipid profile, liver function, and hepatic steatosis index. Subcutaneous semaglutide resulted
+    in greater improvements in HbA1c, weight, and LDL cholesterol in men, while women exhibited a more favorable
+    hepatic response. These findings support the need for sex-specific considerations in T2D therapy personalization.
+  label: null
+  note: ''
+- id: 51
+  nct_id: NCT01813929
+  registry_url: https://clinicaltrials.gov/study/NCT01813929
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Metformin
+    otherNames:
+    - glucophage
+    description: 'Six week intervention: Study drug/placebo will be given in a forced uptitration with 500 mg once
+      daily for one week, 500 mg twice daily for one week, 500/1000 for one week, and then 1000mg twice daily for
+      the remainder of the 6 week intervention. If uptitration is not tolerated, max dose will be max tolerated
+      dose of at least 500 mg twice daily.'
+    armGroupLabels:
+    - Metformin
+  all_interventions:
+  - Metformin
+  - Placebo
+  arm_groups:
+  - label: Metformin
+    type: EXPERIMENTAL
+    description: null
+    interventionNames:
+    - 'Drug: Metformin'
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: null
+    interventionNames:
+    - 'Drug: Placebo'
+  study_type: INTERVENTIONAL
+  title: Effect of Metformin on Vascular and Mitochondrial Function in Type 1 Diabetes
+  summary: Insulin resistance (IR) is an important contributor to increased cardiovascular disease risk in type
+    1 diabetes (T1D). The purpose of this study is to measure the effect of metformin on insulin sensitivity, vascular
+    function and compliance, and mitochondrial function in T1D. The long term goal is to identify novel non-glycemic
+    approaches to managing cardiovascular disease risk in T1D. The results of this study may validate a novel approach
+    to T1D treatment that could significantly improve current management of cardiovascular disease risk in this
+    high risk population.
+  label: null
+  note: ''
+- id: 52
+  nct_id: NCT00935805
+  registry_url: https://clinicaltrials.gov/study/NCT00935805
+  question: Role of captopril in this trial (the intervention object below names it)
+  compound: captopril
+  intervention_index: 5
+  intervention:
+    type: DRUG
+    name: Captopril
+    otherNames:
+    - Added to hydrochlorothiazide if BP not attained
+    description: 50 mg TID
+    armGroupLabels:
+    - Treatment
+  all_interventions:
+  - Metformin
+  - Glybenclamide
+  - NPH insulin
+  - Hydrochlorothiazide
+  - Propranolol
+  - Captopril
+  - Amlodipine
+  arm_groups:
+  - label: Treatment
+    type: null
+    description: 124 patients attending the primary care unit included after formal consent.
+    interventionNames:
+    - 'Drug: Metformin'
+    - 'Drug: Glybenclamide'
+    - 'Drug: NPH insulin'
+    - 'Drug: Hydrochlorothiazide'
+    - 'Drug: Propranolol'
+    - 'Drug: Captopril'
+    - 'Drug: Amlodipine'
+  study_type: OBSERVATIONAL
+  title: ANALYSIS OF THE EFFECTIVENESS OF A STAGED MANAGEMENT PROGRAM AIMED AT CONTROLLING BLOOD PRESSURE AND BLOOD
+    GLUCOSE OF TYPE 2 DIABETIC PATIENTS USING EXCLUSIVELY THE RESOURCES AVAILABLE IN A PRIMARY CARE SETTING IN BRAZIL
+  summary: The aim of this study is to to analyze if it is possible to reach the goals of HbA1c \<7.0% and blood
+    pressure \<= 130/80 mm Hg in a cohort of patients with type 2 diabetes attending a primary care unit, using
+    ony those resources available at the unit, and provided by the Brazilian National Health System. It is an open
+    label, observational study, with a duration of 4-6 years. Patients attending a primary care outpatient facility
+    will be sequentially included in the study provided they give consent. They will be followed on a monthly basis
+    by a team of physicians and nurses. Glucose, A1c, Blood PRessure will be the outcomes.
+  label: null
+  note: ''
+- id: 53
+  nct_id: NCT00834613
+  registry_url: https://clinicaltrials.gov/study/NCT00834613
+  question: Role of metformin in this trial (the intervention object below names it)
+  compound: metformin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Metformin ER 750 mg Tablets
+    otherNames: null
+    description: 1 x 750 mg, single-dose fed
+    armGroupLabels:
+    - '1'
+  all_interventions:
+  - Glucophage® XR 750 mg Tablets
+  - Metformin ER 750 mg Tablets
+  arm_groups:
+  - label: '1'
+    type: EXPERIMENTAL
+    description: null
+    interventionNames:
+    - 'Drug: Metformin ER 750 mg Tablets'
+  - label: '2'
+    type: ACTIVE_COMPARATOR
+    description: null
+    interventionNames:
+    - 'Drug: Glucophage® XR 750 mg Tablets'
+  study_type: INTERVENTIONAL
+  title: A Two-Way Crossover, Open-Label, Single-Dose, Fed, Bioequivalence Study of Metformin ER 750 mg Tablets
+    Versus Glucophage® XR 750 mg Tablets in Normal Healthy Non-Smoking Male and Female Subjects
+  summary: The objective of this study is to compare the rate and extent of absorption of metformin from a test
+    formulation of Metformin ER 750 mg Tablets versus the reference Glucophage® XR 750 mg Tablets under fed conditions.
+  label: null
+  note: ''
+- id: 54
+  nct_id: NCT00311623
+  registry_url: https://clinicaltrials.gov/study/NCT00311623
+  question: Role of rapamycin in this trial (the intervention object below names it)
+  compound: rapamycin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Rapamycin 3mg
+    otherNames:
+    - sirolimus
+    description: Rapamycin 3mg (Wyeth Pharmaceuticals, 1mg tablets) PO once daily on Days 1-14 with the last dose
+      given on the morning before surgery (Day 15).
+    armGroupLabels:
+    - Low-dose Rapamycin (3mg)
+  all_interventions:
+  - Rapamycin 3mg
+  - Rapamycin 6mg
+  - Radical prostatectomy
+  arm_groups:
+  - label: Control group
+    type: ACTIVE_COMPARATOR
+    description: 'Men \>18years old with prostate cancer clinical stages T1c to T3, no metastases, Gleason sum of
+      7-10, multiple positive diagnostic cores, Eastern Cooperative Oncology Group (ECOG) performance status of
+      0-1, candidates for radical prostatectomy.
+
+
+      Receive no intervention on Days 1-14. Surgery performed on Day 15.'
+    interventionNames:
+    - 'Procedure: Radical prostatectomy'
+  - label: Low-dose Rapamycin (3mg)
+    type: EXPERIMENTAL
+    description: 'Men \>18years old with prostate cancer clinical stages T1c to T3, no metastases, Gleason sum of
+      7-10, multiple positive diagnostic cores, Eastern Cooperative Oncology Group (ECOG) performance status of
+      0-1, candidates for radical prostatectomy.
+
+
+      Must have adequate hepatic, renal and bone marrow function, no allergy to rapamycins, avoid medications interfering
+      with rapamycin metabolism, no active infection, no prior therapies for prostate cancer.
+
+
+      Will receive rapamycin 3mg (Wyeth Pharmaceuticals, 1mg tablets) oral (PO) once daily on Days 1-14 with the
+      last dose given on the morning before surgery (Day 15).'
+    interventionNames:
+    - 'Drug: Rapamycin 3mg'
+    - 'Procedure: Radical prostatectomy'
+  - label: High-dose Rapamycin (6mg)
+    type: EXPERIMENTAL
+    description: 'Men \>18years old with prostate cancer clinical stages T1c to T3, no metastases, Gleason sum of
+      7-10, multiple positive diagnostic cores, Eastern Cooperative Oncology Group (ECOG) performance status of
+      0-1, candidates for radical prostatectomy.
+
+
+      Must have adequate hepatic, renal and bone marrow function, no allergy to rapamycins, avoid medications interfering
+      with rapamycin metabolism, no active infection, no prior therapies for prostate cancer.
+
+
+      Will receive rapamycin 6mg (Wyeth Pharmaceuticals, 2mg tablets) oral (PO) once daily on Days 1-14 with the
+      last dose given on the morning before surgery (Day 15).'
+    interventionNames:
+    - 'Drug: Rapamycin 6mg'
+    - 'Procedure: Radical prostatectomy'
+  study_type: INTERVENTIONAL
+  title: A Pharmacodynamic Study of Pre-Prostatectomy Rapamycin in Men With Advanced Localized Prostate Cancer
+  summary: 'RATIONALE: Drugs used in chemotherapy, such as sirolimus, work in different ways to stop the growth
+    of tumor cells, either by killing the cells or by stopping them from dividing.
+
+
+    PURPOSE: This clinical trial is studying the best dose of sirolimus and to see how well it works before surgery
+    in treating patients with advanced localized prostate cancer.'
+  label: null
+  note: ''
+- id: 55
+  nct_id: NCT00485680
+  registry_url: https://clinicaltrials.gov/study/NCT00485680
+  question: Role of lithium in this trial (the intervention object below names it)
+  compound: lithium
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Lithium Carbonate
+    otherNames: null
+    description: null
+    armGroupLabels: null
+  all_interventions:
+  - Olanzapine Hydrochloride
+  - Lithium Carbonate
+  arm_groups: []
+  study_type: INTERVENTIONAL
+  title: Olanzapine Versus Lithium Carbonate in the Treatment of Bipolar Disorder, Manic or Mixed Episodes
+  summary: The purpose of this trial is compare the efficacy of olanzapine and Lithium Carbonate in the treatment
+    of bipolar disorder, manic or mixed episodes, in Chinese patients.
+  label: null
+  note: ''
+- id: 56
+  nct_id: NCT03424005
+  registry_url: https://clinicaltrials.gov/study/NCT03424005
+  question: Role of empagliflozin in this trial (the intervention object below names it)
+  compound: empagliflozin
+  intervention_index: 18
+  intervention:
+    type: DRUG
+    name: Empagliflozin
+    otherNames: null
+    description: Empagliflozin, administered orally, once daily (QD)
+    armGroupLabels:
+    - 'Empagliflozin + Inavolisib (Dose #2) + Fulvestrant ± Palbociclib'
+  all_interventions:
+  - Capecitabine
+  - Atezolizumab
+  - Ipatasertib
+  - SGN-LIV1A
+  - Bevacizumab
+  - Chemotherapy (Gemcitabine + Carboplatin or Eribulin)
+  - Selicrelumab
+  - Tocilizumab
+  - Nab-Paclitaxel
+  - Sacituzumab Govitecan
+  - Abemaciclib
+  - Fulvestrant
+  - 'Ribociclib (Dose #1)'
+  - 'Inavolisib (Dose #1)'
+  - Trastuzumab Deruxtecan
+  - 'Ribociclib (Dose #2)'
+  - Letrozole
+  - 'Inavolisib (Dose #2)'
+  - Empagliflozin
+  - Palbociclib
+  - Metformin
+  - Atirmociclib
+  - Giredestrant
+  arm_groups:
+  - label: Atezolizumab + Nab-Paclitaxel
+    type: ACTIVE_COMPARATOR
+    description: '1L PD-L1-positive participants will receive doublet combination treatment with atezolizumab plus
+      nab-paclitaxel until unacceptable toxicity or loss of clinical benefit as determined by the investigator.
+
+
+      Enrollment is closed.'
+    interventionNames:
+    - 'Drug: Atezolizumab'
+    - 'Drug: Nab-Paclitaxel'
+  - label: Atezolizumab + Nab-Paclitaxel + Tocilizumab
+    type: EXPERIMENTAL
+    description: '1L PD-L1-positive participants will receive combination treatment with atezolizumab plus nab-paclitaxel
+      and tocilizumab until unacceptable toxicity or loss of clinical benefit as determined by the investigator.
+
+
+      Enrollment is closed and participant follow-up is complete.'
+    interventionNames:
+    - 'Drug: Atezolizumab'
+    - 'Drug: Tocilizumab'
+    - 'Drug: Nab-Paclitaxel'
+  - label: Atezolizumab + Sacituzumab Govitecan
+    type: EXPERIMENTAL
+    description: '1L PD-L1-positive participants will receive doublet combination treatment with atezolizumab plus
+      sacituzumab govitecan until unacceptable toxicity or loss of clinical benefit as determined by the investigator.
+
+
+      Enrollment is closed.'
+    interventionNames:
+    - 'Drug: Atezolizumab'
+    - 'Drug: Sacituzumab Govitecan'
+  - label: Capecitabine
+    type: ACTIVE_COMPARATOR
+    description: '2L CIT-naïve participants will receive capecitabine until unacceptable toxicity or disease progression
+      per Response Evaluation Criteria in Solid Tumors v1.1 (RECIST v1.1).
+
+
+      Participants who progressed on treatment may have the option of receiving atezolizumab along with chemotherapy
+      (chemo) during stage 2, provided they meet the eligibility criteria.
+
+
+      Enrollment is closed and participant follow-up is complete.'
+    interventionNames:
+    - 'Drug: Capecitabine'
+  - label: Atezolizumab + Ipatasertib
+    type: EXPERIMENTAL
+    description: '2L CIT-naïve participants will receive doublet combination treatment with atezolizumab plus ipatasertib
+      until unacceptable toxicity or loss of clinical benefit as determined by the investigator.
+
+
+      Participants who progressed on treatment may have the option of receiving atezolizumab + chemo, provided they
+      meet the eligibility criteria.
+
+
+      Enrollment is closed and participant follow-up is complete.'
+    interventionNames:
+    - 'Drug: Atezolizumab'
+    - 'Drug: Ipatasertib'
+  - label: Atezolizumab + SGN-LIV1A
+    type: EXPERIMENTAL
+    description: '2L CIT-naïve participants will receive doublet combination treatment with atezolizumab plus SGNLIV1A
+      until unacceptable toxicity or loss of clinical benefit as determined by the investigator.
+
+
+      Patients who experience loss of clinical benefit as determined by the investigator or unacceptable toxicity
+      related to SGN-LIV1A will be given the option of receiving Atezolizumab + chemo during Stage 2, provided they
+      meet the eligibility criteria.
+
+
+      Enrollment is closed and participant follow-up is complete.'
+    interventionNames:
+    - 'Drug: Atezolizumab'
+    - 'Drug: SGN-LIV1A'
+  - label: Atezolizumab + Selicrelumab + Bevacizumab
+    type: EXPERIMENTAL
+    description: '2L-CIT-naïve participants will receive doublet combination treatment with atezolizumab plus selicrelumab
+      and bevacizumab until unacceptable toxicity or loss of clinical benefit as determined by the investigator.
+
+
+      Participants who progressed on treatment may have the option of receiving atezolizumab + chemo, provided they
+      meet the eligibility criteria.
+
+
+      Enrollment is closed and participant follow-up is complete.'
+    interventionNames:
+    - 'Drug: Atezolizumab'
+    - 'Drug: Bevacizumab'
+    - 'Drug: Selicrelumab'
+  - label: Atezolizumab + Chemo (Gemcitabine + Carboplatin or Eribulin)
+    type: EXPERIMENTAL
+    description: '2L CIT-naïve participants enrolled in the active comparator arm who experience disease progression
+      per RECIST v1.1 and 2L CIT-naïve participants enrolled in an experimental arm who experience loss of clinical
+      benefit as determined by the investigator may receive doublet combination treatment with atezolizumab plus
+      chemo (gemcitabine + carboplatin or eribulin) until unacceptable toxicity or loss of clinical benefit as determined
+      by the investigator.
+
+
+      Enrollment is closed and participant follow-up is complete.'
+    interventionNames:
+    - 'Drug: Atezolizumab'
+    - 'Drug: Chemotherapy (Gemcitabine + Carboplatin or Eribulin)'
+  - label: 'Inavolisib (Dose #2) + Abemaciclib + Fulvestrant'
+    type: EXPERIMENTAL
+    description: HR+ participants will receive treatment with inavolisib plus abemaciclib plus fulvestrant until
+      unacceptable toxicity or disease progression determined by the investigator according to RECIST v1.1.
+    interventionNames:
+    - 'Drug: Abemaciclib'
+    - 'Drug: Fulvestrant'
+    - 'Drug: Inavolisib (Dose #2)'
+  - label: 'Inavolisib (Dose #2) + Ribociclib (Dose #1) + Fulvestrant'
+    type: EXPERIMENTAL
+    description: HR+ participants will receive treatment with inavolisib plus ribociclib plus fulvestrant until
+      unacceptable toxicity or disease progression as determined by the investigator according to RECIST v1.1.
+    interventionNames:
+    - 'Drug: Fulvestrant'
+    - 'Drug: Ribociclib (Dose #1)'
+    - 'Drug: Inavolisib (Dose #2)'
+  - label: 'Inavolisib (Dose #2) + Ribociclib (Dose #1) + Letrozole'
+    type: EXPERIMENTAL
+    description: HR+ participants will receive treatment with inavolisib plus ribociclib plus letrozole until unacceptable
+      toxicity or disease progression as determined by the investigator according to RECIST v1.1.
+    interventionNames:
+    - 'Drug: Ribociclib (Dose #1)'
+    - 'Drug: Letrozole'
+    - 'Drug: Inavolisib (Dose #2)'
+  - label: 'Inavolisib (Dose #2) + Ribociclib (Dose #2) + Fulvestrant'
+    type: EXPERIMENTAL
+    description: HR+ participants will receive treatment with inavolisib plus ribociclib plus fulvestrant until
+      unacceptable toxicity or disease progression as determined by the investigator according to RECIST v1.1.
+    interventionNames:
+    - 'Drug: Fulvestrant'
+    - 'Drug: Ribociclib (Dose #2)'
+    - 'Drug: Inavolisib (Dose #2)'
+  - label: 'Inavolisib (Dose #2) + Ribociclib (Dose #2) + Letrozole'
+    type: EXPERIMENTAL
+    description: HR+ participants will receive treatment with inavolisib plus ribociclib plus letrozole until unacceptable
+      toxicity or disease progression as determined by the investigator according to RECIST v1.1.
+    interventionNames:
+    - 'Drug: Ribociclib (Dose #2)'
+    - 'Drug: Letrozole'
+    - 'Drug: Inavolisib (Dose #2)'
+  - label: 'Inavolisib (Dose #2) + Abemaciclib + Letrozole'
+    type: EXPERIMENTAL
+    description: HR+ participants will receive treatment with inavolisib plus abemaciclib plus letrozole until unacceptable
+      toxicity or disease progression as determined by the investigator according to RECIST v1.1.
+    interventionNames:
+    - 'Drug: Abemaciclib'
+    - 'Drug: Letrozole'
+    - 'Drug: Inavolisib (Dose #2)'
+  - label: 'Inavolisib (Dose #1) + Trastuzumab Deruxtecan'
+    type: EXPERIMENTAL
+    description: 'HER2+/HER2-low participants will receive inavolisib + trastuzumab deruxtecan until unacceptable
+      toxicity or disease progression as determined by the investigator according to RECIST v1.1.
+
+
+      Enrollment is closed.'
+    interventionNames:
+    - 'Drug: Inavolisib (Dose #1)'
+    - 'Drug: Trastuzumab Deruxtecan'
+  - label: 'Inavolisib (Dose #2) + Trastuzumab Deruxtecan'
+    type: EXPERIMENTAL
+    description: 'HER2+/HER2-low participants will receive inavolisib + trastuzumab deruxtecan until unacceptable
+      toxicity or disease progression as determined by the investigator according to RECIST v1.1.
+
+
+      Enrollment is closed.'
+    interventionNames:
+    - 'Drug: Trastuzumab Deruxtecan'
+    - 'Drug: Inavolisib (Dose #2)'
+  - label: 'Empagliflozin + Inavolisib (Dose #2) + Fulvestrant ± Palbociclib'
+    type: EXPERIMENTAL
+    description: Participants with locally advanced or metastatic, HR+, HER2- participants will receive empagliflozin
+      plus inavolisib plus fulvestrant with or without palbociclib until unacceptable toxicity or disease progression
+      as determined by the investigator according to RECIST v1.1.
+    interventionNames:
+    - 'Drug: Fulvestrant'
+    - 'Drug: Inavolisib (Dose #2)'
+    - 'Drug: Empagliflozin'
+    - 'Drug: Palbociclib'
+  - label: 'Metformin + Inavolisib (Dose #2) + Fulvestrant ± Palbociclib'
+    type: EXPERIMENTAL
+    description: Participants with locally advanced or metastatic, HR+, HER2- participants will receive metformin
+      plus inavolisib plus fulvestrant with or without palbociclib until unacceptable toxicity or disease progression
+      as determined by the investigator according to RECIST v1.1.
+    interventionNames:
+    - 'Drug: Fulvestrant'
+    - 'Drug: Inavolisib (Dose #2)'
+    - 'Drug: Palbociclib'
+    - 'Drug: Metformin'
+  - label: 'Inavolisib (Dose #2) + Atirmociclib (Atirmo) + Fulvestrant'
+    type: EXPERIMENTAL
+    description: Participants will receive inavolisib plus atirmociclib plus fulvestrant until unacceptable toxicity
+      or disease progression as determined by the investigator according to RECIST v1.1.
+    interventionNames:
+    - 'Drug: Fulvestrant'
+    - 'Drug: Inavolisib (Dose #2)'
+    - 'Drug: Atirmociclib'
+  - label: 'Inavolisib (Dose #1) + Abemaciclib + Letrozole'
+    type: EXPERIMENTAL
+    description: HR+ participants will receive treatment with inavolisib plus abemaciclib plus letrozole until unacceptable
+      toxicity or disease progression as determined by the investigator according to RECIST v1.1.
+    interventionNames:
+    - 'Drug: Abemaciclib'
+    - 'Drug: Inavolisib (Dose #1)'
+    - 'Drug: Letrozole'
+  - label: 'Inavolisib (Dose #1) + Abemaciclib + Giredestrant'
+    type: EXPERIMENTAL
+    description: HR+ participants will receive treatment with inavolisib plus abemaciclib plus giredestrant until
+      unacceptable toxicity or disease progression as determined by the investigator according to RECIST v1.1.
+    interventionNames:
+    - 'Drug: Abemaciclib'
+    - 'Drug: Inavolisib (Dose #1)'
+    - 'Drug: Giredestrant'
+  - label: 'Inavolisib (Dose #2) + Abemaciclib + Giredestrant'
+    type: EXPERIMENTAL
+    description: HR+ participants will receive treatment with inavolisib plus abemaciclib plus giredestrant until
+      unacceptable toxicity or disease progression as determined by the investigator according to RECIST v1.1.
+    interventionNames:
+    - 'Drug: Abemaciclib'
+    - 'Drug: Inavolisib (Dose #2)'
+    - 'Drug: Giredestrant'
+  - label: 'Inavolisib (Dose #2) + Ribociclib (Dose #1) + Giredestrant'
+    type: EXPERIMENTAL
+    description: HR+ participants will receive treatment with inavolisib plus ribociclib plus giredestrant until
+      unacceptable toxicity or disease progression as determined by the investigator according to RECIST v1.1.
+    interventionNames:
+    - 'Drug: Ribociclib (Dose #1)'
+    - 'Drug: Inavolisib (Dose #2)'
+    - 'Drug: Giredestrant'
+  study_type: INTERVENTIONAL
+  title: A Phase Ib/II, Open-label, Multicenter, Randomized Umbrella Study Evaluating the Efficacy and Safety of
+    Multiple Treatment Combinations in Patients With Metastatic Breast Cancer (Morpheus-panBC)
+  summary: 'This is an umbrella study evaluating the efficacy and safety of multiple treatment combinations in participants
+    with metastatic or inoperable locally advanced breast cancer.
+
+
+    The study will be performed in two stages. During Stage 1, seven cohorts will be enrolled in parallel in this
+    study:
+
+
+    Cohort 1 will consist of programmed death-ligand 1 (PD-L1)-positive participants who have received no prior
+    systemic therapy for metastatic or inoperable locally advanced triple-negative breast cancer (TNBC) (first-line
+    \[1L\] PD-L1+ cohort).
+
+
+    Cohort 2 will consist of participants who had disease progression during or following 1L treatment with chemotherapy
+    for metastatic or inoperable locally-advanced TNBC and have not received cancer immunotherapy (CIT) (second-line
+    \[2L\] CIT-naïve cohort).
+
+
+    Cohort 3, 5, 6 and 7 will consist of participants with locally advanced or metastatic hormone receptor-positive
+    (HR+), human epidermal growth factor receptor 2 (HER2)-negative disease with one or more PIK3CA mutations.
+
+
+    Cohort 4 will consist of participants with locally advanced or metastatic HER2+ /HER2-low disease with one or
+    more PIK3CA mutations who had disease progression on standard-of-care therap'
+  label: null
+  note: ''
+- id: 57
+  nct_id: NCT02357342
+  registry_url: https://clinicaltrials.gov/study/NCT02357342
+  question: Role of rapamycin in this trial (the intervention object below names it)
+  compound: rapamycin
+  intervention_index: 0
+  intervention:
+    type: DRUG
+    name: Sirolimus
+    otherNames:
+    - DE-109
+    description: intravitreal injection
+    armGroupLabels:
+    - Sirolimus
+  all_interventions:
+  - Sirolimus
+  - Standard of Care intravitreal injections of anti-VEGF
+  arm_groups:
+  - label: Sirolimus
+    type: EXPERIMENTAL
+    description: Intravitreal Sirolimus
+    interventionNames:
+    - 'Drug: Sirolimus'
+  - label: Standard of Care intravitreal anti-VEGF
+    type: ACTIVE_COMPARATOR
+    description: anti-VEGF intravitreal injections
+    interventionNames:
+    - 'Drug: Standard of Care intravitreal injections of anti-VEGF'
+  study_type: INTERVENTIONAL
+  title: Sirolimus Versus AntiVEGF for Wet AMD
+  summary: Phase 2 clinical trial, single site, randomized, subject-masked study to determine safety and efficacy
+    of intravitreal injections of Sirolimus in subjects with wet Age-Related Macular Degeneration (wet AMD) with
+    persistent intraretinal or subretinal edema due to neovascular AMD despite previous AntiVEGF treatment.
+  label: null
+  note: ''
+- id: 58
+  nct_id: NCT03100019
+  registry_url: https://clinicaltrials.gov/study/NCT03100019
+  question: Role of resveratrol in this trial (the intervention object below names it)
+  compound: resveratrol
+  intervention_index: 0
+  intervention:
+    type: DIETARY_SUPPLEMENT
+    name: Resveratrol
+    otherNames: null
+    description: null
+    armGroupLabels:
+    - Resveratrol Hypoxia
+    - Resveratrol Normoxia
+  all_interventions:
+  - Resveratrol
+  - Placebo
+  arm_groups:
+  - label: Resveratrol Hypoxia
+    type: EXPERIMENTAL
+    description: 500mg of trans-resveratrol, tested at a 16% atmospheric oxygen level; the equivalent to 2134m above
+      sea level.
+    interventionNames:
+    - 'Dietary Supplement: Resveratrol'
+  - label: Placebo Hypoxia
+    type: PLACEBO_COMPARATOR
+    description: Pharmaceutical grade fumed silica, tested at a 16% atmospheric oxygen level; the equivalent to
+      2134m above sea level.
+    interventionNames:
+    - 'Drug: Placebo'
+  - label: Resveratrol Normoxia
+    type: EXPERIMENTAL
+    description: 500mg of trans-resveratrol, tested at a 20.9% atmospheric oxygen level; the equivalent to sea level.
+    interventionNames:
+    - 'Dietary Supplement: Resveratrol'
+  - label: Placebo Normoixa
+    type: PLACEBO_COMPARATOR
+    description: Pharmaceutical grade fumed silica, tested at a 20.9% atmospheric oxygen level; the equivalent to
+      sea level.
+    interventionNames:
+    - 'Drug: Placebo'
+  study_type: INTERVENTIONAL
+  title: The Effects of Acute Trans-resveratrol Supplementation on Aspects of Cognitive Function and Cerebral Blood
+    Flow, During Hypoxia and Normoxia, in Healthy, Young Humans.
+  summary: 'Objectives: Resveratrol, a non-flavonoid polyphenol, has been found to consistently modulate cerebral
+    blood flow (CBF) following oral supplementation. Although, this has not resulted in subsequent predicted benefits
+    to cognitive performance in young healthy populations. However, it is argued that those who suffer a reduction
+    in CBF and cognition, such as aging populations, may benefit more from resveratrol administration.
+
+
+    Hypothesis: The current investigation aimed to employ a mild hypoxia as an experimental model of aging in a
+    young healthy population, to assess if resveratrol can attenuate the deficits elicited by the reduction in oxygen
+    supply. It was hypothesized resveratrol would module CBF, to provide a more efficient supply of oxygen to overcome
+    any associated decreases to performance caused by the hypoxic model.
+
+
+    Design: This repeated measures, double blind, placebo controlled, balanced design assessed the cognitive and
+    CBF effects of resveratrol in hypoxia (equivalent to \~2000m above sea level) and normoxia (sea level).
+
+
+    Methods: 24 participants arrived fully fasted (except water) for 12 hrs before completing a baseline measure
+    of a cognitive task battery, and taking the'
+  label: null
+  note: ''
+- id: 59
+  nct_id: NCT04014192
+  registry_url: https://clinicaltrials.gov/study/NCT04014192
+  question: Role of empagliflozin in this trial (the intervention object below names it)
+  compound: empagliflozin
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Empagliflozin
+    otherNames: null
+    description: Treated with empagliflozin 10mg/d for one week.
+    armGroupLabels:
+    - Empagliflozin Group
+  all_interventions:
+  - Dapagliflozin
+  - Empagliflozin
+  - Canagliflozin
+  arm_groups:
+  - label: Dapagliflozin Group
+    type: EXPERIMENTAL
+    description: 10mg/d for one week
+    interventionNames:
+    - 'Drug: Dapagliflozin'
+  - label: Empagliflozin Group
+    type: EXPERIMENTAL
+    description: 10mg/d for one week
+    interventionNames:
+    - 'Drug: Empagliflozin'
+  - label: Canagliflozin Group
+    type: EXPERIMENTAL
+    description: 100mg/d for one week
+    interventionNames:
+    - 'Drug: Canagliflozin'
+  - label: Normal Glucose Tolerance Group
+    type: NO_INTERVENTION
+    description: null
+    interventionNames: null
+  study_type: INTERVENTIONAL
+  title: Effects of SGLT2 Inhibitors on Islet Cell Function and Insulin Sensitivity in Patients of Type 2 Diabetes
+    Mellitus
+  summary: The main pathogenesis of type 2 diabetes mellitus is insulin resistance and insufficient secretion of
+    insulin by pancreatic beta cells. SGLT2 (sodium-glucose synergistic transporter 2) inhibitor is a kind of newly
+    developed hypoglycemic medicine, which increases urinary glucose excretion and lowers blood glucose in an insulin-independent
+    manner. The mechanisms of its effects on insulin resistance, insulin secretion by pancreatic beta cells and
+    glucagon secretion by pancreatic alpha cells, are not well studied in domestic and foreign, and there is no
+    unified conclusion. A few studies concerning SGLT2 inhibitors have observed that insulin resistance and islet
+    beta cell secretion function can be improved by the improvement of glucotoxicity and lipotoxicity, but its effect
+    on pancreatic alpha cell function to increase glucagon level, thereby increasing liver glucose output, may be
+    one of the mechanisms of its side effects. In this study, patients with type 2 diabetes mellitus were treated
+    with three domestic listed SGLT2 inhibitors (dapagliflozin, empagliflozin and canagliflozin) for one week, which
+    were expected to improve the glucotoxicity, but excluding the effects on lipotoxicity a
+  label: null
+  note: ''
+- id: 60
+  nct_id: NCT06184568
+  registry_url: https://clinicaltrials.gov/study/NCT06184568
+  question: Role of semaglutide in this trial (the intervention object below names it)
+  compound: semaglutide
+  intervention_index: 1
+  intervention:
+    type: DRUG
+    name: Semaglutide
+    otherNames: null
+    description: Once-weekly injections of gradually increased doses of Semaglutide, subcutaneously (SC)，starting
+      dose is semaglutide 0.25mg, after 4 weeks of continuous administration, increase to semaglutide 0.5mg, after
+      4 weeks of continuous administration, continue Upgrade to semaglutide 1.0 mg for 24 weeks.
+    armGroupLabels:
+    - Semaglutide
+  all_interventions:
+  - IBI362
+  - Semaglutide
+  arm_groups:
+  - label: Semaglutide
+    type: ACTIVE_COMPARATOR
+    description: null
+    interventionNames:
+    - 'Drug: Semaglutide'
+  - label: IBI362
+    type: EXPERIMENTAL
+    description: null
+    interventionNames:
+    - 'Drug: IBI362'
+  study_type: INTERVENTIONAL
+  title: A Multicenter, Randomized, Open-label Phase 3 Study Comparing the Efficacy and Safety of IBI362 Versus
+    Semaglutide in Chinese Participants With Early Type 2 Diabetes and Obesity (DREAMS-3)
+  summary: This is a multicenter, randomized, Open-label Phase 3 clinical study comparing the efficacy and safety
+    of IBI362 6 mg OW versus Semalgutide 1 mg OW in obese(BMI≥28kg/m2) early T2D subjects. Subjects will be randomly
+    assigned to IBI362 6 mg and Semalgutide 1 mg groups for 32 weeks (active-controlled treatment period). In the
+    extension period, participants originally on mazdutide were assigned to continue for an additional 24 weeks
+    with mazdutide 9 mg or 6 mg based on whether they achieved the weight-loss target. All study treatment will
+    be administered once-weekly and subcutaneously. The entire trial cycle includes a 2-week screening period, a
+    32-week active-controlled treatment period, a 24 week extension period and a 4-week drug withdrawal safety follow-up
+    period.
+  label: null
+  note: ''
