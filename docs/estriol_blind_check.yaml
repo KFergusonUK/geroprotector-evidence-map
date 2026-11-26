@@ -1,0 +1,525 @@
+# Blind check of the estriol census, for Kevin Ferguson (docs/estriol_census_protocol.md).
+#
+# Judge each claim ("This intervention object is estriol") by the identity rule in
+# docs/step4_precision_protocol.md:
+#   correct    the intervention administers estriol itself (any formulation, brand, dose).
+#   incorrect  a different molecule (estradiol, estrone, 16-epiestriol...), a placebo, an ester
+#              prodrug (e.g. estriol succinate) or a combination product presented as estriol.
+#   Ambiguous counts as incorrect. Route is NOT part of identity (a vaginal gel is estriol).
+#
+# Set `verdict` to correct or incorrect and add a `note` where useful. Please do not open
+# data/reviews/estriol_census.yaml until you have finished. Then run:
+#     python3 docs/estriol_blind.py compare
+rows:
+- blind_id: 1
+  census_i: 6
+  nct_id: NCT02413008
+  registry_url: https://clinicaltrials.gov/study/NCT02413008
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: estriol
+    otherNames:
+    - Blissel (estriol)
+    - Gelistrol (estriol)
+    description: 0.005% estriol vaginal gel
+    armGroupLabels:
+    - 0.005% estriol vaginal gel
+  study_title: A Clinical Trial to Assess the Safety of 0.005 % Estriol Vaginal Gel in Hormone Receptor-Positive
+    Postmenopausal Women With Early Stage Breast Cancer in Treatment With Aromatase Inhibitor in the Adjuvant Setting
+  arm_groups:
+  - label: 0.005% estriol vaginal gel
+    type: EXPERIMENTAL
+    description: 'Route: Vaginal. Administration by an applicator inserted deep inside the vagina Dose: 1 g of gel,
+      containing 50 Mcg of estriol Dosage schedule: Weeks 1-3: single daily application Weeks 4-12: twice weekly
+      administration'
+  - label: placebo vaginal gel
+    type: PLACEBO_COMPARATOR
+    description: 'Route: Vaginal. Administration by an applicator inserted deep inside the vagina Dose: 1 g of gel.
+      Dosage schedule: Weeks 1-3: single daily application Weeks 4-12: twice weekly administration'
+  verdict: null
+  note: ''
+- blind_id: 2
+  census_i: 12
+  nct_id: NCT03363997
+  registry_url: https://clinicaltrials.gov/study/NCT03363997
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: Estriol 0.125 mg/day
+    otherNames: null
+    description: Application of one vaginal ring
+    armGroupLabels:
+    - Test 1 vaginal ring
+  study_title: Pharmacokinetics and Pharmacodynamics of 3 Dosages of Estriol After Continuous Vaginal Administration
+    for 21 Days
+  arm_groups:
+  - label: Test 1 vaginal ring
+    type: EXPERIMENTAL
+    description: Single vaginal application of 1 vaginal ring containing 100 mg estriol, with delivery rate of 0.125
+      mg/day over 21 days
+  - label: Test 2 vaginal ring
+    type: EXPERIMENTAL
+    description: Single vaginal application of 1 vaginal ring containing 300 mg estriol, with delivery rate of 0.250
+      mg/day over 21 days
+  - label: Test 3 vaginal ring
+    type: EXPERIMENTAL
+    description: Single vaginal application of 1 vaginal ring containing 600 mg estriol, with delivery rate of 0.500
+      mg/day over 21 days
+  verdict: null
+  note: ''
+- blind_id: 3
+  census_i: 17
+  nct_id: NCT04574999
+  registry_url: https://clinicaltrials.gov/study/NCT04574999
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: Estriol
+    otherNames:
+    - 16α-hydroxyestradiol or as estra-1,3,5(10)-triene-3,16α,17β-triol
+    description: Gel for vaginal application
+    armGroupLabels:
+    - 0.005% Estriol group
+  study_title: Study to Determine Efficacy & Safety of a Low Concentration Estriol (0.005%) in Postmenopausal Vaginal
+    Atrophy.
+  arm_groups:
+  - label: 0.005% Estriol group
+    type: EXPERIMENTAL
+    description: '0.005% Estriol (50 μg/g) gel for vaginal administration. Route: Vaginal by a cannula inserted
+      deep inside the vagina Single dose: 1 g of gel Dosage schedule: Weeks 1-3: single daily application Weeks
+      4-12: single application 2 times per week.'
+  - label: Placebo group
+    type: PLACEBO_COMPARATOR
+    description: 'Placebo gel for vaginal administration. Route: Vaginal by a cannula inserted deep inside the vagina
+      Single dose: 1 g of gel Dosage schedule: Weeks 1-3: single daily application Weeks 4-12: single application
+      2 times per week.'
+  verdict: null
+  note: ''
+- blind_id: 4
+  census_i: 13
+  nct_id: NCT03363997
+  registry_url: https://clinicaltrials.gov/study/NCT03363997
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: Estriol 0.250 mg/day
+    otherNames: null
+    description: Application of one vaginal ring
+    armGroupLabels:
+    - Test 2 vaginal ring
+  study_title: Pharmacokinetics and Pharmacodynamics of 3 Dosages of Estriol After Continuous Vaginal Administration
+    for 21 Days
+  arm_groups:
+  - label: Test 1 vaginal ring
+    type: EXPERIMENTAL
+    description: Single vaginal application of 1 vaginal ring containing 100 mg estriol, with delivery rate of 0.125
+      mg/day over 21 days
+  - label: Test 2 vaginal ring
+    type: EXPERIMENTAL
+    description: Single vaginal application of 1 vaginal ring containing 300 mg estriol, with delivery rate of 0.250
+      mg/day over 21 days
+  - label: Test 3 vaginal ring
+    type: EXPERIMENTAL
+    description: Single vaginal application of 1 vaginal ring containing 600 mg estriol, with delivery rate of 0.500
+      mg/day over 21 days
+  verdict: null
+  note: ''
+- blind_id: 5
+  census_i: 14
+  nct_id: NCT03363997
+  registry_url: https://clinicaltrials.gov/study/NCT03363997
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: Estriol 0.500 mg/day
+    otherNames: null
+    description: Application of one vaginal ring
+    armGroupLabels:
+    - Test 3 vaginal ring
+  study_title: Pharmacokinetics and Pharmacodynamics of 3 Dosages of Estriol After Continuous Vaginal Administration
+    for 21 Days
+  arm_groups:
+  - label: Test 1 vaginal ring
+    type: EXPERIMENTAL
+    description: Single vaginal application of 1 vaginal ring containing 100 mg estriol, with delivery rate of 0.125
+      mg/day over 21 days
+  - label: Test 2 vaginal ring
+    type: EXPERIMENTAL
+    description: Single vaginal application of 1 vaginal ring containing 300 mg estriol, with delivery rate of 0.250
+      mg/day over 21 days
+  - label: Test 3 vaginal ring
+    type: EXPERIMENTAL
+    description: Single vaginal application of 1 vaginal ring containing 600 mg estriol, with delivery rate of 0.500
+      mg/day over 21 days
+  verdict: null
+  note: ''
+- blind_id: 6
+  census_i: 5
+  nct_id: NCT01466114
+  registry_url: https://clinicaltrials.gov/study/NCT01466114
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: estriol
+    otherNames:
+    - Synapause
+    description: 4 capsules of 2 mg (total of 8 mg) PO QD
+    armGroupLabels:
+    - 'Group A: Estriol'
+  study_title: 'Estriol Treatment in Multiple Sclerosis (MS): Effect on Cognition'
+  arm_groups:
+  - label: 'Group A: Estriol'
+    type: EXPERIMENTAL
+    description: Standard MS Treatment + Estriol
+  - label: 'Group B: Placebo'
+    type: PLACEBO_COMPARATOR
+    description: Standard MS Treatment + Placebo
+  verdict: null
+  note: ''
+- blind_id: 7
+  census_i: 10
+  nct_id: NCT03032848
+  registry_url: https://clinicaltrials.gov/study/NCT03032848
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: Estriol
+    otherNames:
+    - Stelle
+    description: use of 1 gram per day
+    armGroupLabels:
+    - Conjugated Estrogen Group
+    - Promestriene Group
+    - Vaginal Moisturizer Cream
+  study_title: Vaginal Estrogens Comparative Trial on Pelvic Organ Prolapse Patients
+  arm_groups:
+  - label: Conjugated Estrogen Group
+    type: ACTIVE_COMPARATOR
+    description: use of 1 gram per day
+  - label: Promestriene Group
+    type: ACTIVE_COMPARATOR
+    description: use of 1 gram per day
+  - label: Estriol Group
+    type: ACTIVE_COMPARATOR
+    description: use of 1 gram per day
+  - label: Vaginal Moisturizer Cream
+    type: PLACEBO_COMPARATOR
+    description: use of 1 gram per day
+  verdict: null
+  note: ''
+- blind_id: 8
+  census_i: 2
+  nct_id: NCT00816556
+  registry_url: https://clinicaltrials.gov/study/NCT00816556
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: Estriol
+    otherNames: null
+    description: Estriol 10 micrograms added to Vanicream Lite 0.5 grams applied to vaginal introitus daily for
+      2 weeks and then twice weekly for 10 weeks.
+    armGroupLabels:
+    - Estriol
+  study_title: A Trial to Evaluate the Efficacy of Low Dose Vaginal Estrogens in the Treatment of Atrophic Vaginitis
+  arm_groups:
+  - label: Estriol
+    type: ACTIVE_COMPARATOR
+    description: Estriol 10 micrograms added to Vanicream Lite 0.5 grams applied to vaginal introitus daily for
+      two weeks and then twice weekly for 10 weeks
+  - label: Estradiol
+    type: ACTIVE_COMPARATOR
+    description: Estradiol valerate 10 micrograms added to Vanicream Lite 0.5 grams applied to vaginal introitus
+      daily for two weeks and then twice weekly for 10 weeks
+  - label: Vanicream Lite
+    type: PLACEBO_COMPARATOR
+    description: Vanicream Lite 0.5 grams applied to vaginal introitus daily for two weeks and then twice weekly
+      for 10 weeks
+  verdict: null
+  note: ''
+- blind_id: 9
+  census_i: 8
+  nct_id: NCT02906111
+  registry_url: https://clinicaltrials.gov/study/NCT02906111
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: estriol
+    otherNames: null
+    description: 'Study Group, treated with estriol
+
+
+      Control Group, no drug treatment
+
+
+      Both groups will undergo vaginal surgery for prolapse'
+    armGroupLabels:
+    - Study Group on estriol vaginal gel
+  study_title: Vaginal Estriol Before and Vaginal Surgery for Prolapse
+  arm_groups:
+  - label: Study Group on estriol vaginal gel
+    type: ACTIVE_COMPARATOR
+    description: 'Drug: 1 g/daily of vaginal gel containing 50 μg of estriol (0.005%) for 3 weeks and then twice
+      weekly for 9 weeks, for a complete cycle of treatment of 12 weeks'
+  - label: Control group, no estriol treatment
+    type: ACTIVE_COMPARATOR
+    description: 'Procedure: vaginal surgery'
+  verdict: null
+  note: ''
+- blind_id: 10
+  census_i: 3
+  nct_id: NCT00908570
+  registry_url: https://clinicaltrials.gov/study/NCT00908570
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: estriol
+    otherNames: null
+    description: 4 ml vaginal cream (1.0 mg estriol/1 ml cream), 3 days/week for approximately 2 months.
+    armGroupLabels:
+    - 1Topical estriol cream
+  study_title: Topical Estriol for Vaginal Health
+  arm_groups:
+  - label: 1Topical estriol cream
+    type: EXPERIMENTAL
+    description: null
+  - label: 2Placebo cream
+    type: PLACEBO_COMPARATOR
+    description: null
+  verdict: null
+  note: ''
+- blind_id: 11
+  census_i: 7
+  nct_id: NCT02733731
+  registry_url: https://clinicaltrials.gov/study/NCT02733731
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: Estriol
+    otherNames: null
+    description: null
+    armGroupLabels:
+    - Estriol
+  study_title: The Treatment Effect of Chinese Herbal Compound Ointment on Atrophic Vaginitis
+  arm_groups:
+  - label: Chinese Herbal Compound Ointment
+    type: EXPERIMENTAL
+    description: This kind of CHCO composed of several chinese herbs,dong quai,angelica,resina draconis and lithospermum.The
+      dosage of medicine for single treatment once a day in two group is 0.5g,The total time for therapy is 3 weeks.
+  - label: Estriol
+    type: ACTIVE_COMPARATOR
+    description: The dosage of medicine for single treatment once a day in two group is 0.5g,The total time for
+      therapy is 3 weeks in two groups.
+  verdict: null
+  note: ''
+- blind_id: 12
+  census_i: 16
+  nct_id: NCT04159493
+  registry_url: https://clinicaltrials.gov/study/NCT04159493
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: Estriol
+    otherNames:
+    - Ovestin
+    description: Vaginal Application
+    armGroupLabels:
+    - Ovestin
+  study_title: A Randomized Controlled Phase 2 Study to Determine Lowest Efficacious Dose of Ovestin in Vulvar and
+    Vaginal Atrophy
+  arm_groups:
+  - label: Placebo
+    type: PLACEBO_COMPARATOR
+    description: 'Subjects will be randomized to placebo.
+
+
+      Placebo, Vaginal Application 0.5 to 2 g administered daily for the 1st 14 days, then twice weekly for following
+      10 weeks'
+  - label: Ovestin
+    type: ACTIVE_COMPARATOR
+    description: 'Subjects will be randomized or assigned to varying doses of Ovestin (500, 50, 25, 12.5, 10, 5,
+      2.5, 0.5, 0.25 mcg) as determined by the dose de-escalation constraints specified in the protocol.
+
+
+      Active, Vaginal Application 0.5 to 2 g administered daily for the 1st 14 days, then twice weekly for following
+      10 weeks'
+  verdict: null
+  note: ''
+- blind_id: 13
+  census_i: 18
+  nct_id: NCT07854873
+  registry_url: https://clinicaltrials.gov/study/NCT07854873
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: Estriol
+    otherNames: null
+    description: Vaginal estriol (Oekolp forte) was administered once daily for 14 days, followed by twice-weekly
+      administration for 8 weeks before urogynecological surgery. In participants with advanced pelvic organ prolapse,
+      estriol cream was used when clinically indicated.
+    armGroupLabels:
+    - 'Arm2: Estriol Group'
+  study_title: Vaginal Prasterone Versus Estriol in Women With Pelvic Floor Disorders
+  arm_groups:
+  - label: 'Arm1: Prasterone Group'
+    type: EXPERIMENTAL
+    description: \- Participants received vaginal prasterone 6.5 mg once daily for 8 weeks before urogynecological
+      surgery.
+  - label: 'Arm2: Estriol Group'
+    type: ACTIVE_COMPARATOR
+    description: Participants received vaginal estriol according to the preoperative treatment regimen before urogynecological
+      surgery.
+  verdict: null
+  note: ''
+- blind_id: 14
+  census_i: 4
+  nct_id: NCT01408030
+  registry_url: https://clinicaltrials.gov/study/NCT01408030
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: Estriol
+    otherNames:
+    - Estrogen
+    description: 0.1% suspension in methylcellulose, 0.1 ml spray in each nostril bid
+    armGroupLabels:
+    - Estriol spray
+  study_title: North American Study of Epistaxis in Hereditary Hemorrhagic Telangiectasia (HHT)
+  arm_groups:
+  - label: Placebo spray
+    type: PLACEBO_COMPARATOR
+    description: sterile saline
+  - label: Bevacizumab spray
+    type: ACTIVE_COMPARATOR
+    description: bevacizumab 1%
+  - label: Estriol spray
+    type: ACTIVE_COMPARATOR
+    description: Estriol 0.1%
+  - label: Tranexamic acid spray
+    type: ACTIVE_COMPARATOR
+    description: tranexamic acid 10%
+  verdict: null
+  note: ''
+- blind_id: 15
+  census_i: 9
+  nct_id: NCT02967510
+  registry_url: https://clinicaltrials.gov/study/NCT02967510
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: Estriol
+    otherNames: null
+    description: null
+    armGroupLabels:
+    - 0.0008% estriol vaginal gel
+    - 0.002% estriol vaginal gel
+    - 0.005% estriol vaginal gel
+  study_title: Study Evaluating the Efficacy and Safety of Three Formulations of Ultra-low Dose Estriol Vaginal
+    Gel (0.005%, 0.002%, 0.0008% Estriol Vaginal Gel) for the Treatment of Vaginal Dryness in Postmenopausal Women
+    With Vulvovaginal Atrophy
+  arm_groups:
+  - label: 0.005% estriol vaginal gel
+    type: EXPERIMENTAL
+    description: 'Vaginal. Administration by an applicator inserted deep inside the vagina Dose: 1 g of gel, containing
+      50 Mcg of estriol Dosage schedule: Weeks 1-3: single daily application Weeks 4-12: twice weekly administration'
+  - label: 0.002% estriol vaginal gel
+    type: EXPERIMENTAL
+    description: 'Vaginal. Administration by an applicator inserted deep inside the vagina Dose: 1 g of gel, containing
+      50 Mcg of estriol Dosage schedule: Weeks 1-3: single daily application Weeks 4-12: twice weekly administration'
+  - label: 0.0008% estriol vaginal gel
+    type: EXPERIMENTAL
+    description: 'Vaginal. Administration by an applicator inserted deep inside the vagina Dose: 1 g of gel, containing
+      50 Mcg of estriol Dosage schedule: Weeks 1-3: single daily application Weeks 4-12: twice weekly administration'
+  - label: estriol vaginal gel
+    type: PLACEBO_COMPARATOR
+    description: 'Vaginal. Administration by an applicator inserted deep inside the vagina Dose: 1 g of gel, containing
+      50 Mcg of estriol Dosage schedule: Weeks 1-3: single daily application Weeks 4-12: twice weekly administration'
+  verdict: null
+  note: ''
+- blind_id: 16
+  census_i: 15
+  nct_id: NCT04045379
+  registry_url: https://clinicaltrials.gov/study/NCT04045379
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: Estriol
+    otherNames:
+    - Estriol 01mg/ml
+    description: The patient will perform self application of this vaginal estriol daily for 2 weeks and after that
+      the applications will occur twice a week.
+    armGroupLabels:
+    - Estriol
+  study_title: LASER and Radiofrequency and Genitourinary Syndrome of Menopause
+  arm_groups:
+  - label: LASER
+    type: ACTIVE_COMPARATOR
+    description: The patients will receive 3 consecutive applications of intravaginal and vulvar CO2 (carbon dioxide)LASER,
+      according to the manufacturer protocol for vaginal atrophy. The applications will be separated by the interval
+      of 30 days
+  - label: Micro Ablative Radiofrequency
+    type: ACTIVE_COMPARATOR
+    description: The patients will receive 3 consecutive applications of intravaginal and vulvar MIcro ablative
+      radiofrequency, according to the manufacturer protocol for vaginal atrophy. The applications will be separated
+      by the interval of 30 days
+  - label: Estriol
+    type: ACTIVE_COMPARATOR
+    description: The patient will use intravaginal estriol, daily for 2 weeks and them twice a week for 3 months
+      . Each 30 days, the patients will have an appointment when will be checked the weight of the estriol tube
+      to verify the correct use.
+  verdict: null
+  note: ''
+- blind_id: 17
+  census_i: 11
+  nct_id: NCT03116022
+  registry_url: https://clinicaltrials.gov/study/NCT03116022
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: Estriol
+    otherNames:
+    - PEG
+    description: Women using drug 1 mg / 1g in the proximal third of the vagina every other night for 12 weeks
+    armGroupLabels:
+    - proximal estriol group (PEG )
+  study_title: Use of Estriol at Distal Third of Vagina Improving Coital Pain in Post-menopause Women
+  arm_groups:
+  - label: proximal estriol group (PEG )
+    type: ACTIVE_COMPARATOR
+    description: This arm is composed of women using estriol 1 mg / 1g in the proximal third of vagina every other
+      night
+  - label: distal estriol group (DEG)
+    type: EXPERIMENTAL
+    description: This arm is composed of women using estriol 1 mg / 1g in the distal third of the vagina every other
+      night
+  - label: Control group (CG)
+    type: PLACEBO_COMPARATOR
+    description: This arm is composed of women using vaginal gel lubricant base water during intercourse
+  verdict: null
+  note: ''
+- blind_id: 18
+  census_i: 1
+  nct_id: NCT00451204
+  registry_url: https://clinicaltrials.gov/study/NCT00451204
+  claim: This intervention object is estriol
+  intervention:
+    type: DRUG
+    name: Estriol
+    otherNames:
+    - E3
+    - estrogen
+    description: Estriol 8 mg capsule, once per day, duration of treatment is 2 years
+    armGroupLabels:
+    - Estriol plus Copaxone injections QD
+  study_title: A Combination Trial of Copaxone Plus Estriol in Relapsing Remitting Multiple Sclerosis (RRMS)
+  arm_groups:
+  - label: Estriol plus Copaxone injections QD
+    type: ACTIVE_COMPARATOR
+    description: Estriol Capsules (daily) plus Copaxone injections (daily). Progestin capsules given for 2 weeks
+      every 3 months to avoid unopposed estrogens.
+  - label: Placebo plus Copaxone injections QD
+    type: PLACEBO_COMPARATOR
+    description: Placebo Capsules (daily) plus Copaxone injections (daily). A second placebo capsule given for 2
+      weeks every 3 months.
+  verdict: null
+  note: ''
