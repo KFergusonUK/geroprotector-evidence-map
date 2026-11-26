@@ -66,7 +66,7 @@ its reason, so the filters can be audited.
   "Thermal" or "Aid".
 
 **Collisions.** A normalised string generated for two or more compounds, or one that
-equals any string in the seed fixture (synonym, negative or review), is **removed from
+equals a seed fixture synonym or review string, is **removed from
 automatic matching for every compound involved** and put on their review lists. It never
 auto-accepts. The count is reported (step-7 secondary question).
 
@@ -75,6 +75,14 @@ form and its `strip()` form, the latter with dose, formulation and salt words re
 Two strings that differ only by a salt or formulation word ("X hydrochloride" and "X")
 therefore collide. Matching would treat them as the same string, so collision detection
 must too. This was proposed by Codex on 2026-11-26.
+
+A seed **negative** does not cause a collision (synonyms-v2). "Everolimus" in rapamycin's
+`must_not_match` says everolimus is a different compound. That is exactly what the scaled
+everolimus entry is, so it may match its own name.
+
+**PubChem rank cap (synonyms-v2):** only the first 25 PubChem names per compound that
+survive the filters are used. A sample showed the tail beyond rank 25 to be mostly
+consumer products, reference materials and IDs.
 
 A test must show that a colliding generated term is withheld from auto-accept for **every**
 compound it was generated for, and is routed to review for each.

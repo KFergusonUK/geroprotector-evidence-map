@@ -121,10 +121,13 @@ def run(conn: sqlite3.Connection) -> dict:
                 cand[s].add(f"chembl:{t}")
                 if t in rules["query_chembl_syn_types"]:
                     query.add(s)
-        dropped = []
+        dropped, n_kept = [], 0
         for s in pubchem.synonyms(pc, cid):
             kept, why = filt(s)
+            if kept and n_kept >= rules["pubchem_max_rank"]:
+                kept, why = None, "beyond_max_rank"
             if kept:
+                n_kept += 1
                 cand[kept].add("pubchem")
             else:
                 dropped.append((s, why))
@@ -141,7 +144,10 @@ def run(conn: sqlite3.Connection) -> dict:
                 owner[fm].add(k)
     seed_forms = set()
     for c in fx["compounds"]:
-        for s in [c["canonical_name"]] + list(c["must_match"]) + list(c.get("must_not_match", [])) + list(c.get("needs_review", [])):
+        # A seed SYNONYM or REVIEW string is ambiguous with a scaled compound's name. A seed
+        # NEGATIVE is not: "everolimus" in rapamycin's must_not_match says everolimus is a
+        # different compound, which is exactly what the scaled everolimus entry is (v2 fix).
+        for s in [c["canonical_name"]] + list(c["must_match"]) + list(c.get("needs_review", [])):
             seed_forms |= forms(s)
 
     out = []
