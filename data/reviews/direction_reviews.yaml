@@ -47,3 +47,77 @@ reviews:
       extension; the paper reports p = 0.291 and frames the effect as male-only.
     reviewed_by: "Claude Opus 5.5 (AI), on the basis of Kevin Ferguson's instruction"
     reviewed_at: "2026-11-11"
+
+  # Direction conflicts, decided by Kevin Ferguson 2026-11-26 ("conflicts: neither") on the brief
+  # docs/direction_conflicts_brief.md (Codex) and Claude's note in docs/agent_discussion.md.
+  - evidence_key: drugage:91b828027f556b4dab85b8568b2fc8c6
+    locator:
+      source: drugage
+      species: Mus musculus
+      compound_name: Beta-aminopropionitrile fumarate
+      pubmed_id: '689120'
+      gender: Male
+      dosage: 1000 ppm water
+      treatment_duration: 12 months
+    reason: conflict_resolution
+    source_says: 'DrugAge: avg +6% significant, max -1% not significant (1,000 ppm in water from 2 months,
+      for 12 months).'
+    resolved_direction: 'null'
+    rationale: 'Conflict under the project rule: significant mean extension with a maximum point estimate
+      in the opposite direction. One of six duration/dose groups in this paper; three others (3,000 ppm
+      for 18 and 12 months, 1,000 ppm for 18 months) show significant extension and are unaffected. The
+      paper''s tables could not be checked (Codex, docs/direction_conflicts_brief.md). Kevin Ferguson: neither
+      path, recorded as null (measured, no reliable direction).'
+    reviewed_by: Kevin Ferguson
+    reviewed_at: '2026-11-26'
+  - evidence_key: drugage:8fa089a57699d33143d29d6650bfc5b6
+    locator:
+      source: drugage
+      species: Mus musculus
+      compound_name: Beta-aminopropionitrile fumarate
+      pubmed_id: '689120'
+      gender: Male
+      dosage: 1000 ppm water
+      treatment_duration: 6 months
+    reason: conflict_resolution
+    source_says: 'DrugAge: avg +5% significant, max -1% not significant (1,000 ppm in water from 2 months,
+      for 6 months).'
+    resolved_direction: 'null'
+    rationale: 'The same conflict in the 6-month group of the same paper; a separate group, not a duplicate.
+      The decision is the same: neither path, recorded as null.'
+    reviewed_by: Kevin Ferguson
+    reviewed_at: '2026-11-26'
+  - evidence_key: drugage:3347a5f59a297eec83da10bb5f6023b0
+    locator:
+      source: drugage
+      species: Mus musculus
+      compound_name: Levodopa
+      pubmed_id: '850799'
+      gender: Male
+      dosage: 1000 ppm food
+    reason: conflict_resolution
+    source_says: 'DrugAge: avg +7% not significant, max -14% significant (1,000 ppm in food from 1 month).'
+    resolved_direction: 'null'
+    rationale: 'Conflict at the low dose only. The same paper''s 20,000 and 40,000 ppm rows (+15%, +28%,
+      significant) are unaffected and keep counting on their own. The 1,000 ppm table could not be checked
+      (abstract only). Kevin Ferguson: neither path, recorded as null.'
+    reviewed_by: Kevin Ferguson
+    reviewed_at: '2026-11-26'
+  - evidence_key: drugage:f5b0ca844777b5fc5273c36ec30ee6ea
+    locator:
+      source: drugage
+      species: Mus musculus
+      compound_name: Epitalon
+      pubmed_id: '14501183'
+      gender: Female
+    reason: conflict_resolution
+    source_says: 'Anisimov et al. 2003, Table 6: median 512 vs 487 days (about -5%, no significance mark);
+      mean of the last 10% of survivors 709 vs 803 days (+13.3%, P < .01).'
+    resolved_direction: 'null'
+    rationale: 'DrugAge''s avg is the median and its max the longest-lived-tail measure (its usual encoding;
+      cf. meclizine), so the row is transcribed correctly and the conflict is genuine: no change in the
+      bulk, a significant gain in the longest-lived tenth. Single study; given Kevin''s conservative extension
+      thresholds: neither path, recorded as null. (Codex''s brief reads the max S flag as unsupported; see
+      the discussion file.)'
+    reviewed_by: Kevin Ferguson
+    reviewed_at: '2026-11-26'
