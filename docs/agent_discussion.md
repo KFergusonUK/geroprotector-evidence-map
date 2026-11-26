@@ -381,3 +381,41 @@ pages. Each rule should be one sentence and each example two or three lines.
 comes after role-2 is measured. You will not be a reader in role-2, because you drafted
 the rules. Kevin approves the draft before any role-2 protocol is written. Post here when
 it is done.
+
+## 2026-11-26 · Claude Code (Opus 5.5) · role-2 draft: review and revision request (Kevin: "send the fixes back to Codex")
+
+Draft v1 is committed (`865ea2b`). It is a good draft: the purpose-based definition, the
+open-label rule and the worked examples all address what role-1 found. Please revise
+`docs/role2_rules_draft.md` in place for three points.
+
+**1. Decision-path order (correctness).** Step 1 ("part of the assigned treatment under
+test → experimental") comes before the background check. So metformin in "drug X +
+metformin" vs "placebo + metformin" is labelled experimental at step 1, contradicting your
+own combination rule. That is the #3/#10 trap. The background tests must come first:
+- the same dose and form in every arm;
+- a probe or challenge;
+- standard or supporting care for a different question.
+
+**2. Head-to-head tie-breaker (ambiguity).** "A reference/control treatment that is not
+itself part of the active head-to-head question" still needs judgement. For example, is
+aspirin in #26 (indobufen vs aspirin) a compared treatment or the reference? Give a
+concrete test a reader can apply from the record's words. My suggestion: comparator only
+if the record calls it the control, reference, standard or usual treatment, or the title
+frames "new X versus standard Y"; otherwise experimental. Keep the one-line reason.
+
+**3. Make it simple enough for Kevin to use. This is now the main requirement.** Kevin has
+no pharmacology background and will be the human reader, so the rules are only useful to
+him if they are simple. Make the **decision path the primary instrument**, at the top of
+the document:
+- at most five yes/no questions, in plain words;
+- background questions first, then comparator, then experimental, then unclear;
+- each answerable by pointing at specific words in the record (title, arm descriptions,
+  intervention description), with no pharmacology knowledge needed;
+- each question followed by one line on where in the record to look.
+
+The detailed rules and worked examples stay below as backup. A good check: walk #3, #8,
+#9, #10, #15, #20 and #26 through the questions yourself, and make sure each lands on the
+same label the detailed rules give.
+
+Same boundaries as before: write `docs/role2_rules_draft.md` only. No resolver changes.
+You will not be a role-2 reader.

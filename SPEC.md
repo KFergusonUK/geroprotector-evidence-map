@@ -14,8 +14,10 @@
 **Changes in v0.7** (2026-11-18):
 - §5.1: the registry's MeSH search expansion is the stated evidence for forbidding
   search-membership joins; resolver design for §7 step 3 fixed (§5.1a).
-- §5.9: `trial_intervention.role` (experimental | comparator | background | unclear);
-  primary counts use experimental only. Closes the comparator/background question.
+- §5.9: `trial_intervention.role` (experimental | comparator | background | unclear).
+  Since 2026-11-26, headline counts do not depend on role: they count trials that clearly
+  give the compound (identity-confirmed, systemic, not a combination), with role as a
+  breakdown carrying its measured accuracy.
 - §4.2a: query rules file (ASA and NR dropped as search strings; decoys for identity
   traps); masoprocol and Y-27632 added to the fetch; staging no longer copies records.
 - §5.2: results sections fetched only for trials that survive §7 step 4.
@@ -895,13 +897,37 @@ path, not this one.
   metformin; a P2Y12 inhibitor alongside aspirin);
 - `unclear` — not yet assigned (default).
 
-**Primary counts use `experimental` only** (`v_compound_trials`, the gold and null cells,
+**Superseded 2026-11-26 (see "Headline counts do not depend on role" below):** primary
+counts used `experimental` only (`v_compound_trials`, the gold and null cells,
 `v_unreported`, the mechanistic dossier). Background and comparator trials are retained
 and labelled, with their own counts: they carry exposure and safety information, which
 matters for the harm path. Evidence for the large background share: most of metformin's
 and aspirin's trials that do not name the compound in an intervention object mention it
 only in arm descriptions, titles or summaries (§4.2a). `role_basis` records what set the
 role (arm group type, or a reviewed rule).
+
+**Headline counts do not depend on role (decided by Kevin Ferguson, 2026-11-26).** Role
+could not be shown to be assignable reliably from registry text:
+- role-1 was **Moderate**, κ 0.77, between two AIs only;
+- the human reader's 15 rows pointed systematically the other way;
+- the resolver's role accuracy is 72% (61.8–80.8%) against reader consensus.
+
+See `docs/role1_result.md`. So the headline must not rest on it.
+
+- **Headline count, per compound:** trials in which the compound itself is clearly given
+  to people. That means an identity-confirmed match (auto-accepted or reviewed), with
+  systemic exposure (§5.6), not as part of a combination (`is_combination = 0`), in **any
+  role**. This rests only on identity and route, which are measured: identity 99.5% in
+  step 4b; route 96.9% in step 4.
+- **Role is a breakdown inside it:** "of which the compound was what the trial tested:
+  about N". It is always printed with the role accuracy current at the time, and never
+  stated as an exact count.
+- **The gold cell, null cell, `v_unreported` and the mechanistic dossier** are restated on
+  the headline count. Each also shows the role breakdown. A view that asks specifically
+  whether the compound was *tested* (for example "registered and tested, never reported")
+  must say that its role filter carries the stated accuracy.
+- **Role-2** (`docs/role2_rules_draft.md`) can improve role accuracy. It cannot move the
+  headline, and a better role-2 result changes only the breakdown's accuracy figure.
 
 ## 6. Seed list (n=18 + 2 class test cases + 1 linked compound)
 
@@ -1004,7 +1030,8 @@ collaborate. That is the realistic route to the data behind governance walls
   now in scope via the harm path, not deferred.**
 - Is the EU Clinical Trials Register (or WHO ICTRP) worth adding in v2 for non-US coverage?
 - ~~How to handle trials where the compound is a comparator or background therapy?~~
-  **Resolved:** `trial_intervention.role`; primary counts use experimental only (§5.9).
+  **Resolved:** `trial_intervention.role` (§5.9). Revised 2026-11-26: headline counts no
+  longer filter on role, which is a breakdown with its measured accuracy.
 - **Deliberate precision-over-recall trade-off:** "ASA" and "NR" are not used as registry
   search strings (`data/rules/ctgov_query.yaml`). In the seed fetch "ASA" found 614
   studies "aspirin" did not — mesalamine/mesalazine (5-ASA), anaesthesia trials citing ASA
