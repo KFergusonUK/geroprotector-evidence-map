@@ -1,9 +1,9 @@
 # Synonym pipeline for scaled compounds (SPEC §7 step 7): design
 
-This document defines what `docs/step7_precision_protocol.md` measures. It is a **draft
-until approved**. Choices marked **[decide]** are judgement calls for Kevin Ferguson. Once
-approved, the rules live in a versioned file (`data/rules/synonyms.yaml`), and its hash
-goes into the step-7 frozen inputs.
+This document defines what `docs/step7_precision_protocol.md` measures. **D1–D3 were
+decided by Kevin Ferguson on 2026-11-26**, after they were put to him as plain trade-off
+questions ("Q1 official, Q2 off, Q3 no lists"). The rules live in a versioned file
+(`data/rules/synonyms.yaml`), and its hash goes into the step-7 frozen inputs.
 
 ## Scope
 
@@ -81,7 +81,7 @@ compound it was generated for, and is routed to review for each.
 
 ## Stage 3 — matching and querying
 
-**[decide] D1. Which synonyms become registry *query* strings.**
+**D1. Which synonyms become registry *query* strings. DECIDED: official names only.**
 - *Proposed:* DrugAge name, ChEMBL preferred name, and ChEMBL INN, USAN, BAN and trade
   names.
 - *Not:* PubChem synonyms. They are used **for matching only**.
@@ -95,7 +95,8 @@ compound it was generated for, and is routed to review for each.
   unique query count, the overlap between sources, and the expected fetch volume before any
   fetch runs, so the cost of D1 sits next to its recall gap. This was proposed by Codex.
 
-**[decide] D2. No fuzzy (edit-distance-1) matching for scaled compounds.**
+**D2. No fuzzy (edit-distance-1) matching for scaled compounds. DECIDED: off for scaled
+compounds, kept for the seed fixture.**
 - *Proposed:* off.
 - *Why:* with tens of thousands of unreviewed synonyms, near-misses would flood review.
   Fuzzy matching can never auto-accept anyway, so precision is unaffected; the cost is
@@ -105,7 +106,8 @@ compound it was generated for, and is routed to review for each.
   punctuation, and still strips dose, formulation and salt words. This was proposed by
   Codex.
 
-**[decide] D3. Scaled compounds get no `must_not_match` lists.**
+**D3. Scaled compounds get no `must_not_match` lists. DECIDED: no lists up front.** If
+step 7 is CONDITIONAL or NO-GO, lists are added for the compounds behind the errors.
 - *Proposed:* the generated set has no negatives beyond the collision rule.
 - *Why:* hand negatives were the seed fixture's main defence, and writing them for about
   1,000 compounds is exactly the manual work scaling avoids. This is the "dirty" half of

@@ -1,0 +1,30 @@
+# Scaled synonym rules (docs/synonym_pipeline.md). Versioned: bump on any change; the hash
+# goes into the step-7 frozen inputs. D1-D3 decided by Kevin Ferguson 2026-11-26.
+version: synonyms-v1
+created: "2026-11-26"
+
+# D1: registry QUERY strings come only from these (plus every DrugAge name and the ChEMBL
+# preferred name). PubChem synonyms are used for matching only.
+query_chembl_syn_types: [INN, USAN, BAN, JAN, TRADE_NAME]
+
+# ChEMBL synonym types used for MATCHING (all of these; short ones go to review anyway).
+match_chembl_syn_types: [INN, USAN, BAN, JAN, TRADE_NAME, FDA, USP, MERCK_INDEX, ATC, OTHER, RESEARCH_CODE,
+  INN_SPANISH, INN_FRENCH, INN_LATIN, BNF, DCF, E_NUMBER, SYSTEMATIC]
+
+# PubChem synonym filters. A dropped string is recorded with its reason. Filters apply to
+# PubChem strings ONLY: DrugAge names and ChEMBL names are never dropped by them (many real
+# drug names are dictionary words: aspirin, caffeine, nicotine).
+pubchem_drop_patterns:
+  cas_number: '^\d{2,7}-\d{2}-\d$'
+  database_id: '^(chembl|schembl|dtxsid|dtxcid|zinc|mfcd|akos|nsc|einecs|chebi|hmdb|bdbm|smr|mls|ncgc|cas|ec|sid|cid|kegg|lmfa|pubchem)\s*[-:_]?\s*\d|^(unii|brd|hy|cs|tox21|prestwick\d?|spectrum|sr|bspbio|kbio|kbiogr|kbioss|idi1|opera_id|wln|ccris|hsdb|nci|ai3|brn|dsstox)[-_: ]'
+  unii_like: '^(?=[a-z]*\d)(?=\d*[a-z])[a-z0-9]{10}$'
+  wikidata: '^q\d+$'
+  inchi_or_smiles: '^inchi=|^(?=\S*[=#\[\]@])\S{8,}$'
+  catalogue_code: '^[a-z]{1,4}\d?-?\d{3,}[a-z]?$'
+  grade_or_product: '\b(standard|crs|usp|reference|analytical|grade|certified|tested|pharmaceutical secondary|for system suitability|solution|cream|tablets?|capsules?|injection|ointment|powder|labeled|labelled|isotope|13c|15n|impurity)\b|-d\d+\b|%|\b\d+(\.\d+)?\s*(mg|g|ml|mcg|ug)\b|>=|<=|\(\s*(ep|bp|jp|usp|nf)\s*\)'
+# Trailing language / status annotations are stripped and the rest kept: "Estriolo [Italian]".
+pubchem_strip_trailing_bracket: '\s*\[[^\]]*\]\s*$'
+pubchem_min_len: 5            # <= 4 characters: dropped (short codes never auto-accept anyway)
+pubchem_max_len: 60           # systematic names longer than this: dropped
+# Single-token PubChem synonyms that are ordinary words are dropped.
+dictionary_files: [/usr/share/dict/british-english, /usr/share/dict/american-english]
