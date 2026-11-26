@@ -20,7 +20,7 @@ class FixtureInternal(unittest.TestCase):
         roles = {}
         for c in self.fx["compounds"]:
             roles.setdefault(c["role"], set()).add(c["key"])
-        self.assertEqual(len(roles["seed"]), 18)
+        self.assertEqual(len(roles["seed"]), 19)     # +estriol, 2026-11-18
         self.assertEqual(roles["class_test_case"], {"empagliflozin", "semaglutide"})
         self.assertEqual(roles["linked_compound"], {"masoprocol"})
         self.assertEqual(roles["identity_trap"], {"y27632"})
@@ -37,6 +37,17 @@ class FixtureInternal(unittest.TestCase):
         self.assertIn("estradiol", e["must_not_match"])
         self.assertIn("17‐alpha‐estradiol", e["must_match"])
         self.assertEqual(len(e["inchikey"]), 27)
+
+    def test_estriol_is_not_an_estradiol(self):
+        # The ITP's "16-hydroxyestradiol" is estriol: a different molecule from both estradiols.
+        k = self.by_key()
+        e = k["estriol"]
+        self.assertEqual(e["inchikey"], "PROQIPRRNZUXQM-ZXXIGWHRSA-N")
+        self.assertNotEqual(e["inchikey"][:14], k["17a-estradiol"]["inchikey"][:14])
+        for s in ("estradiol", "17-alpha-estradiol", "16-epiestriol"):
+            self.assertIn(s, e["must_not_match"])
+        self.assertIn("estriol", k["17a-estradiol"]["must_not_match"])
+        self.assertIn("16-hydroxyestradiol", e["needs_review"])           # stereo unstated: 16beta is 16-epiestriol
 
     def test_rapalogs_never_match_rapamycin(self):
         self.assertIn("everolimus", self.by_key()["rapamycin"]["must_not_match"])
@@ -56,7 +67,7 @@ class FixtureInternal(unittest.TestCase):
     def test_both_path_compounds(self):
         both = {c["key"] for c in self.fx["compounds"]
                 if set(c["expected_paths"]) == {"extension", "harm_candidate"}}
-        self.assertEqual(both, {"metformin", "canagliflozin", "aspirin", "quercetin"})
+        self.assertEqual(both, {"metformin", "canagliflozin", "aspirin", "quercetin", "estriol"})
 
     def test_aspirin_itp_is_weak_rapamycin_strong(self):
         k = self.by_key()

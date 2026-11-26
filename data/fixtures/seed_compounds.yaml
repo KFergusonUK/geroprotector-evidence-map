@@ -39,7 +39,7 @@
 #   decisions        Decisions made by a named person, with date. Distinct from the
 #                    entry-level review sign-off.
 
-fixture_version: 0.8.0
+fixture_version: 0.9.0
 pubchem_checked_at: "2026-11-11"
 drugage_version: "Build 5 (2024-11-29); archive sha256 d12f59717de60a207748f53bdbcdb484ed07e30d8608eb8e4a101e2a08d7fa80"
 
@@ -115,6 +115,51 @@ compounds:
       DrugAge's string uses U+2010 hyphens; ASCII matching alone will miss it.
     route_excluded: ["alfatradiol topical solution", "Ell-Cranell alpha", "topical 17-alpha-estradiol"]
     decisions: []
+    review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
+
+  - key: estriol
+    canonical_name: estriol
+    group: naming_nightmare
+    role: seed
+    expected_entry_route: direct
+    expected_paths: [extension, harm_candidate]
+    itp:
+      experiments: 1
+      arms: [1, 2]
+      cohorts: [1, 2]
+      male: [1, 1]
+      female: [0, 1]
+      tier: {overall: "mixed", male: "mixed", female: "none"}
+    mammal_evidence: true
+    mammal_extension: true
+    pubchem_cid: 5756
+    inchikey: PROQIPRRNZUXQM-ZXXIGWHRSA-N
+    chembl_id: null
+    atc_codes: null
+    drugage_names: [16-alpha-hydroxyestradiol]
+    must_match: [estriol, Estriol, oestriol, Oestriol, 16-alpha-hydroxyestradiol, "16α-hydroxyestradiol",
+                 16alpha-hydroxyestradiol, theelol, Ovestin, Trimesta]
+    must_not_match: [estradiol, Estradiol, 17-beta-estradiol, "17β-estradiol", 17-alpha-estradiol,
+                     "17α-estradiol", estrone, ethinylestradiol, ethinyl estradiol, estetrol,
+                     16-epiestriol, 16beta-hydroxyestradiol, 16alpha-hydroxyestrone, Estrace]
+    needs_review: [16-hydroxyestradiol, estriol succinate, Gynoflor]
+    notes: >
+      Added 2026-11-18 from a harm-signal check (docs/harm_signal_checks.md). DrugAge's
+      "16-alpha-hydroxyestradiol" is the ITP's OH_Est (Miller et al. 2024, PMID 38753230,
+      Table 2): females -6.5% median, log-rank p = 0.002; males +15.1%, p = 0.0001; 5 ppm from
+      12 months, three sites pooled. The paper first named it "16alpha-hydroxyestriol" (no such
+      PubChem record); the 2025 correction (PMC12634909) says "16-hydroxyestradiol". Together:
+      16alpha-hydroxyestradiol = estriol (PubChem CID 5756 by name). Identity rests on that
+      reading, not on a CAS number (the supplement was not read): confirm before publication.
+      Bare "16-hydroxyestradiol" is stereo-ambiguous (16beta = 16-epiestriol): review only.
+      Estriol succinate is an ester prodrug: review. Gynoflor = estriol + Lactobacillus:
+      review. Human use is largely VAGINAL (local, §5.6): expect many route exclusions; oral
+      estriol (e.g. Trimesta) is the systemic route. Incurin (PubChem synonym) is a
+      veterinary product and is not used. Mirrors 17a-estradiol (male benefit), but here
+      with a significant FEMALE shortening in a drug prescribed to women.
+    route_excluded: ["estriol vaginal cream", "Ovestin cream", "vaginal estriol", "estriol vaginal pessary"]
+    decisions:
+    - {decision: "Add estriol as a seed compound (ITP OH_Est, PMID 38753230 as corrected by PMC12634909, is estriol). Its auto-accepts are measured by census before use (docs/estriol_census_protocol.md).", decided_by: "Kevin Ferguson", decided_at: "2026-11-18"}
     review: {resolved_by: claude-draft, reviewed_by: null, reviewed_at: null}
 
   - key: ndga
