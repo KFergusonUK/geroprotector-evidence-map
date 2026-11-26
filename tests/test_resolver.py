@@ -367,5 +367,23 @@ class DiffAndDowngradeGuard(unittest.TestCase):
         self.assertEqual(out["diff"]["transitions"]["review->auto_accept"]["rows"], 1)
 
 
+
+class ResolverV6Routes(unittest.TestCase):
+    """Estriol census route errors (data/reviews/estriol_census.yaml #4, #11)."""
+
+    def test_vagina_is_local(self):
+        for desc in ["Women using drug 1 mg / 1g in the proximal third of the vagina every other night",
+                     "applied intravaginally", "intravaginal ring"]:
+            self.assertEqual(decide("Estriol", description=desc)["estriol"]["systemic_exposure"], "local", desc)
+
+    def test_nostril_is_unclear_like_nasal(self):
+        r = decide("Estriol", description="0.1% suspension in methylcellulose, 0.1 ml spray in each nostril bid")
+        self.assertEqual(r["estriol"]["systemic_exposure"], "unclear")
+
+    def test_oral_estriol_still_systemic(self):
+        self.assertEqual(decide("Estriol", description="Estriol 8 mg capsule, once per day")["estriol"]["systemic_exposure"],
+                         "systemic")
+
+
 if __name__ == "__main__":
     unittest.main()

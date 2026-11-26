@@ -1,6 +1,6 @@
 # Intervention-string resolver rules (SPEC §5.1a, §5.6, §5.9). Versioned: bump on any change;
 # every resolver_match row records the version that produced it.
-version: resolver-v5
+version: resolver-v6
 created: "2026-11-18"
 
 # Stripped before comparing a registry string with a fixture synonym, so "Metformin
@@ -52,9 +52,9 @@ local_route_patterns: ['\bstents?\b', '\beluting\b', '\bballoons?\b', '\btopical
   '\bointments?\b', '\bgels?\b', '\blotions?\b', '\beye\s*drops?\b', '\bophthalmic\b', '\bintravitreal\b',
   '\bintracameral\b', '\bintraocular\b', '\bsubconjunctival\b', '\bcorneal\b', '\bintra-?articular\b',
   '\bintralesional\b', '\bmouth\s*(wash|rinse)\b', '\btoothpaste\b', '\bdressings?\b', '\birrigation\b',
-  '\bcardioplegi[ac]\b', '\bdermal\b', '\bshampoo\b', '\bvaginal\b', '\bintravesical\b']
+  '\bcardioplegi[ac]\b', '\bdermal\b', '\bshampoo\b', '\b(intra)?vagina(l|lly)?\b', '\bintravesical\b']
 unclear_route_patterns: ['\binhal(ed|ation|er)\b', '\bnebuli[sz]ed\b', '\bintrathecal\b', '\brectal\b',
-  '\bsuppositor(y|ies)\b', '\benema\b', '\bimplants?\b', '\bnasal\b', '\bintranasal\b']
+  '\bsuppositor(y|ies)\b', '\benema\b', '\bimplants?\b', '\bnasal\b', '\bintranasal\b', '\bnostrils?\b']
 systemic_route_patterns: ['\btransdermal\b']
 local_intervention_types: [DEVICE, PROCEDURE, RADIATION]
 
@@ -98,3 +98,10 @@ combination_name_pattern: '/|\+|&|\band\b|\bwith\b|\bplus\b|,'
 #    "Placebo plus X", "Placebo with X", "... on background of X" -> placebo_with (review).
 #    v1-v4 rejected all of them, silently losing real (mostly background) administrations
 #    that the harm path may need. rejected -> review only: cannot add an auto-accept.
+
+# ---- resolver-v6 (2026-11-26, decided by Kevin Ferguson; estriol census route errors) ----
+#  - local: 'vagina', 'intravaginal', 'vaginally' as well as 'vaginal' (census #11: "applied
+#    in the proximal third of the vagina" defaulted to systemic).
+#  - unclear: 'nostril(s)' alongside 'nasal'/'intranasal' (census #4: estriol spray "in each
+#    nostril" defaulted to systemic). Intranasal stays UNCLEAR, not local: it can be systemic.
+#  Route only: moves systemic -> local/unclear; cannot add an auto-accept.
