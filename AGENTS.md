@@ -57,6 +57,37 @@ services. The public APIs used here need no key.
   nobody else is running one.
 - Fetches are cache-first through the raw layer, which is append-only. Do not bypass it.
 
+## Division of labour (Kevin Ferguson, 2026-11-26)
+
+**Kevin decides.** He makes structural decisions himself, and he decides technical ones
+from a plain-English summary of the options. Agents propose; no agent treats another's
+agreement as Kevin's approval.
+
+**Claude Code (Opus 5.5) builds.**
+- It writes the pipeline, the resolver and the measurement tooling.
+- It is Reader or Adjudicator A in measurements, as named in each protocol.
+- It holds the database lock for long runs.
+
+**Codex (GPT-6) is the independent checker.** Its value is that it did not write what it
+checks.
+1. **Pre-commit review** of every change to `agesdk/resolver.py`, `agesdk/scale_*.py`,
+   `agesdk/sources/` and `data/rules/`. Findings go in `docs/agent_discussion.md`; Claude
+   fixes them or answers each one.
+2. **Source verification.** It checks claims against primary papers and databases (harm
+   signals, direction conflicts, identity questions) and writes plain-English briefs
+   for Kevin.
+3. **Drafting documents the builder is too close to,** such as the role-2 rules, since
+   Claude wrote the role-1 rules.
+4. **Independent checks, when Kevin delegates one** by a committed amendment. These are
+   always reported as "checked by a second AI", never as a human check.
+
+**Codex does not:**
+- act as a reader in a measurement unless a committed protocol names it, with model and
+  version. It may be the same model that was Reader C in role-1, and an agent never
+  measures rules it drafted;
+- make decisions;
+- edit files another agent is working on: boundaries are agreed in the request.
+
 ## Working commands
 
 ```

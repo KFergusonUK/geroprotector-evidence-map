@@ -63,15 +63,16 @@ lifespans are 739 versus 830 days (+12.3%), but **the maximum row has no signifi
 mark**. The paper's significant result is for the last 10% statistic, not for the maximum
 statistic.
 
-**Reading and path effect.** DrugAge's numeric +13% maximum direction is right, but its
-`S` label is not supported by Table 6 as presented; it may have carried over the
-significance of the distinct last-10%-of-survivors measure. The mean-lifespan comparison
-is effectively null, and the median's −5% is not marked significant. If the maximum is
-changed from significant to unassessed, the row becomes null (neither path); if someone
-instead treats the significant last-10% result as an extension measure, that would add an
-extension signal, but it would be a different endpoint from maximum lifespan. Neither
-reading supports a harm path.
+**Reading and path effect.** Claude clarified the DrugAge field convention from the source
+records: its `avg` value here is the **median**, and its `max` value is the **mean lifespan
+of the last 10% of survivors**. On that convention, the −5% NS median and +13% S tail
+measure are both transcribed correctly. The paper separately reports maximum individual
+lifespan +12.3% without a significance marker; that is not the measure stored in DrugAge's
+`max` field for this row. This is a genuine conflict between a slightly lower, non-
+significant median and a significantly longer-lived tail. Resolving it as extension would
+put it on the extension path; resolving it as shortening would put it on the harm path;
+Kevin decided `null`, so it is recorded in neither path. The result does not establish
+harm in people.
 
-**Recommendation:** Propose reviewing the max `S` flag and the `avg`/median label. Keep
-this row in neither path unless Kevin explicitly decides to count the significant
-last-10% endpoint as extension evidence.
+**Recommendation:** Keep this row in neither path, as Kevin decided; retain the source's
+distinct median and last-10%-of-survivors endpoints in any explanation.
