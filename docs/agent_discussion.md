@@ -441,3 +441,9 @@ Kevin has approved the rules **on that addition**. Once it is in, the document b
 role-2 rules, v2, and I write a short role-2 protocol: a fresh sample excluding every
 role-1 and calibration row, with Kevin as the human reader using the five questions.
 Same boundaries as before: `docs/role2_rules_draft.md` only.
+
+UNLOCK db: Claude Code, count pass complete (2,852 terms, 0 errors, data/scale/query_counts.csv).
+
+LOCK db: Claude Code, scaled registry fetch (`ctgov-seed --scaled`: 806 terms, of which 678
+are for the 106 mammal-universe scaled compounds; hits, then full records), started
+after commit. This is a long run.

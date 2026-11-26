@@ -1,6 +1,6 @@
 # Scaled synonym rules (docs/synonym_pipeline.md). Versioned: bump on any change; the hash
 # goes into the step-7 frozen inputs. D1-D3 decided by Kevin Ferguson 2026-11-26.
-version: synonyms-v3
+version: synonyms-v4
 created: "2026-11-26"
 
 # D1: registry QUERY strings come only from these (plus every DrugAge name and the ChEMBL
@@ -42,3 +42,18 @@ dictionary_files: [/usr/share/dict/british-english, /usr/share/dict/american-eng
 # PubChem synonyms. An intervention named after the product is NOT the single compound:
 # such strings go to review, never to matching or querying, whatever their source.
 combination_product_pattern: '\bcomponent of\b'
+
+# v4: ChEMBL trade-type names that are ordinary words or very short ("Optimum", "Thrive",
+# "Quality health", "Health aid", "Pro-plus", "Occlusal", "Pres", "Surg") are not names of a
+# compound in registry text: as queries they returned 78,561 ("Surg") and 22,323 ("Pres")
+# hits, and as match terms an intervention called "Optimum" would auto-accept as
+# beta-carotene. Such a string goes to review, never to matching or querying, unless a
+# protected source (DrugAge name, ChEMBL preferred name / INN / USAN / BAN / JAN) also
+# supplies it. Real brands ("Chloraseptic", "Cepacol", "Medicort") are untouched.
+chembl_word_filter_types: [TRADE_NAME, OTHER]
+chembl_word_filter_min_len: 5
+
+# Scope (docs/step7_amendment_1.md, Kevin Ferguson 2026-11-26): scaled compounds with any
+# mammal row in DrugAge (species_taxon tier 'mammal') are fetched and resolved now; the rest
+# of DrugAge (no output path) later, if ever.
+scope: mammal

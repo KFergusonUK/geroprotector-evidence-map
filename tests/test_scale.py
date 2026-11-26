@@ -134,5 +134,32 @@ class CodexReviewFixes(unittest.TestCase):
                 fixture.load_with_scaled(scaled_path=stale)
 
 
+
+class SynonymsV4(unittest.TestCase):
+    def _rows(self):
+        import csv
+        from pathlib import Path
+        path = Path(__file__).resolve().parent.parent / "data" / "scale" / "synonyms.csv"
+        with open(path, encoding="utf-8") as fh:      # the kept fate; PubChem's dropped copies are separate rows
+            return [r for r in csv.DictReader(fh) if not r["fate"].startswith("dropped_")]
+
+    def test_word_trade_names_never_match(self):
+        rows = {(r["compound_key"], r["synonym"]): r["fate"] for r in self._rows()}
+        for key, s in [("s-beta-carotene", "Optimum"), ("s-nicotine", "Thrive"), ("s-melatonin", "Quality health"),
+                       ("s-enalapril", "Pres"), ("s-alcohol", "Surg"), ("s-caffeine", "Pro-plus")]:
+            self.assertEqual(rows[(key, s)], "review_generic_trade_name", s)
+
+    def test_real_brands_kept(self):
+        rows = {(r["compound_key"], r["synonym"]): r["fate"] for r in self._rows()}
+        for key, s in [("s-phenol", "Chloraseptic"), ("s-cetylpyridinium", "Cepacol"), ("s-hydrocortisone", "Medicort")]:
+            self.assertEqual(rows[(key, s)], "match", s)
+
+    def test_mammal_scope(self):
+        from agesdk import fixture
+        m, a = fixture.load_with_scaled(scope="mammal"), fixture.load_with_scaled(scope="all")
+        self.assertLess(len(m["compounds"]), len(a["compounds"]))
+        self.assertTrue(all(c.get("mammal_evidence") for c in m["compounds"] if c["role"] == "scaled"))
+
+
 if __name__ == "__main__":
     unittest.main()

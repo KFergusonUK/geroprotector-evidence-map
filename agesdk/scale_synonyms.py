@@ -101,6 +101,9 @@ def run(conn: sqlite3.Connection) -> dict:
     for r in ident:
         by_key[r["inchikey"]].append(r)
 
+    from agesdk.sources import drugage
+    mammal_species = {r[0] for r in conn.execute("SELECT species FROM species_taxon WHERE tier = 'mammal'")}
+    mammal_names = {r["compound_name"] for r in drugage.current_rows(conn) if r["species"] in mammal_species}
     compounds, rows = {}, []          # rows: one per (compound, candidate string)
     seed_keys = {c["key"] for c in fx["compounds"]}
     for ik, rs in sorted(by_key.items()):
@@ -153,6 +156,16 @@ def run(conn: sqlite3.Connection) -> dict:
             seed_forms |= forms(s)
 
     combo_rx = re.compile(rules["combination_product_pattern"], re.IGNORECASE)
+    word_types = {f"chembl:{x}" for x in rules["chembl_word_filter_types"]}
+    min_len = rules["chembl_word_filter_min_len"]
+
+    def generic_trade(s: str, src: set) -> bool:
+        """v4: a ChEMBL trade-type name made only of ordinary words, or very short, unless a
+        protected source (DrugAge, ChEMBL preferred name / INN-type) also gives it."""
+        if not src or not src <= (word_types | {"pubchem"}) or not (src & word_types):
+            return False
+        toks = [w for w in re.split(r"[^a-z]+", s.lower()) if w]
+        return len(s.strip()) < min_len or (bool(toks) and all(w in filt.words for w in toks))
     out = []
     for k, c in compounds.items():
         match, review = [], []
@@ -163,8 +176,9 @@ def run(conn: sqlite3.Connection) -> dict:
             others = set().union(*(owner[f] for f in fm)) - {k}
             seed_hit = bool(fm & seed_forms)
             combo = bool(combo_rx.search(s))
-            fate = ("review_combination_product" if combo else "review_collision_seed" if seed_hit
-                    else "review_collision" if others else "match")
+            generic = generic_trade(s, src)
+            fate = ("review_combination_product" if combo else "review_generic_trade_name" if generic
+                    else "review_collision_seed" if seed_hit else "review_collision" if others else "match")
             (match if fate == "match" else review).append(s)
             rows.append({"compound_key": k, "inchikey": c["inchikey"], "synonym": s, "sources": "|".join(sorted(src)),
                          "fate": fate, "query": s in c["query"] and fate == "match",
@@ -172,7 +186,8 @@ def run(conn: sqlite3.Connection) -> dict:
         for s, why in c["dropped"]:
             rows.append({"compound_key": k, "inchikey": c["inchikey"], "synonym": s, "sources": "pubchem",
                          "fate": f"dropped_{why}", "query": False, "collides_with": ""})
-        out.append({"key": k, "role": "scaled", "canonical_name": c["canonical_name"], "inchikey": c["inchikey"],
+        out.append({"key": k, "role": "scaled", "mammal_evidence": bool(set(c["drugage_names"]) & mammal_names),
+                    "canonical_name": c["canonical_name"], "inchikey": c["inchikey"],
                     "pubchem_cid": c["pubchem_cid"], "chembl_id": c["chembl_id"], "drugage_names": c["drugage_names"],
                     "must_match": match, "must_not_match": [], "needs_review": review, "route_excluded": [],
                     "query_terms": sorted(q for q in c["query"] if q in match),
@@ -193,4 +208,6 @@ def run(conn: sqlite3.Connection) -> dict:
             "match_terms": sum(len(c["must_match"]) for c in out),
             "query_terms_unique": len(qterms),
             "compounds_with_no_match_term": sum(1 for c in out if not c["must_match"]),
-            "chembl_errors": sum(1 for c in out if c.get("chembl_error"))}
+            "chembl_errors": sum(1 for c in out if c.get("chembl_error")),
+            "mammal_universe_compounds": sum(1 for c in out if c["mammal_evidence"]),
+            "query_terms_unique_mammal": len({q.lower() for c in out if c["mammal_evidence"] for q in c["query_terms"]})}

@@ -123,7 +123,10 @@ def cmd_state_backups(args):
 
 def cmd_ctgov_seed(conn, args):
     from agesdk.sources import ctgov
-    out = ctgov.fetch_seed(conn, fixture.load())
+    if args.scaled:   # §7 step 7: seed + scaled compounds in scope (docs/step7_amendment_1.md)
+        out = ctgov.fetch_seed(conn, fixture.load_with_scaled(), roles=ctgov.PLAN_ROLES + ("scaled",))
+    else:
+        out = ctgov.fetch_seed(conn, fixture.load())
     per_term = out.pop("per_term")
     print(json.dumps(out, indent=2))
     trunc = [t["query_term"] for t in per_term if t["truncated"]]
@@ -189,7 +192,9 @@ def main(argv=None):
     p.add_argument("--changelog-dir", default="changelog")
     p.add_argument("--no-ctgov", action="store_true")
     p.add_argument("--no-litscan", action="store_true")
-    sub.add_parser("ctgov-seed", help="fetch ClinicalTrials.gov hits + full records for the seed compounds")
+    p = sub.add_parser("ctgov-seed", help="fetch ClinicalTrials.gov hits + full records for the seed compounds")
+    p.add_argument("--scaled", action="store_true",
+                   help="also the scaled compounds in scope (mammal universe; docs/step7_amendment_1.md)")
     sub.add_parser("ctgov-report", help="hit volume and intervention-string quality for the seed fetch")
     sub.add_parser("recall-check", help="literature-sampled recall check of the ClinicalTrials.gov fetch")
     p = sub.add_parser("resolve", help="run the intervention-string resolver over staging (after a fixture check); "

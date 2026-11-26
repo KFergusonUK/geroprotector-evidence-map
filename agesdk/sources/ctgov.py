@@ -299,11 +299,13 @@ def study_record(conn: sqlite3.Connection, nct_id: str) -> dict | None:
 # ---------------------------------------------------------------- orchestration
 
 def fetch_seed(conn: sqlite3.Connection, fx: dict, *, client: HttpClient | None = None,
-               run_id: int | None = None) -> dict:
+               run_id: int | None = None, roles=PLAN_ROLES) -> dict:
     """§7 step 2: hits for every seed query string, then full records for every study not
-    already stored. Idempotent: a re-run with everything cached makes no network calls."""
+    already stored. Idempotent: a re-run with everything cached makes no network calls.
+    roles: pass PLAN_ROLES + ("scaled",) with fixture.load_with_scaled() for §7 step 7. The
+    saved plan replaces the previous one, so a later run must use the same scope."""
     rules = load_rules()
-    plan = seed_query_plan(fx, rules=rules)
+    plan = seed_query_plan(fx, roles=roles, rules=rules)
     save_plan(conn, plan, f"fixture-{fx.get('fixture_version')}+{rules['version']}")
     f = Fetcher(conn, client or HttpClient(min_interval_s=MIN_INTERVAL_S))
     per_term = []
