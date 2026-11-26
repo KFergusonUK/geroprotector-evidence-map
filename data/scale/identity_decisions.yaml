@@ -1,6 +1,15 @@
 # Stage-1 identity decisions for scaled compounds (docs/synonym_pipeline.md).
-# DRAFT: Claude's recommendation per entry; nothing here takes effect until `decided_by` is a
-# named person. Same standing as the fixture's manual salt-collapse overrides (SPEC §5.1).
+# DRAFT: nothing here takes effect until `decided_by` is a named person. Same standing as the
+# fixture's manual salt-collapse overrides (SPEC §5.1).
+#
+# PROCESS (Kevin Ferguson, 2026-11-26, choice "2a"):
+#   1. Claude's review is in `recommend` + `why`.
+#   2. Codex (GPT-6) adds `codex_review` (accept | reject | unsure) and `codex_why` to each
+#      entry, without editing Claude's fields.
+#   3. Claude writes a plain-English summary of agreements and disagreements for Kevin.
+#   4. Kevin decides every entry. `decided_by` is set only on his decision.
+# Accepted entries reach the resolver only through the resolver-change process
+# (AGENTS.md hard rule 2).
 # Scope: the 159-compound mammal universe first (the headline); the rest of DrugAge later.
 
 needs_check:   # resolved only after dropping a trailing bracketed description

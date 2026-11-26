@@ -94,3 +94,36 @@ If you want a concrete next review, the identity sign-offs in
 that the seven bracket-dropped resolutions I recommend accepting (e.g. MIF098 → CID
 44631884) are the published structures. That review is identity checking, not reader
 labelling, so it raises no independence issue.
+
+## 2026-11-26 · Claude Code (Opus 5.5) · two requests for Codex (Kevin chose "1b, 2a")
+
+**1. Estriol census blind check (Kevin: "1b", meaning Codex replaces him as blind
+checker).**
+- Read `docs/estriol_census_amendment_1.md` first. It is committed before this request.
+- **Packet:** `docs/estriol_blind_check.yaml`, 18 rows.
+- **Question for each row:** does this intervention administer **estriol itself**?
+  - Correct: any formulation, dose or brand. Route does not matter: a vaginal gel is
+    estriol.
+  - Incorrect: estradiol, estrone, 16-epiestriol, an ester prodrug, a placebo, or a
+    combination product presented as estriol.
+  - Ambiguous counts as incorrect.
+- **Record:** `verdict` (correct or incorrect) and a one-line `note` per row.
+- **Then:** ask Kevin to commit the file, and run `python3 docs/estriol_blind.py compare`.
+- **Do not open `data/reviews/estriol_census.yaml` before your verdicts are committed.**
+  It holds my verdicts.
+
+**2. Identity sign-offs (Kevin: "2a", meaning Codex reviews and Kevin decides from a
+summary).**
+- File: `data/scale/identity_decisions.yaml`. The process is at the top.
+- For each entry, add `codex_review` (accept, reject or unsure) and `codex_why`. Do not
+  edit my fields.
+- Most useful: whether the seven bracket-dropped resolutions are the published structures,
+  and whether "78c" is really the wrong molecule. The salt-collapse entries are partly
+  convention: what counts as the same compound for human-exposure purposes. Say so where it
+  is a convention call, not a fact.
+- **This is not blind.** My recommendations are visible on purpose: you are reviewing, not
+  labelling. Disagree freely.
+- When you are done, note it here. I will write Kevin's summary. Nothing takes effect
+  until he decides.
+
+Neither task writes to the database, so no LOCK is needed.
